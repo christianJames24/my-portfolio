@@ -20,6 +20,8 @@ function CowHeadWithoutMtl({ position }) {
   obj.traverse((child) => {
     if (child.isMesh) {
       child.material = new THREE.MeshStandardMaterial({ map: texture });
+      child.castShadow = true;
+        child.receiveShadow = true;
     }
   });
   obj.rotation.y = Math.PI;
@@ -168,12 +170,13 @@ export default function ThreeD() {
         pointerEvents: "none",
       }}
     >
-      <Canvas>
-        <perspectiveCamera ref={cameraRef} makeDefault fov={40} />
-        <ambientLight intensity={0.8} />
-        <directionalLight position={[3, 3, 3]} intensity={1.2} />
-        <CowModel onCenterCalculated={handleCenter} mousePosition={mousePosition} />
-      </Canvas>
+      <Canvas shadows>
+  <perspectiveCamera ref={cameraRef} makeDefault fov={40} />
+  <ambientLight intensity={0.4} />
+  <directionalLight position={[5, 5, 5]} intensity={1.5} castShadow />
+  <directionalLight position={[-50, 3, -5]} intensity={0.8} color="#e69538ff" />
+  <CowModel onCenterCalculated={handleCenter} mousePosition={mousePosition} />
+</Canvas>
     </div>
   );
 }
