@@ -1,13 +1,108 @@
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+  font-family: "Comic Sans MS", -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
+
+@font-face {
+    font-family: Comfortaa;
+    src: url('../public/assets/Fonts/fonts/Comfortaa-Regular.ttf');
+}
+
+@font-face {
+    font-family: Comfortaa;
+    src: url('../public/assets/Fonts/fonts/Comfortaa-Light.ttf');
+    font-weight: light;
+}
+
+@font-face {
+    font-family: Comfortaa;
+    src: url('../public/assets/Fonts/fonts/Comfortaa-Bold.ttf');
+    font-weight: bold;
+}
+
+@font-face {
+    font-family: Lollipoptron;
+    src: url('../public/assets/Fonts/fonts/Lollipoptron-7GPD.ttf');
+}
+
+
+@font-face {
+    font-family: Emoji Font;
+    src: url('../public/assets/Fonts/dingbatFonts/EmojiFont.ttf');
+}
+
+@font-face {
+    font-family: SimpleDirectionArrows;
+    src: url('../public/assets/Fonts/dingbatFonts/SimpleDirectionArrows.ttf');
+}
+
+@font-face {
+    font-family: Star Things;
+    src: url('../public/assets/Fonts/dingbatFonts/starthings.ttf');
+}
+
+@font-face {
+    font-family: Burnstown Dam Back;
+    src: url('../public/assets/Fonts/fonts/Burnstown\ Dam\ Back.otf');
+}
+
+@font-face {
+    font-family: Burnstown Dam;
+    src: url('../public/assets/Fonts/fonts/Burnstown\ Dam.otf');
+}
+
+@font-face {
+    font-family: Chintzy;
+    src: url('../public/assets/Fonts/fonts/chintzy.ttf');
+}
+
+@font-face {
+    font-family: EHSMB;
+    src: url('../public/assets/Fonts/fonts/EHSMB.TTF');
+}
+
+@font-face {
+    font-family: Gothica;
+    src: url('../public/assets/Fonts/fonts/Gothica-Bold.ttf');
+}
+
+@font-face {
+    font-family: Hypik;
+    src: url('../public/assets/Fonts/fonts/hypik.otf');
+}
+
+@font-face {
+    font-family: Metal Lord;
+    src: url('../public/assets/Fonts/fonts/Metal\ Lord.otf');
+}
+
+@font-face {
+    font-family: RobloxFont;
+    src: url('../public/assets/Fonts/fonts/RobloxFont-Regular.ttf');
+}
+
+@font-face {
+    font-family: TimesNewArial;
+    src: url('../public/assets/Fonts/fonts/timesnewarial.ttf');
+}
+
+@font-face {
+    font-family: ZeroAnd;
+    src: url('../public/assets/Fonts/fonts/zero&.ttf');
+}
+
+
+
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Comfortaa', cursive;
 }

@@ -3,6 +3,7 @@ import { Canvas, useLoader, useFrame } from "@react-three/fiber"; //uses react-t
 //npm install three
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader";
 import { MTLLoader } from "three/examples/jsm/loaders/MTLLoader";
+// import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader";
 import * as THREE from "three";
 import React, { useRef, useLayoutEffect, useState, useEffect } from "react";
 
@@ -46,6 +47,22 @@ function CowHead({ position }) {
   ) : (
     <CowHeadWithoutMtl position={position} />
   );
+}
+
+function CameraController({ sizeRef, isReady }) {
+  //const cameraRef = useRef();
+  
+  useFrame(({ camera }) => {
+    if (isReady && sizeRef.current.length()) {
+      const s = sizeRef.current;
+      const maxDim = Math.max(s.x, s.y, s.z);
+      const dist = maxDim * 4;
+      camera.position.set(0, 0, dist);
+      camera.lookAt(0, 0, 0);
+    }
+  });
+  
+  return null;
 }
 
 function CowModel({ onCenterCalculated, mousePosition }) {
@@ -118,7 +135,7 @@ function CowModel({ onCenterCalculated, mousePosition }) {
 
   return (
     ///////////////////////////////////////////////////////////////////////////// initial scale
-    <group ref={groupRef} scale={[0.8, 0.8, 0.8]}>
+    <group ref={groupRef} scale={[2, 2, 2]}>
       <primitive object={bodyObj} position={bodyOffset} />
       <group ref={headRef} position={headOffset}>
         <CowHead position={[0, 0, 0]} />
@@ -129,22 +146,39 @@ function CowModel({ onCenterCalculated, mousePosition }) {
 
 export default function ThreeD() {
   const sizeRef = useRef(new THREE.Vector3());
-  const cameraRef = useRef();
   const mousePosition = useRef({ x: 0, y: 0 });
-  const containerRef = useRef();
+  const [isReady, setIsReady] = useState(false);
 
   function handleCenter(size) {
     sizeRef.current = size;
   }
 
+  useEffect(() => {
+    const initializeCow = () => {
+      setTimeout(() => {
+        setIsReady(true);
+      }, 1000);///////////////////////////////////////////////////////////////////// initial load delay
+    };
+
+    if (document.visibilityState === 'visible') {
+      initializeCow();
+    } else {
+      const handleVisibilityChange = () => {
+        if (document.visibilityState === 'visible') {
+          document.removeEventListener('visibilitychange', handleVisibilityChange);
+          initializeCow();
+        }
+      };
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+      return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+    }
+  }, []);
+
   useLayoutEffect(() => {
-    if (!cameraRef.current) return;
-    const s = sizeRef.current;
-    const maxDim = Math.max(s.x, s.y, s.z);
-    const dist = maxDim * 4;
-    cameraRef.current.position.set(0, 0, dist);
-    cameraRef.current.lookAt(0, 0, 0);
-  });
+    if (!isReady) return;
+    const timer = setTimeout(() => {}, 1000);
+    return () => clearTimeout(timer);
+  }, [isReady]);
 
   useEffect(() => {
     const handleMouseMove = (event) => {
@@ -157,9 +191,10 @@ export default function ThreeD() {
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
 
+  if (!isReady) return null;
+
   return (
     <div
-      ref={containerRef}
       style={{
         position: "fixed",
         bottom: 0,
@@ -171,7 +206,8 @@ export default function ThreeD() {
       }}
     >
       <Canvas shadows>
-        <perspectiveCamera ref={cameraRef} makeDefault fov={40} />
+        <perspectiveCamera makeDefault fov={40} />
+        <CameraController sizeRef={sizeRef} isReady={isReady} />
         <ambientLight intensity={0.4} />
         <directionalLight position={[5, 5, 5]} intensity={1.5} castShadow />
         <directionalLight
