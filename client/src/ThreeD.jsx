@@ -1,4 +1,6 @@
-import { Canvas, useLoader, useFrame } from "@react-three/fiber";
+import { Canvas, useLoader, useFrame } from "@react-three/fiber"; //uses react-three-fiber
+//npm install three @react-three/fiber
+//npm install three
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader";
 import { MTLLoader } from "three/examples/jsm/loaders/MTLLoader";
 import * as THREE from "three";
@@ -21,7 +23,7 @@ function CowHeadWithoutMtl({ position }) {
     if (child.isMesh) {
       child.material = new THREE.MeshStandardMaterial({ map: texture });
       child.castShadow = true;
-        child.receiveShadow = true;
+      child.receiveShadow = true;
     }
   });
   obj.rotation.y = Math.PI;
@@ -30,7 +32,7 @@ function CowHeadWithoutMtl({ position }) {
 
 function CowHead({ position }) {
   const [hasMtl, setHasMtl] = useState(null);
-  
+
   useEffect(() => {
     fetch("/assets/cow/head.mtl")
       .then((res) => setHasMtl(res.ok))
@@ -38,7 +40,7 @@ function CowHead({ position }) {
   }, []);
 
   if (hasMtl === null) return null;
-  
+
   return hasMtl ? (
     <CowHeadWithMtl position={position} />
   ) : (
@@ -63,7 +65,7 @@ function CowModel({ onCenterCalculated, mousePosition }) {
   tempGroup.add(bodyObj.clone());
   const box = new THREE.Box3().setFromObject(tempGroup);
   const center = box.getCenter(new THREE.Vector3());
-  
+
   const size = React.useMemo(() => {
     const s = new THREE.Vector3();
     box.getSize(s);
@@ -78,38 +80,38 @@ function CowModel({ onCenterCalculated, mousePosition }) {
   }, [onCenterCalculated, size]);
 
   useFrame(() => {
-  if (groupRef.current && mousePosition.current) {
-    const targetRotationY = 50 + Math.PI + mousePosition.current.x * 0.15; ///////////////////////////////////////////////////////////////////////////// body rotation follow mouse strength
-    const targetRotationX = mousePosition.current.y * -0.1;
-    
-    groupRef.current.rotation.y = THREE.MathUtils.lerp(
-      groupRef.current.rotation.y,
-      targetRotationY,
-      0.1
-    );
-    groupRef.current.rotation.x = THREE.MathUtils.lerp(
-      groupRef.current.rotation.x,
-      targetRotationX,
-      0.1
-    );
+    if (groupRef.current && mousePosition.current) {
+      const targetRotationY = 50 + Math.PI + mousePosition.current.x * 0.15; ///////////////////////////////////////////////////////////////////////////// body rotation follow mouse strength
+      const targetRotationX = mousePosition.current.y * -0.1;
 
-    if (headRef.current) {
-      const headTargetY = mousePosition.current.x * 0.3;///////////////////////////////////////////////////////////////////////////// head follow mouse rotation strength
-      const headTargetX = mousePosition.current.y * 0.4;
-      
-      headRef.current.rotation.y = THREE.MathUtils.lerp(
-        headRef.current.rotation.y,
-        headTargetY,
-        0.15
+      groupRef.current.rotation.y = THREE.MathUtils.lerp(
+        groupRef.current.rotation.y,
+        targetRotationY,
+        0.1
       );
-      headRef.current.rotation.x = THREE.MathUtils.lerp(
-        headRef.current.rotation.x,
-        headTargetX,
-        0.15
+      groupRef.current.rotation.x = THREE.MathUtils.lerp(
+        groupRef.current.rotation.x,
+        targetRotationX,
+        0.1
       );
+
+      if (headRef.current) {
+        const headTargetY = mousePosition.current.x * 0.3; ///////////////////////////////////////////////////////////////////////////// head follow mouse rotation strength
+        const headTargetX = mousePosition.current.y * 0.4;
+
+        headRef.current.rotation.y = THREE.MathUtils.lerp(
+          headRef.current.rotation.y,
+          headTargetY,
+          0.15
+        );
+        headRef.current.rotation.x = THREE.MathUtils.lerp(
+          headRef.current.rotation.x,
+          headTargetX,
+          0.15
+        );
+      }
     }
-  }
-});
+  });
 
   const bodyOffset = new THREE.Vector3().copy(center).negate();
   const headOffset = relativeHeadPos.clone().sub(center);
@@ -160,23 +162,28 @@ export default function ThreeD() {
       ref={containerRef}
       style={{
         position: "fixed",
-        bottom: "0vw",
-        right: "0vw",
-        width: "60vw",
-        height: "60vw",
-        maxWidth: "800px",
-        maxHeight: "800px",
+        bottom: 0,
+        right: 0,
+        width: "min(60vw, 60vh)",
+        height: "min(60vw, 60vh)",
         zIndex: 9999,
         pointerEvents: "none",
       }}
     >
       <Canvas shadows>
-  <perspectiveCamera ref={cameraRef} makeDefault fov={40} />
-  <ambientLight intensity={0.4} />
-  <directionalLight position={[5, 5, 5]} intensity={1.5} castShadow />
-  <directionalLight position={[-50, 3, -5]} intensity={0.8} color="#e69538ff" />
-  <CowModel onCenterCalculated={handleCenter} mousePosition={mousePosition} />
-</Canvas>
+        <perspectiveCamera ref={cameraRef} makeDefault fov={40} />
+        <ambientLight intensity={0.4} />
+        <directionalLight position={[5, 5, 5]} intensity={1.5} castShadow />
+        <directionalLight
+          position={[-5, 0, -5]}
+          intensity={1}
+          color="#ffdd45"
+        />
+        <CowModel
+          onCenterCalculated={handleCenter}
+          mousePosition={mousePosition}
+        />
+      </Canvas>
     </div>
   );
 }
