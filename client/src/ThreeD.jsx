@@ -69,19 +69,15 @@ function CowModel({ onCenterCalculated, mousePosition }) {
   }, [box]);
 
   useEffect(() => {
-  if (groupRef.current) {
-    groupRef.current.rotation.y = Math.PI;
-    groupRef.current.rotation.x = -0.15;
-  }
-  if (headRef.current) {
-    headRef.current.rotation.x = -0.5;
-  }
-  onCenterCalculated(size);
-}, [onCenterCalculated, size]);
+    if (groupRef.current) {
+      groupRef.current.rotation.y = Math.PI;
+    }
+    onCenterCalculated(size);
+  }, [onCenterCalculated, size]);
 
   useFrame(() => {
   if (groupRef.current && mousePosition.current) {
-    const targetRotationY = Math.PI + mousePosition.current.x * 0.15;
+    const targetRotationY = 50 + Math.PI + mousePosition.current.x * 0.15; ///////////////////////////////////////////////////////////////////////////// body rotation follow mouse strength
     const targetRotationX = mousePosition.current.y * -0.1;
     
     groupRef.current.rotation.y = THREE.MathUtils.lerp(
@@ -96,7 +92,7 @@ function CowModel({ onCenterCalculated, mousePosition }) {
     );
 
     if (headRef.current) {
-      const headTargetY = mousePosition.current.x * 0.2;
+      const headTargetY = mousePosition.current.x * 0.3;///////////////////////////////////////////////////////////////////////////// head follow mouse rotation strength
       const headTargetX = mousePosition.current.y * 0.4;
       
       headRef.current.rotation.y = THREE.MathUtils.lerp(
@@ -117,6 +113,7 @@ function CowModel({ onCenterCalculated, mousePosition }) {
   const headOffset = relativeHeadPos.clone().sub(center);
 
   return (
+    ///////////////////////////////////////////////////////////////////////////// initial scale
     <group ref={groupRef} scale={[0.8, 0.8, 0.8]}>
       <primitive object={bodyObj} position={bodyOffset} />
       <group ref={headRef} position={headOffset}>
