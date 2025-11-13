@@ -1,5 +1,9 @@
 import React, {useEffect, useState} from 'react';
+import ThreeD from "./ThreeD";
 //https://youtu.be/w3vs4a03y3I?si=cJiFQ1nQtIqFaHwx GOATED VIDEO
+
+//run frontend: npm start
+//run backend: npm run dev
 
 function App() {
 
@@ -17,6 +21,8 @@ function App() {
 
   return (
     <div>
+      <h1>ok</h1>
+      
       {(typeof backendData.users === 'undefined') ? (
         <p>Loading...</p>
       ) : (
@@ -24,6 +30,7 @@ function App() {
           <p key={i}>{user}</p>
         ))
       )}
+      <ThreeD />
     </div>
   );
 }
