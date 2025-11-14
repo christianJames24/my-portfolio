@@ -51,17 +51,15 @@ function CowHead({ position }) {
 
 function CameraController({ sizeRef, isReady }) {
   //const cameraRef = useRef();
-  
+
   useFrame(({ camera }) => {
-    if (isReady && sizeRef.current.length()) {
-      const s = sizeRef.current;
-      const maxDim = Math.max(s.x, s.y, s.z);
-      const dist = maxDim * 4;
-      camera.position.set(0, 0, dist);
-      camera.lookAt(0, 0, 0);
+    if (isReady) {
+      const distance = 11; ///////////////////////////////////////////////////////////////////////////// manual camera distance
+      camera.position.set(0, 0, distance);
+      camera.lookAt(0, -1, 0);
     }
   });
-  
+
   return null;
 }
 
@@ -78,23 +76,13 @@ function CowModel({ onCenterCalculated, mousePosition }) {
   const headPos = new THREE.Vector3(0, -0.75, -0.008517);
   const relativeHeadPos = headPos.sub(bodyPos);
 
-  const tempGroup = new THREE.Group();
-  tempGroup.add(bodyObj.clone());
-  const box = new THREE.Box3().setFromObject(tempGroup);
-  const center = box.getCenter(new THREE.Vector3());
-
-  const size = React.useMemo(() => {
-    const s = new THREE.Vector3();
-    box.getSize(s);
-    return s;
-  }, [box]);
+  const center = new THREE.Vector3(0, 0, 0);
 
   useEffect(() => {
     if (groupRef.current) {
-      groupRef.current.rotation.y = Math.PI;
+      groupRef.current.rotation.y = 50 + Math.PI;
     }
-    onCenterCalculated(size);
-  }, [onCenterCalculated, size]);
+  }, []);
 
   useFrame(() => {
     if (groupRef.current && mousePosition.current) {
@@ -143,7 +131,6 @@ function CowModel({ onCenterCalculated, mousePosition }) {
     </group>
   );
 }
-
 export default function ThreeD() {
   const sizeRef = useRef(new THREE.Vector3());
   const mousePosition = useRef({ x: 0, y: 0 });
@@ -157,7 +144,7 @@ export default function ThreeD() {
     const initializeCow = () => {
       setTimeout(() => {
         setIsReady(true);
-      }, 1000);///////////////////////////////////////////////////////////////////// initial load delay
+      }, 0);///////////////////////////////////////////////////////////////////// initial load delay
     };
 
     if (document.visibilityState === 'visible') {
@@ -199,9 +186,9 @@ export default function ThreeD() {
         position: "fixed",
         bottom: 0,
         right: 0,
-        width: "min(60vw, 60vh)",
-        height: "min(60vw, 60vh)",
-        zIndex: 9999,
+        width: "100%",
+        height: "100%",
+        zIndex: 1,
         pointerEvents: "none",
       }}
     >

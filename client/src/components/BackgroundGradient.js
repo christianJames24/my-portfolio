@@ -10,8 +10,7 @@ export default function BackgroundGradient({ scrollY }) {
         width: '100%',
         height: '100%',
         zIndex: 0,
-        background: 'linear-gradient(180deg, #a6c1c5ff 0%, #B2EBF2 50%, #80DEEA 100%)',
-        transform: `translateY(${scrollY * 0.5}px)`
+        background: 'linear-gradient(180deg, #e8fafdff 0%, #B2EBF2 50%, #80DEEA 100%)'
       }}
     >
       <div style={{
