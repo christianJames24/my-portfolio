@@ -19,14 +19,12 @@ let db;
 const isProduction = process.env.NODE_ENV === "production";
 
 if (isProduction) {
-  // PostgreSQL for production
   const { Pool } = require("pg");
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false
-  }
-});
+  
+  const pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: true  // Just use true!
+  });
   db = pool;
 
   // Initialize table
