@@ -1,31 +1,32 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { LanguageContext } from '../App';
+import React, { useContext, useEffect, useState } from "react";
+import { LanguageContext } from "../App";
 
 export default function Projects() {
   const { language } = useContext(LanguageContext);
   const [projects, setProjects] = useState([]);
 
   useEffect(() => {
-    fetch(
-      process.env.NODE_ENV === "production"
-        ? "https://YOUR-BACKEND-URL/api/projects"
-        : "http://localhost:8080/api/projects"
-    )
-      .then(res => res.json())
+    fetch("/api/projects")
+      .then(res => {
+        if (!res.ok) {
+          throw new Error("Failed to fetch projects");
+        }
+        return res.json();
+      })
       .then(data => setProjects(data))
-      .catch(err => console.error(err));
+      .catch(err => console.error("Fetch error:", err));
   }, []);
 
   const content = {
     en: {
-      title: 'My Projects',
-      description: 'Showcase your best work here.',
-      empty: 'No projects loaded.'
+      title: "My Projects",
+      description: "Showcase your best work here.",
+      empty: "No projects loaded."
     },
     fr: {
-      title: 'Mes Projets',
-      description: 'Présentez vos meilleurs travaux ici.',
-      empty: 'Aucun projet chargé.'
+      title: "Mes Projets",
+      description: "Présentez vos meilleurs travaux ici.",
+      empty: "Aucun projet chargé."
     }
   };
 
