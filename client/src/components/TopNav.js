@@ -1,9 +1,20 @@
 import React, { useContext } from 'react';
-import { LanguageContext, AuthContext } from '../App';
+import { useAuth0 } from '@auth0/auth0-react';
+import { useLocation } from 'react-router-dom';
+import { LanguageContext } from '../App';
 
 export default function TopNav() {
   const { language, toggleLanguage, t } = useContext(LanguageContext);
-  const { isAuthenticated, handleLogin, handleLogout } = useContext(AuthContext);
+  const { isAuthenticated, loginWithRedirect, logout } = useAuth0();
+  const location = useLocation();
+
+  const handleLogin = () => {
+    loginWithRedirect({
+      appState: {
+        returnTo: location.pathname
+      }
+    });
+  };
 
   return (
     <div style={{
@@ -43,7 +54,10 @@ export default function TopNav() {
       </button>
 
       <button
-        onClick={isAuthenticated ? handleLogout : handleLogin}
+        onClick={isAuthenticated 
+          ? () => logout({ logoutParams: { returnTo: window.location.origin } })
+          : handleLogin
+        }
         style={{
           padding: '8px 16px',
           borderRadius: '24px',

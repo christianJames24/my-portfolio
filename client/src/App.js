@@ -1,10 +1,9 @@
-import React, { useEffect, useState, createContext, useContext } from "react";
+import React, { useEffect, useState, createContext } from "react";
+import { useAuth0 } from '@auth0/auth0-react';
 import {
-  BrowserRouter as Router,
   Routes,
   Route,
   useNavigate,
-  useLocation,
 } from "react-router-dom";
 import BubbleMenu from "./components/BubbleMenu";
 import BackgroundGradient from "./components/BackgroundGradient";
@@ -18,7 +17,6 @@ import Comments from "./Pages/Comments";
 import "./styles/animations.css";
 
 export const LanguageContext = createContext();
-export const AuthContext = createContext();
 
 //https://youtu.be/w3vs4a03y3I?si=cJiFQ1nQtIqFaHwx GOATED VIDEO
 //run frontend: npm start
@@ -49,14 +47,13 @@ const translations = {
   }
 };
 
-function AppContent() {
+function App() {
   const [backendData, setBackendData] = useState([{}]);
   const [scrollY, setScrollY] = useState(0);
   const [language, setLanguage] = useState('en');
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState(null);
   
   const navigate = useNavigate();
+  const { isLoading } = useAuth0();
 
   const t = translations[language];
 
@@ -119,60 +116,43 @@ function AppContent() {
     setLanguage(prev => prev === 'en' ? 'fr' : 'en');
   };
 
-  const handleLogin = () => {
-    setIsAuthenticated(true);
-    setUser({ name: 'User' });
-  };
-
-  const handleLogout = () => {
-    setIsAuthenticated(false);
-    setUser(null);
-  };
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <LanguageContext.Provider value={{ language, t, toggleLanguage }}>
-      <AuthContext.Provider value={{ isAuthenticated, user, handleLogin, handleLogout }}>
-        <div style={{
-          minHeight: '100vh',
-          position: 'relative',
-          // background: '#E0F7FA'
-        }}>
-          <BackgroundGradient scrollY={scrollY} />
-          
-          <TopNav />
-          
-          <BubbleMenu
-            items={menuItems}
-            menuAriaLabel="Toggle navigation"
-            menuBg="rgba(255, 255, 255, 0.9)"
-            menuContentColor="#0288D1"
-            useFixedPosition={true}
-            animationEase="back.out(1.5)"
-            animationDuration={0.5}
-            staggerDelay={0.12}
-            onItemClick={handleMenuItemClick}
-          />
+      <div style={{
+        minHeight: '100vh',
+        position: 'relative',
+      }}>
+        <BackgroundGradient scrollY={scrollY} />
+        
+        <TopNav />
+        
+        <BubbleMenu
+          items={menuItems}
+          menuAriaLabel="Toggle navigation"
+          menuBg="rgba(255, 255, 255, 0.9)"
+          menuContentColor="#0288D1"
+          useFixedPosition={true}
+          animationEase="back.out(1.5)"
+          animationDuration={0.5}
+          staggerDelay={0.12}
+          onItemClick={handleMenuItemClick}
+        />
 
-          <Routes>
-            <Route path="/" element={<Home backendData={backendData} />} />
-            <Route path="/about" element={<About backendData={backendData} />} />
-            <Route path="/projects" element={<Projects backendData={backendData} />} />
-            <Route path="/resume" element={<Resume backendData={backendData} />} />
-            <Route path="/comments" element={<Comments backendData={backendData} />} />
-          </Routes>
+        <Routes>
+          <Route path="/" element={<Home backendData={backendData} />} />
+          <Route path="/about" element={<About backendData={backendData} />} />
+          <Route path="/projects" element={<Projects backendData={backendData} />} />
+          <Route path="/resume" element={<Resume backendData={backendData} />} />
+          <Route path="/comments" element={<Comments backendData={backendData} />} />
+        </Routes>
 
-          <BottomBar />
-        </div>
-      </AuthContext.Provider>
+        <BottomBar />
+      </div>
     </LanguageContext.Provider>
-  );
-}
-
-function App() {
-  return (
-    <Router>
-      <AppContent />
-    </Router>
   );
 }
 
