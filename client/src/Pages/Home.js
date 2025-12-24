@@ -1,10 +1,8 @@
-import React, { useContext, useEffect, useState } from 'react';
-import ThreeD from '../ThreeD';
+import React, { useContext, useEffect } from 'react';
 import { LanguageContext } from '../App';
 
 export default function Home({ backendData }) {
   const { language } = useContext(LanguageContext);
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
   const content = {
     en: {
@@ -25,29 +23,6 @@ export default function Home({ backendData }) {
       document.body.style.overflow = 'auto';
     };
   }, []);
-
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  const cowStyles = {
-    pointerEvents: 'none',
-    position: 'fixed',
-    bottom: isMobile ? '-10%' : '0',
-    right: isMobile ? '-20%' : '0',
-    width: isMobile ? '75vw' : '50vw',
-    height: isMobile ? '100vh' : '80vh',
-    zIndex: 1,
-    opacity: isMobile ? 0.3 : 1,
-    transform: isMobile ? 'scale(0.7)' : 'scale(1)',
-    transition: 'all 0.3s ease'
-  };
 
   return (
     <div style={{
@@ -104,10 +79,6 @@ export default function Home({ backendData }) {
       }}>
         {t.subtitle}
       </p>
-      
-      <div style={cowStyles}>
-        <ThreeD />
-      </div>
     </div>
   );
 }

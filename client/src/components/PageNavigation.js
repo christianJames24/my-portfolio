@@ -69,25 +69,26 @@ export default function PageNavigation({ isTransitioning }) {
   };
 
   const buttonStyle = {
-    position: 'fixed',
-    top: '50%',
-    transform: 'translateY(-50%)',
-    padding: '20px',
-    border: '4px solid #000000',
-    background: '#ffffff',
-    cursor: 'pointer',
-    fontSize: '32px',
-    fontWeight: '900',
-    boxShadow: '8px 8px 0 #000000',
-    transition: 'all 0.2s',
-    zIndex: 50,
-    color: '#000000',
-    width: '70px',
-    height: '70px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  };
+  position: 'fixed',
+  top: '50%',
+  transform: 'translateY(-50%)',
+  padding: '20px',
+  border: '4px solid #000000',
+  background: '#ffffff',
+  cursor: 'pointer',
+  fontSize: '32px',
+  fontWeight: '900',
+  boxShadow: '8px 8px 0 #000000',
+  transition: 'all 0.2s',
+  zIndex: 50,
+  color: '#000000',
+  width: '70px',
+  height: '70px',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  outline: 'none', // Remove white outline
+};
 
   const labelStyle = (isVisible) => ({
     position: 'absolute',

@@ -11,6 +11,7 @@ import BackgroundGradient from "./components/BackgroundGradient";
 import TopNav from "./components/TopNav";
 import BottomBar from "./components/BottomBar";
 import PageNavigation from "./components/PageNavigation";
+import ThreeD from "./ThreeD";
 import Home from "./Pages/Home";
 import About from "./Pages/About";
 import Projects from "./Pages/Projects";
@@ -65,6 +66,7 @@ function App() {
   const [displayLocation, setDisplayLocation] = useState(null);
   const [transitionStage, setTransitionStage] = useState('idle');
   const [direction, setDirection] = useState('forward');
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   
   const navigate = useNavigate();
   const location = useLocation();
@@ -121,6 +123,16 @@ function App() {
     const handleScroll = () => setScrollY(window.scrollY);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   useEffect(() => {
@@ -189,6 +201,22 @@ function App() {
     }
   };
 
+  // Check if we should show the cow (only on home page)
+  const showCow = location.pathname === '/';
+
+  const cowStyles = {
+    pointerEvents: 'none',
+    position: 'fixed',
+    bottom: isMobile ? '-10%' : '0',
+    right: isMobile ? '-20%' : '0',
+    width: isMobile ? '75vw' : '50vw',
+    height: isMobile ? '100vh' : '80vh',
+    zIndex: 1,
+    opacity: showCow ? (isMobile ? 0.3 : 1) : 0,
+    transform: isMobile ? 'scale(0.7)' : 'scale(1)',
+    transition: 'opacity 0.5s ease-in-out'
+  };
+
   return (
     <LanguageContext.Provider value={{ language, t, toggleLanguage }}>
       <div style={{
@@ -212,6 +240,11 @@ function App() {
         />
 
         <PageNavigation isTransitioning={transitionStage !== 'idle'} />
+
+        {/* Cow - outside transition wrapper so it stays stable */}
+        <div style={cowStyles}>
+          <ThreeD />
+        </div>
 
         <div className="page-transition-wrapper">
           <div 
