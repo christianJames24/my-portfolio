@@ -14,6 +14,7 @@ import About from "./Pages/About";
 import Projects from "./Pages/Projects";
 import Resume from "./Pages/Resume";
 import Comments from "./Pages/Comments";
+import PageNavigation from "./components/PageNavigation";
 import "./styles/animations.css";
 
 export const LanguageContext = createContext();
@@ -141,6 +142,9 @@ function App() {
           staggerDelay={0.12}
           onItemClick={handleMenuItemClick}
         />
+
+        {/* Add this new component */}
+        <PageNavigation />
 
         <Routes>
           <Route path="/" element={<Home backendData={backendData} />} />
