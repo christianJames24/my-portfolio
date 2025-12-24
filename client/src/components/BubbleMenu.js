@@ -99,12 +99,12 @@ export default function BubbleMenu({
       if (isHovering) {
         bubble.style.background = item.hoverStyles?.bgColor || "#ffffff";
         bubble.style.color = item.hoverStyles?.textColor || menuContentColor;
-        bubble.style.transform = `rotate(0deg) scale(1.05) translate(-4px, -4px)`;
+        // bubble.style.transform = `rotate(0deg) scale(1.05) translate(-4px, -4px)`;
         bubble.style.boxShadow = "12px 12px 0 #000000";
       } else {
         bubble.style.background = menuBg;
         bubble.style.color = menuContentColor;
-        bubble.style.transform = `rotate(${item.rotation ?? 0}deg) scale(1)`;
+        // bubble.style.transform = `rotate(${item.rotation ?? 0}deg) scale(1)`;
         bubble.style.boxShadow = "8px 8px 0 #000000";
       }
     },
