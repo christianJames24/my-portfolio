@@ -1,12 +1,19 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { LanguageContext } from '../App';
 
-export default function PageNavigation() {
+export default function PageNavigation({ isTransitioning }) {
   const navigate = useNavigate();
   const location = useLocation();
   const { language } = useContext(LanguageContext);
   const [hoveredButton, setHoveredButton] = useState(null);
+
+  // Reset hover state when transitioning
+  useEffect(() => {
+    if (isTransitioning) {
+      setHoveredButton(null);
+    }
+  }, [isTransitioning]);
 
   const content = {
     en: {
@@ -50,11 +57,15 @@ export default function PageNavigation() {
   const nextPage = hasNext ? pages[currentIndex + 1] : null;
 
   const handlePrev = () => {
-    if (hasPrev) navigate(prevPage.path);
+    if (hasPrev) {
+      navigate(prevPage.path);
+    }
   };
 
   const handleNext = () => {
-    if (hasNext) navigate(nextPage.path);
+    if (hasNext) {
+      navigate(nextPage.path);
+    }
   };
 
   const buttonStyle = {
@@ -96,6 +107,11 @@ export default function PageNavigation() {
     transform: isVisible ? 'translateY(-50%) scale(1)' : 'translateY(-50%) scale(0.9)',
     top: '50%',
   });
+
+  // Don't render arrows during transitions
+  if (isTransitioning) {
+    return null;
+  }
 
   return (
     <>

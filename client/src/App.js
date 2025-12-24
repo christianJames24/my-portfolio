@@ -211,7 +211,7 @@ function App() {
           onItemClick={handleMenuItemClick}
         />
 
-        <PageNavigation />
+        <PageNavigation isTransitioning={transitionStage !== 'idle'} />
 
         <div className="page-transition-wrapper">
           <div 
