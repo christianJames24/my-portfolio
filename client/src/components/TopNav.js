@@ -29,25 +29,34 @@ export default function TopNav() {
       <button
         onClick={toggleLanguage}
         style={{
-          padding: '8px 16px',
-          borderRadius: '24px',
-          border: 'none',
-          background: 'rgba(255, 255, 255, 0.9)',
-          color: '#0288D1',
-          fontSize: '14px',
-          fontWeight: '600',
+          padding: '12px 24px',
+          borderRadius: '8px',
+          border: '3px solid #000000',
+          background: '#ffffff',
+          color: '#000000',
+          fontSize: '16px',
+          fontWeight: '900',
           cursor: 'pointer',
-          boxShadow: '0 4px 16px rgba(0, 0, 0, 0.12)',
+          boxShadow: '4px 4px 0 #000000',
           transition: 'all 0.2s',
-          fontFamily: 'Comfortaa, sans-serif'
+          fontFamily: 'Comfortaa, sans-serif',
+          textTransform: 'uppercase',
+          letterSpacing: '0.05em',
+          transform: 'rotate(-2deg)'
         }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.transform = 'scale(1.05)';
-          e.currentTarget.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.15)';
+          e.currentTarget.style.transform = 'rotate(0deg) translate(-2px, -2px)';
+          e.currentTarget.style.boxShadow = '6px 6px 0 #000000';
+          e.currentTarget.style.background = '#ffff00';
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.transform = 'scale(1)';
-          e.currentTarget.style.boxShadow = '0 4px 16px rgba(0, 0, 0, 0.12)';
+          e.currentTarget.style.transform = 'rotate(-2deg)';
+          e.currentTarget.style.boxShadow = '4px 4px 0 #000000';
+          e.currentTarget.style.background = '#ffffff';
+        }}
+        onMouseDown={(e) => {
+          e.currentTarget.style.transform = 'rotate(0deg) translate(2px, 2px)';
+          e.currentTarget.style.boxShadow = '2px 2px 0 #000000';
         }}
       >
         {language === 'en' ? 'FR' : 'EN'}
@@ -59,25 +68,32 @@ export default function TopNav() {
           : handleLogin
         }
         style={{
-          padding: '8px 16px',
-          borderRadius: '24px',
-          border: 'none',
-          background: isAuthenticated ? 'rgba(239, 68, 68, 0.9)' : 'rgba(255, 255, 255, 0.9)',
-          color: isAuthenticated ? '#ffffff' : '#0288D1',
-          fontSize: '14px',
-          fontWeight: '600',
+          padding: '12px 24px',
+          borderRadius: '8px',
+          border: '3px solid #000000',
+          background: isAuthenticated ? '#ff0055' : '#00d4ff',
+          color: '#ffffff',
+          fontSize: '16px',
+          fontWeight: '900',
           cursor: 'pointer',
-          boxShadow: '0 4px 16px rgba(0, 0, 0, 0.12)',
+          boxShadow: '4px 4px 0 #000000',
           transition: 'all 0.2s',
-          fontFamily: 'Comfortaa, sans-serif'
+          fontFamily: 'Comfortaa, sans-serif',
+          textTransform: 'uppercase',
+          letterSpacing: '0.05em',
+          transform: 'rotate(2deg)'
         }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.transform = 'scale(1.05)';
-          e.currentTarget.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.15)';
+          e.currentTarget.style.transform = 'rotate(0deg) translate(-2px, -2px)';
+          e.currentTarget.style.boxShadow = '6px 6px 0 #000000';
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.transform = 'scale(1)';
-          e.currentTarget.style.boxShadow = '0 4px 16px rgba(0, 0, 0, 0.12)';
+          e.currentTarget.style.transform = 'rotate(2deg)';
+          e.currentTarget.style.boxShadow = '4px 4px 0 #000000';
+        }}
+        onMouseDown={(e) => {
+          e.currentTarget.style.transform = 'rotate(0deg) translate(2px, 2px)';
+          e.currentTarget.style.boxShadow = '2px 2px 0 #000000';
         }}
       >
         {isAuthenticated ? t.nav.logout : t.nav.login}

@@ -23,7 +23,7 @@
   --bubble-size: 48px;
   width: var(--bubble-size);
   height: var(--bubble-size);
-  border-radius: 50%;
+  border-radius: 15%;
   background: #fff;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
   display: inline-flex;
@@ -191,7 +191,7 @@
   font-size: clamp(1.5rem, 4vw, 4rem);
   font-weight: 400;
   line-height: 0;
-  border-radius: 999px;
+  border-radius: 25px;
   background: var(--pill-bg);
   color: var(--pill-color);
   text-decoration: none;

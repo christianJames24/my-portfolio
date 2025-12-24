@@ -30,7 +30,7 @@ export default function Modal({ activeModal, onClose, backendData }) {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        background: "rgba(0, 0, 0, 0.4)",
+        background: "rgba(0, 0, 0, 0.6)",
         backdropFilter: "blur(8px)",
         animation: "fadeIn 0.3s ease",
         padding: "40px",
@@ -43,14 +43,9 @@ export default function Modal({ activeModal, onClose, backendData }) {
           maxWidth: "900px",
           minHeight: "60vh",
           maxHeight: "85%",
-          background:
-            "linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(240, 248, 255, 0.98) 100%)",
-          borderRadius: "40px",
-          boxShadow: `
-            0 20px 80px rgba(0, 0, 0, 0.25),
-            inset 0 2px 0 rgba(255, 255, 255, 1),
-            0 0 0 2px rgba(255, 255, 255, 0.5)
-          `,
+          background: "#ffffff",
+          border: "5px solid #000000",
+          boxShadow: "16px 16px 0 #000000",
           padding: "20px 50px 50px 50px",
           position: "relative",
           overflow: "visible",
@@ -58,38 +53,39 @@ export default function Modal({ activeModal, onClose, backendData }) {
             ? "modalSlideOut 0.4s cubic-bezier(0.4, 0, 1, 1)"
             : "modalSlideUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)",
           transformOrigin: "center",
+          transform: "rotate(-0.5deg)"
         }}
         onClick={(e) => e.stopPropagation()}
       >
+        {/* Yellow accent bar */}
         <div
           style={{
             position: "absolute",
             top: 0,
             left: 0,
             right: 0,
-            height: "70%",
-            background:
-              "radial-gradient(circle at 50% 0%, rgba(135, 206, 250, 0.25) 0%, transparent 60%)",
-            pointerEvents: "none",
-            borderRadius: "40px",
+            height: "12px",
+            background: "#ffff00",
+            borderBottom: "3px solid #000000"
           }}
         />
+        
         <button
           onClick={handleClose}
           style={{
             position: "absolute",
             top: "30px",
             right: "30px",
-            width: "48px",
-            height: "48px",
-            border: "none",
-            borderRadius: "50%",
-            background: "rgba(255, 255, 255, 0.9)",
-            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+            width: "56px",
+            height: "56px",
+            border: "3px solid #000000",
+            background: "#ff0055",
+            boxShadow: "4px 4px 0 #000000",
             cursor: "pointer",
-            fontSize: "24px",
+            fontSize: "28px",
+            fontWeight: "900",
             lineHeight: "1",
-            color: "#666",
+            color: "#ffffff",
             transition: "all 0.2s",
             zIndex: 100,
             display: "flex",
@@ -99,28 +95,45 @@ export default function Modal({ activeModal, onClose, backendData }) {
             transformOrigin: "center",
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.background = "rgba(255, 255, 255, 1)";
-            e.currentTarget.style.transform = "scale(1.10)";
-            e.currentTarget.style.boxShadow = "0 6px 16px rgba(0, 0, 0, 0.2)";
+            e.currentTarget.style.transform = "translate(-2px, -2px)";
+            e.currentTarget.style.boxShadow = "6px 6px 0 #000000";
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.background = "rgba(255, 255, 255, 0.9)";
-            e.currentTarget.style.transform = "scale(1)";
-            e.currentTarget.style.boxShadow = "0 4px 12px rgba(0, 0, 0, 0.15)";
+            e.currentTarget.style.transform = "translate(0, 0)";
+            e.currentTarget.style.boxShadow = "4px 4px 0 #000000";
+          }}
+          onMouseDown={(e) => {
+            e.currentTarget.style.transform = "translate(2px, 2px)";
+            e.currentTarget.style.boxShadow = "2px 2px 0 #000000";
           }}
         >
           ×
         </button>
-        <div style={{ position: "relative", zIndex: 1 }}>
+        
+        <div style={{ position: "relative", zIndex: 1, marginTop: "40px" }}>
           <h2
             style={{
-              fontSize: "clamp(32px, 5vw, 48px)",
-              color: "#0288D1",
+              fontSize: "clamp(40px, 6vw, 72px)",
+              color: "#000000",
               marginBottom: "30px",
-              fontWeight: "300",
+              fontWeight: "900",
+              textTransform: "uppercase",
+              letterSpacing: "-0.03em",
+              position: "relative",
+              display: "inline-block",
+              transform: "rotate(1deg)"
             }}
           >
             {activeModal && content?.title}
+            <div style={{
+              position: "absolute",
+              bottom: 0,
+              left: "-10px",
+              right: "-10px",
+              height: "50%",
+              background: "#ffff00",
+              zIndex: -1
+            }} />
           </h2>
           {activeModal && content?.content}
         </div>

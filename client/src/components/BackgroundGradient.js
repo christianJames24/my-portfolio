@@ -10,18 +10,57 @@ export default function BackgroundGradient({ scrollY }) {
         width: '100%',
         height: '100%',
         zIndex: 0,
-        background: 'linear-gradient(180deg, #e8fafdff 0%, #B2EBF2 50%, #80DEEA 100%)'
+        background: '#fafafa'
       }}
     >
+      {/* Geometric accent shapes */}
+      <div style={{
+        position: 'absolute',
+        top: '10%',
+        right: '5%',
+        width: '300px',
+        height: '300px',
+        background: '#ffff00',
+        opacity: 0.15,
+        transform: 'rotate(45deg)',
+        borderRadius: '20px'
+      }} />
+      
+      <div style={{
+        position: 'absolute',
+        bottom: '15%',
+        left: '8%',
+        width: '200px',
+        height: '200px',
+        background: '#ff0055',
+        opacity: 0.1,
+        transform: 'rotate(-25deg)',
+        borderRadius: '30px'
+      }} />
+      
+      <div style={{
+        position: 'absolute',
+        top: '40%',
+        left: '15%',
+        width: '150px',
+        height: '150px',
+        background: '#00d4ff',
+        opacity: 0.12,
+        transform: 'rotate(15deg)',
+        clipPath: 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)'
+      }} />
+
+      {/* Grid pattern overlay */}
       <div style={{
         position: 'absolute',
         width: '100%',
         height: '100%',
         backgroundImage: `
-          radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.3) 0%, transparent 50%),
-          radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.2) 0%, transparent 50%),
-          radial-gradient(circle at 40% 20%, rgba(135, 206, 250, 0.2) 0%, transparent 40%)
-        `
+          linear-gradient(rgba(0, 0, 0, 0.02) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(0, 0, 0, 0.02) 1px, transparent 1px)
+        `,
+        backgroundSize: '50px 50px',
+        opacity: 0.5
       }} />
     </div>
   );

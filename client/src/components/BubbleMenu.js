@@ -9,36 +9,35 @@ const DEFAULT_ITEMS = [
     href: "#",
     ariaLabel: "Home",
     rotation: -8,
-    hoverStyles: { bgColor: "#3b82f6", textColor: "#ffffff" },
+    hoverStyles: { bgColor: "#ff0055", textColor: "#ffffff" },
   },
   {
     label: "about",
     href: "#",
     ariaLabel: "About",
     rotation: 8,
-    hoverStyles: { bgColor: "#10b981", textColor: "#ffffff" },
+    hoverStyles: { bgColor: "#00d4ff", textColor: "#ffffff" },
   },
   {
     label: "projects",
     href: "#",
     ariaLabel: "Documentation",
-    FontFace: "Comic Sans MS",
     rotation: 8,
-    hoverStyles: { bgColor: "#f59e0b", textColor: "#ffffff" },
+    hoverStyles: { bgColor: "#ffff00", textColor: "#000000" },
   },
   {
     label: "blog",
     href: "#",
     ariaLabel: "Blog",
     rotation: 8,
-    hoverStyles: { bgColor: "#ef4444", textColor: "#ffffff" },
+    hoverStyles: { bgColor: "#8b5cf6", textColor: "#ffffff" },
   },
   {
     label: "contact",
     href: "#",
     ariaLabel: "Contact",
     rotation: -8,
-    hoverStyles: { bgColor: "#8b5cf6", textColor: "#ffffff" },
+    hoverStyles: { bgColor: "#10b981", textColor: "#ffffff" },
   },
 ];
 
@@ -50,7 +49,7 @@ export default function BubbleMenu({
   style,
   menuAriaLabel = "Toggle menu",
   menuBg = "#fff",
-  menuContentColor = "#111",
+  menuContentColor = "#000",
   useFixedPosition = false,
   items,
   animationEase = "back.out(1.5)",
@@ -98,11 +97,15 @@ export default function BubbleMenu({
 
       const item = menuItems[idx];
       if (isHovering) {
-        bubble.style.background = item.hoverStyles?.bgColor || "#f3f4f6";
+        bubble.style.background = item.hoverStyles?.bgColor || "#ffffff";
         bubble.style.color = item.hoverStyles?.textColor || menuContentColor;
+        bubble.style.transform = `rotate(0deg) scale(1.05) translate(-4px, -4px)`;
+        bubble.style.boxShadow = "12px 12px 0 #000000";
       } else {
         bubble.style.background = menuBg;
         bubble.style.color = menuContentColor;
+        bubble.style.transform = `rotate(${item.rotation ?? 0}deg) scale(1)`;
+        bubble.style.boxShadow = "8px 8px 0 #000000";
       }
     },
     [isDisabled, menuItems, menuContentColor, menuBg]
@@ -245,7 +248,22 @@ export default function BubbleMenu({
           onClick={handleToggle}
           aria-label={menuAriaLabel}
           aria-pressed={isMenuOpen}
-          style={{ background: menuBg }}
+          style={{ 
+            background: menuBg,
+            border: '4px solid #000000',
+            boxShadow: '6px 6px 0 #000000',
+            transition: 'all 0.2s'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'rotate(0deg) translate(-2px, -2px)';
+            e.currentTarget.style.boxShadow = '8px 8px 0 #000000';
+            e.currentTarget.style.background = '#ffff00';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'rotate(-2deg)';
+            e.currentTarget.style.boxShadow = '6px 6px 0 #000000';
+            e.currentTarget.style.background = menuBg;
+          }}
         >
           <span
             className="menu-line"
@@ -266,7 +284,7 @@ export default function BubbleMenu({
             style={{
               position: useFixedPosition ? "fixed" : "absolute",
               inset: 0,
-              background: "rgba(0, 0, 0, 0.6)",
+              background: "rgba(0, 0, 0, 0.7)",
               backdropFilter: "blur(4px)",
               zIndex: 97,
               opacity: 0,
@@ -296,13 +314,18 @@ export default function BubbleMenu({
                       "--item-rot": `${item.rotation ?? 0}deg`,
                       "--pill-bg": menuBg,
                       "--pill-color": menuContentColor,
-                      "--hover-bg": item.hoverStyles?.bgColor || "#f3f4f6",
-                      "--hover-color":
-                        item.hoverStyles?.textColor || menuContentColor,
+                      "--hover-bg": item.hoverStyles?.bgColor || "#ffffff",
+                      "--hover-color": item.hoverStyles?.textColor || menuContentColor,
                       pointerEvents: isDisabled ? "none" : "auto",
                       opacity: isDisabled ? 0.5 : 1,
                       cursor: isDisabled ? "default" : "pointer",
                       userSelect: "none",
+                      border: "4px solid #000000",
+                      background: menuBg,
+                      boxShadow: "8px 8px 0 #000000",
+                      fontWeight: "900",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.05em"
                     }}
                     ref={(el) => {
                       if (el) bubblesRef.current[idx] = el;

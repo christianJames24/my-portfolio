@@ -1,272 +1,121 @@
-@font-face {
-    font-family: Comfortaa;
-    src: url('../public/assets/Fonts/fonts/Comfortaa-Regular.ttf');
-}
-
-@font-face {
-    font-family: Comfortaa;
-    src: url('../public/assets/Fonts/fonts/Comfortaa-Light.ttf');
-    font-weight: light;
-}
-
-@font-face {
-    font-family: Comfortaa;
-    src: url('../public/assets/Fonts/fonts/Comfortaa-Bold.ttf');
-    font-weight: bold;
-}
-
-@font-face {
-    font-family: Lollipoptron;
-    src: url('../public/assets/Fonts/fonts/Lollipoptron-7GPD.ttf');
-}
-
-
-@font-face {
-    font-family: Emoji Font;
-    src: url('../public/assets/Fonts/dingbatFonts/EmojiFont.ttf');
-}
-
-@font-face {
-    font-family: SimpleDirectionArrows;
-    src: url('../public/assets/Fonts/dingbatFonts/SimpleDirectionArrows.ttf');
-}
-
-@font-face {
-    font-family: Star Things;
-    src: url('../public/assets/Fonts/dingbatFonts/starthings.ttf');
-}
-
-@font-face {
-    font-family: Burnstown Dam Back;
-    src: url('../public/assets/Fonts/fonts/Burnstown\ Dam\ Back.otf');
-}
-
-@font-face {
-    font-family: Burnstown Dam;
-    src: url('../public/assets/Fonts/fonts/Burnstown\ Dam.otf');
-}
-
-@font-face {
-    font-family: Chintzy;
-    src: url('../public/assets/Fonts/fonts/chintzy.ttf');
-}
-
-@font-face {
-    font-family: EHSMB;
-    src: url('../public/assets/Fonts/fonts/EHSMB.TTF');
-}
-
-@font-face {
-    font-family: Gothica;
-    src: url('../public/assets/Fonts/fonts/Gothica-Bold.ttf');
-}
-
-@font-face {
-    font-family: Hypik;
-    src: url('../public/assets/Fonts/fonts/hypik.otf');
-}
-
-@font-face {
-    font-family: Metal Lord;
-    src: url('../public/assets/Fonts/fonts/Metal\ Lord.otf');
-}
-
-@font-face {
-    font-family: RobloxFont;
-    src: url('../public/assets/Fonts/fonts/RobloxFont-Regular.ttf');
-}
-
-@font-face {
-    font-family: TimesNewArial;
-    src: url('../public/assets/Fonts/fonts/timesnewarial.ttf');
-}
-
-@font-face {
-    font-family: ZeroAnd;
-    src: url('../public/assets/Fonts/fonts/zero&.ttf');
-}
-
 body {
   margin: 0;
-  font-family: "Comic Sans MS", -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  background: #fafafa;
+  color: #000000;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
-}
-
-h1, h2, h3, h4, h5, h6 {
-  font-family: 'Comfortaa', cursive;
 }
 
 .page-container {
   position: relative;
   z-index: 10;
-  padding: 120px 40px 80px 40px;
+  padding: 120px 40px 100px 40px;
   max-width: 1200px;
   margin: 0 auto;
   min-height: 100vh;
 }
 
-.home-page {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding-bottom: 80px;
-  height: 100vh;
-  overflow: hidden;
-}
-
-.home-page h1 {
-  font-size: clamp(48px, 8vw, 96px);
-  color: #0288D1;
-  margin: 0 0 20px 0;
-}
-
-.home-page p {
-  font-size: clamp(18px, 3vw, 24px);
-  color: #0288D1;
-}
-
-.cow-container {
-  pointer-events: none;
-  position: fixed;
-  bottom: 0;
-  right: 0;
-  width: min(60vw, 60vh);
-  height: min(60vw, 60vh);
-  z-index: 5;
+.page-container::before {
+  content: '';
+  position: absolute;
+  top: 60px;
+  left: 40px;
+  width: 100px;
+  height: 8px;
+  background: #ff0055;
+  transform: rotate(-2deg);
 }
 
 h1 {
-  font-size: clamp(40px, 6vw, 64px);
-  color: #0288D1;
-  margin: 0 0 30px 0;
+  font-size: clamp(64px, 10vw, 140px);
+  color: #000000;
+  margin: 0 0 20px 0;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  line-height: 0.9;
+  text-transform: uppercase;
+  transform: rotate(-1deg);
 }
 
 h2 {
-  font-size: 32px;
-  color: #0288D1;
-  margin: 0 0 20px 0;
+  font-size: clamp(40px, 6vw, 72px);
+  color: #000000;
+  margin: 80px 0 30px 0;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.03em;
+  position: relative;
+  display: inline-block;
+  transform: rotate(1deg);
+}
+
+h2::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: -10px;
+  right: -10px;
+  height: 50%;
+  background: #ffff00;
+  z-index: -1;
 }
 
 .content-card {
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 30px;
+  background: #ffffff;
+  border: 4px solid #000000;
   padding: 40px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
   margin-bottom: 30px;
+  position: relative;
+  box-shadow: 12px 12px 0 #000000;
+  transform: rotate(-0.5deg);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.content-card:last-child {
-  margin-bottom: 0;
+.content-card:nth-child(even) {
+  transform: rotate(0.5deg);
+  box-shadow: -12px 12px 0 #000000;
+}
+
+.content-card:hover {
+  transform: rotate(0deg) translateY(-4px);
+  box-shadow: 16px 16px 0 #ff0055;
+}
+
+.content-card:nth-child(even):hover {
+  box-shadow: -16px 16px 0 #00d4ff;
 }
 
 .content-card p {
-  font-size: 18px;
-  color: #666;
-  line-height: 1.8;
+  font-size: 19px;
+  color: #000000;
+  line-height: 1.7;
   margin: 0 0 20px 0;
-}
-
-.content-card p:last-child {
-  margin-bottom: 0;
-}
-
-.placeholder,
-.empty-state {
-  padding: 60px 20px;
-  text-align: center;
-  color: #999;
-}
-
-.button-group {
-  display: flex;
-  gap: 20px;
-  flex-wrap: wrap;
-}
-
-.btn-primary,
-.btn-secondary {
-  padding: 16px 32px;
-  border-radius: 30px;
-  border: none;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
+  font-weight: 400;
 }
 
 .btn-primary {
-  background: #4CC9F0;
+  padding: 16px 36px;
+  border: 4px solid #000000;
+  background: #ff0055;
   color: #ffffff;
-  box-shadow: 0 4px 16px rgba(76, 201, 240, 0.3);
+  font-size: 18px;
+  font-weight: 900;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: all 0.2s;
+  box-shadow: 6px 6px 0 #000000;
+  transform: rotate(-1deg);
 }
 
 .btn-primary:hover {
-  transform: scale(1.05);
+  transform: rotate(0deg) translate(-2px, -2px);
+  box-shadow: 8px 8px 0 #000000;
+  background: #ffff00;
+  color: #000000;
 }
 
-.btn-secondary {
-  background: transparent;
-  color: #4CC9F0;
-  border: 2px solid #4CC9F0;
-}
-
-.btn-secondary:hover {
-  background: #4CC9F0;
-  color: #ffffff;
-  transform: scale(1.05);
-}
-
-.comment-input {
-  width: 100%;
-  min-height: 120px;
-  padding: 16px;
-  border-radius: 16px;
-  border: 2px solid #E0E0E0;
-  font-size: 16px;
-  resize: vertical;
-  margin-bottom: 16px;
-  box-sizing: border-box;
-  font-family: 'Comfortaa', sans-serif;
-}
-
-.login-message {
-  text-align: center;
-  color: #999;
-}
-
-.comments-list {
-  margin-top: 20px;
-}
-
-.comment-card {
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 20px;
-  padding: 24px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-  margin-bottom: 16px;
-}
-
-.comment-card:last-child {
-  margin-bottom: 0;
-}
-
-.comment-card p {
-  font-size: 16px;
-  color: #424242;
-  line-height: 1.6;
-  margin: 0 0 12px 0;
-}
-
-.comment-date {
-  font-size: 14px;
-  color: #999;
+.btn-primary:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 #000000;
 }
