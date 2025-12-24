@@ -4,18 +4,20 @@ import {
   Routes,
   Route,
   useNavigate,
+  useLocation,
 } from "react-router-dom";
 import BubbleMenu from "./components/BubbleMenu";
 import BackgroundGradient from "./components/BackgroundGradient";
 import TopNav from "./components/TopNav";
 import BottomBar from "./components/BottomBar";
+import PageNavigation from "./components/PageNavigation";
 import Home from "./Pages/Home";
 import About from "./Pages/About";
 import Projects from "./Pages/Projects";
 import Resume from "./Pages/Resume";
 import Comments from "./Pages/Comments";
-import PageNavigation from "./components/PageNavigation";
 import "./styles/animations.css";
+import "./styles/pageTransitions.css";
 
 export const LanguageContext = createContext();
 
@@ -48,12 +50,24 @@ const translations = {
   }
 };
 
+const pages = [
+  { path: '/', name: 'home' },
+  { path: '/about', name: 'about' },
+  { path: '/projects', name: 'projects' },
+  { path: '/resume', name: 'resume' },
+  { path: '/comments', name: 'comments' }
+];
+
 function App() {
   const [backendData, setBackendData] = useState([{}]);
   const [scrollY, setScrollY] = useState(0);
   const [language, setLanguage] = useState('en');
+  const [displayLocation, setDisplayLocation] = useState(null);
+  const [transitionStage, setTransitionStage] = useState('idle');
+  const [direction, setDirection] = useState('forward');
   
   const navigate = useNavigate();
+  const location = useLocation();
   const { isLoading } = useAuth0();
 
   const t = translations[language];
@@ -109,6 +123,33 @@ function App() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  useEffect(() => {
+    if (displayLocation === null) {
+      setDisplayLocation(location);
+      setTransitionStage('idle');
+      return;
+    }
+
+    if (location.pathname !== displayLocation.pathname) {
+      const currentIndex = pages.findIndex(p => p.path === displayLocation.pathname);
+      const nextIndex = pages.findIndex(p => p.path === location.pathname);
+      
+      const isForward = nextIndex > currentIndex;
+      setDirection(isForward ? 'forward' : 'backward');
+      
+      setTransitionStage('exiting');
+    }
+  }, [location, displayLocation]);
+
+  const handleTransitionEnd = () => {
+    if (transitionStage === 'exiting') {
+      setDisplayLocation(location);
+      setTransitionStage('entering');
+    } else if (transitionStage === 'entering') {
+      setTransitionStage('idle');
+    }
+  };
+
   const handleMenuItemClick = (item) => {
     navigate(item.path);
   };
@@ -120,6 +161,33 @@ function App() {
   if (isLoading) {
     return <div>Loading...</div>;
   }
+
+  const getTransitionClass = () => {
+    if (transitionStage === 'exiting') {
+      return direction === 'forward' ? 'page-transition-exit-forward' : 'page-transition-exit-backward';
+    }
+    if (transitionStage === 'entering') {
+      return direction === 'forward' ? 'page-transition-enter-forward' : 'page-transition-enter-backward';
+    }
+    return '';
+  };
+
+  const renderPage = (pathname) => {
+    switch(pathname) {
+      case '/':
+        return <Home backendData={backendData} />;
+      case '/about':
+        return <About backendData={backendData} />;
+      case '/projects':
+        return <Projects backendData={backendData} />;
+      case '/resume':
+        return <Resume backendData={backendData} />;
+      case '/comments':
+        return <Comments backendData={backendData} />;
+      default:
+        return <Home backendData={backendData} />;
+    }
+  };
 
   return (
     <LanguageContext.Provider value={{ language, t, toggleLanguage }}>
@@ -143,16 +211,16 @@ function App() {
           onItemClick={handleMenuItemClick}
         />
 
-        {/* Add this new component */}
         <PageNavigation />
 
-        <Routes>
-          <Route path="/" element={<Home backendData={backendData} />} />
-          <Route path="/about" element={<About backendData={backendData} />} />
-          <Route path="/projects" element={<Projects backendData={backendData} />} />
-          <Route path="/resume" element={<Resume backendData={backendData} />} />
-          <Route path="/comments" element={<Comments backendData={backendData} />} />
-        </Routes>
+        <div className="page-transition-wrapper">
+          <div 
+            className={`page-transition-content ${transitionStage !== 'idle' ? 'transitioning' : ''} ${getTransitionClass()}`}
+            onAnimationEnd={handleTransitionEnd}
+          >
+            {displayLocation && renderPage(displayLocation.pathname)}
+          </div>
+        </div>
 
         <BottomBar />
       </div>
