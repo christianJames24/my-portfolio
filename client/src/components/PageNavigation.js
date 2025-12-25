@@ -8,7 +8,6 @@ export default function PageNavigation({ isTransitioning }) {
   const { language } = useContext(LanguageContext);
   const [hoveredButton, setHoveredButton] = useState(null);
 
-  // Reset hover state when transitioning
   useEffect(() => {
     if (isTransitioning) {
       setHoveredButton(null);
@@ -69,26 +68,26 @@ export default function PageNavigation({ isTransitioning }) {
   };
 
   const buttonStyle = {
-  position: 'fixed',
-  top: '50%',
-  transform: 'translateY(-50%)',
-  padding: '20px',
-  border: '4px solid #000000',
-  background: '#ffffff',
-  cursor: 'pointer',
-  fontSize: '32px',
-  fontWeight: '900',
-  boxShadow: '8px 8px 0 #000000',
-  transition: 'all 0.2s',
-  zIndex: 50,
-  color: '#000000',
-  width: '70px',
-  height: '70px',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  outline: 'none', // Remove white outline
-};
+    position: 'fixed',
+    top: '50%',
+    transform: 'translateY(-50%)',
+    padding: '20px',
+    border: '4px solid #000000',
+    background: '#ffffff',
+    cursor: 'pointer',
+    fontSize: '32px',
+    fontWeight: '900',
+    boxShadow: '8px 8px 0 #000000',
+    transition: 'all 0.2s',
+    zIndex: 50,
+    color: '#000000',
+    width: '70px',
+    height: '70px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    outline: 'none',
+  };
 
   const labelStyle = (isVisible) => ({
     position: 'absolute',
@@ -109,105 +108,194 @@ export default function PageNavigation({ isTransitioning }) {
     top: '50%',
   });
 
-  // Don't render arrows during transitions
   if (isTransitioning) {
     return null;
   }
 
   return (
     <>
-      {/* Previous Button - Only render if there's a previous page */}
-      {hasPrev && (
-        <div style={{ position: 'fixed', left: '40px', top: '50%', transform: 'translateY(-50%)', zIndex: 50 }}>
+      {/* Desktop Navigation - Side arrows */}
+      <div className="desktop-nav">
+        {hasPrev && (
+          <div style={{ position: 'fixed', left: '40px', top: '50%', transform: 'translateY(-50%)', zIndex: 50 }}>
+            <button
+              onClick={handlePrev}
+              aria-label={`${t.prev}: ${t.pages[prevPage.name]}`}
+              style={{
+                ...buttonStyle,
+                position: 'relative',
+                transform: 'rotate(-3deg)',
+              }}
+              onMouseEnter={(e) => {
+                setHoveredButton('prev');
+                e.currentTarget.style.transform = 'rotate(0deg) translate(-4px, 0)';
+                e.currentTarget.style.boxShadow = '12px 12px 0 #000000';
+                e.currentTarget.style.background = '#00d4ff';
+                e.currentTarget.style.color = '#ffffff';
+              }}
+              onMouseLeave={(e) => {
+                setHoveredButton(null);
+                e.currentTarget.style.transform = 'rotate(-3deg)';
+                e.currentTarget.style.boxShadow = '8px 8px 0 #000000';
+                e.currentTarget.style.background = '#ffffff';
+                e.currentTarget.style.color = '#000000';
+              }}
+              onMouseDown={(e) => {
+                e.currentTarget.style.transform = 'translate(2px, 2px)';
+                e.currentTarget.style.boxShadow = '4px 4px 0 #000000';
+              }}
+            >
+              ←
+            </button>
+            
+            <div style={{
+              ...labelStyle(hoveredButton === 'prev'),
+              left: 'calc(100% + 20px)',
+            }}>
+              {t.pages[prevPage.name]}
+            </div>
+          </div>
+        )}
+
+        {hasNext && (
+          <div style={{ position: 'fixed', right: '40px', top: '50%', transform: 'translateY(-50%)', zIndex: 50 }}>
+            <button
+              onClick={handleNext}
+              aria-label={`${t.next}: ${t.pages[nextPage.name]}`}
+              style={{
+                ...buttonStyle,
+                position: 'relative',
+                transform: 'rotate(3deg)',
+              }}
+              onMouseEnter={(e) => {
+                setHoveredButton('next');
+                e.currentTarget.style.transform = 'rotate(0deg) translate(4px, 0)';
+                e.currentTarget.style.boxShadow = '12px 12px 0 #000000';
+                e.currentTarget.style.background = '#ff0055';
+                e.currentTarget.style.color = '#ffffff';
+              }}
+              onMouseLeave={(e) => {
+                setHoveredButton(null);
+                e.currentTarget.style.transform = 'rotate(3deg)';
+                e.currentTarget.style.boxShadow = '8px 8px 0 #000000';
+                e.currentTarget.style.background = '#ffffff';
+                e.currentTarget.style.color = '#000000';
+              }}
+              onMouseDown={(e) => {
+                e.currentTarget.style.transform = 'translate(2px, 2px)';
+                e.currentTarget.style.boxShadow = '4px 4px 0 #000000';
+              }}
+            >
+              →
+            </button>
+            
+            <div style={{
+              ...labelStyle(hoveredButton === 'next'),
+              right: 'calc(100% + 20px)',
+            }}>
+              {t.pages[nextPage.name]}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Mobile Navigation - Bottom bar ABOVE footer */}
+      <div className="mobile-nav" style={{
+        position: 'fixed',
+        bottom: '160px', // Changed from 100px to 160px to sit above footer
+        left: '50%',
+        transform: 'translateX(-50%)',
+        zIndex: 95, // Increased from 50 to be above footer content but below footer itself
+        display: 'none',
+        gap: '16px',
+        alignItems: 'center'
+      }}>
+        {hasPrev && (
           <button
             onClick={handlePrev}
-            aria-label={`${t.prev}: ${t.pages[prevPage.name]}`}
+            aria-label={t.prev}
             style={{
-              ...buttonStyle,
-              position: 'relative',
-              transform: 'rotate(-3deg)',
-            }}
-            onMouseEnter={(e) => {
-              setHoveredButton('prev');
-              e.currentTarget.style.transform = 'rotate(0deg) translate(-4px, 0)';
-              e.currentTarget.style.boxShadow = '12px 12px 0 #000000';
-              e.currentTarget.style.background = '#00d4ff';
-              e.currentTarget.style.color = '#ffffff';
-            }}
-            onMouseLeave={(e) => {
-              setHoveredButton(null);
-              e.currentTarget.style.transform = 'rotate(-3deg)';
-              e.currentTarget.style.boxShadow = '8px 8px 0 #000000';
-              e.currentTarget.style.background = '#ffffff';
-              e.currentTarget.style.color = '#000000';
-            }}
-            onMouseDown={(e) => {
-              e.currentTarget.style.transform = 'translate(2px, 2px)';
-              e.currentTarget.style.boxShadow = '4px 4px 0 #000000';
+              padding: '12px 16px',
+              border: '3px solid #000000',
+              background: '#00d4ff',
+              color: '#ffffff',
+              fontSize: '20px',
+              fontWeight: '900',
+              boxShadow: '4px 4px 0 #000000',
+              cursor: 'pointer',
+              width: '50px',
+              height: '50px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: '8px'
             }}
           >
             ←
           </button>
-          
-          {/* Label for previous page - appears to the RIGHT */}
-          <div style={{
-            ...labelStyle(hoveredButton === 'prev'),
-            left: 'calc(100% + 20px)',
-          }}>
-            {t.pages[prevPage.name]}
-          </div>
+        )}
+        
+        <div style={{
+          background: '#000000',
+          color: '#ffffff',
+          padding: '8px 16px',
+          border: '3px solid #000000',
+          fontSize: '13px',
+          fontWeight: '900',
+          textTransform: 'uppercase',
+          borderRadius: '8px',
+          boxShadow: '4px 4px 0 #ffff00'
+        }}>
+          {t.pages[pages[currentIndex].name]}
         </div>
-      )}
 
-      {/* Next Button - Only render if there's a next page */}
-      {hasNext && (
-        <div style={{ position: 'fixed', right: '40px', top: '50%', transform: 'translateY(-50%)', zIndex: 50 }}>
+        {hasNext && (
           <button
             onClick={handleNext}
-            aria-label={`${t.next}: ${t.pages[nextPage.name]}`}
+            aria-label={t.next}
             style={{
-              ...buttonStyle,
-              position: 'relative',
-              transform: 'rotate(3deg)',
-            }}
-            onMouseEnter={(e) => {
-              setHoveredButton('next');
-              e.currentTarget.style.transform = 'rotate(0deg) translate(4px, 0)';
-              e.currentTarget.style.boxShadow = '12px 12px 0 #000000';
-              e.currentTarget.style.background = '#ff0055';
-              e.currentTarget.style.color = '#ffffff';
-            }}
-            onMouseLeave={(e) => {
-              setHoveredButton(null);
-              e.currentTarget.style.transform = 'rotate(3deg)';
-              e.currentTarget.style.boxShadow = '8px 8px 0 #000000';
-              e.currentTarget.style.background = '#ffffff';
-              e.currentTarget.style.color = '#000000';
-            }}
-            onMouseDown={(e) => {
-              e.currentTarget.style.transform = 'translate(2px, 2px)';
-              e.currentTarget.style.boxShadow = '4px 4px 0 #000000';
+              padding: '12px 16px',
+              border: '3px solid #000000',
+              background: '#ff0055',
+              color: '#ffffff',
+              fontSize: '20px',
+              fontWeight: '900',
+              boxShadow: '4px 4px 0 #000000',
+              cursor: 'pointer',
+              width: '50px',
+              height: '50px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: '8px'
             }}
           >
             →
           </button>
-          
-          {/* Label for next page - appears to the LEFT */}
-          <div style={{
-            ...labelStyle(hoveredButton === 'next'),
-            right: 'calc(100% + 20px)',
-          }}>
-            {t.pages[nextPage.name]}
-          </div>
-        </div>
-      )}
+        )}
+      </div>
 
-      {/* Mobile hide styles */}
       <style>{`
-        @media (max-width: 768px) {
-          div[style*="fixed"] button[aria-label*="${t.prev}"],
-          div[style*="fixed"] button[aria-label*="${t.next}"] {
+        @media (max-width: 1450px) {
+          .desktop-nav {
             display: none !important;
+          }
+          
+          .mobile-nav {
+            display: flex !important;
+          }
+        }
+        
+        @media (min-width: 1451px) {
+          .mobile-nav {
+            display: none !important;
+          }
+        }
+        
+        /* Adjust for very tall mobile footers */
+        @media (max-width: 480px) {
+          .mobile-nav {
+            bottom: 180px !important;
           }
         }
       `}</style>

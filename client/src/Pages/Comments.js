@@ -18,16 +18,20 @@ export default function Comments() {
       placeholder: "Leave a comment...",
       submit: "Submit",
       login: "Login to Comment",
+      loginMessage: "You must be logged in to comment",
       delete: "Delete",
       noComments: "No comments yet. Be the first!",
+      posting: "Posting..."
     },
     fr: {
       title: "Commentaires",
       placeholder: "Laisser un commentaire...",
       submit: "Soumettre",
       login: "Connexion pour commenter",
+      loginMessage: "Vous devez être connecté pour commenter",
       delete: "Supprimer",
       noComments: "Pas encore de commentaires.",
+      posting: "Publication..."
     },
   };
 
@@ -44,15 +48,6 @@ export default function Comments() {
       fetchPermissions();
     }
   }, [isAuthenticated]);
-
-  //   useEffect(() => {
-  //   if (isAuthenticated) {
-  //     getAccessTokenSilently().then(token => {
-  //       console.log('Access Token:', token);
-  //       // Decode it at jwt.io to see permissions
-  //     });
-  //   }
-  // }, [isAuthenticated]);
 
   const fetchPermissions = async () => {
     try {
@@ -130,20 +125,7 @@ export default function Comments() {
 
   return (
     <div className="page-container comments-page">
-      <h1>{t.title}</h1>
-
-      {/* {isAdmin && (
-        <div style={{ 
-          background: '#FFD700', 
-          padding: '10px', 
-          borderRadius: '8px',
-          marginBottom: '20px',
-          textAlign: 'center',
-          fontWeight: 'bold'
-        }}>
-          ⭐ Admin Mode
-        </div>
-      )} */}
+      <h1 style={{ whiteSpace: 'nowrap' }}>{t.title}</h1>
 
       <div className="content-card">
         {isAuthenticated ? (
@@ -154,14 +136,30 @@ export default function Comments() {
               placeholder={t.placeholder}
               className="comment-input"
               disabled={loading}
+              style={{
+                width: '100%',
+                minHeight: '100px',
+                padding: '12px',
+                border: '3px solid #000000',
+                borderRadius: '8px',
+                fontSize: '16px',
+                fontFamily: 'inherit',
+                resize: 'vertical',
+                marginBottom: '16px'
+              }}
             />
             <button type="submit" className="btn-primary" disabled={loading}>
-              {loading ? "Posting..." : t.submit}
+              {loading ? t.posting : t.submit}
             </button>
           </form>
         ) : (
           <div>
-            <p className="login-message">You must be logged in to comment</p>
+            <p className="login-message" style={{
+              fontSize: 'clamp(16px, 2.5vw, 19px)',
+              marginBottom: '20px'
+            }}>
+              {t.loginMessage}
+            </p>
             <button
               onClick={() =>
                 loginWithRedirect({

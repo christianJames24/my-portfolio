@@ -66,7 +66,9 @@ function App() {
   const [displayLocation, setDisplayLocation] = useState(null);
   const [transitionStage, setTransitionStage] = useState('idle');
   const [direction, setDirection] = useState('forward');
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  // const mobileWidth = 768;
+  const mobileWidth = 1100;
+  const [isMobile, setIsMobile] = useState(window.innerWidth < mobileWidth);
   
   const navigate = useNavigate();
   const location = useLocation();
@@ -127,7 +129,7 @@ function App() {
 
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
+      setIsMobile(window.innerWidth < mobileWidth);
     };
 
     handleResize();

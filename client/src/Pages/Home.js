@@ -25,45 +25,33 @@ export default function Home({ backendData }) {
   }, []);
 
   return (
-    <div style={{
+    <div className="home-container" style={{
       position: 'relative',
       zIndex: 10,
-      padding: '40px',
+      padding: '20px',
       maxWidth: '800px',
       height: '100vh',
       display: 'flex',
       flexDirection: 'column',
       justifyContent: 'center',
     }}>
-      {/* Accent line */}
       <div style={{
         position: 'absolute',
         top: '20%',
-        left: '40px',
-        width: '120px',
-        height: '8px',
+        left: '20px',
+        width: 'clamp(60px, 15vw, 120px)',
+        height: 'clamp(6px, 1.5vw, 8px)',
         background: '#ff0055',
         transform: 'rotate(-3deg)',
         marginBottom: '40px'
       }} />
       
-      <h1 style={{
-        fontSize: 'clamp(64px, 10vw, 140px)',
-        color: '#000000',
-        margin: '0 0 20px 0',
-        fontWeight: '900',
-        letterSpacing: '-0.04em',
-        lineHeight: '0.9',
-        textTransform: 'uppercase',
-        transform: 'rotate(-1deg)',
-        position: 'relative',
-        zIndex: 2
-      }}>
+      <h1>
         {t.title}
       </h1>
       
       <p style={{
-        fontSize: 'clamp(20px, 3vw, 32px)',
+        fontSize: 'clamp(16px, 3vw, 32px)',
         color: '#000000',
         fontWeight: '400',
         margin: '0',
@@ -71,14 +59,28 @@ export default function Home({ backendData }) {
         zIndex: 2,
         background: '#ffff00',
         display: 'inline-block',
-        padding: '8px 16px',
+        padding: 'clamp(6px, 1.5vw, 8px) clamp(12px, 3vw, 16px)',
         transform: 'rotate(1deg)',
         border: '2px solid #000000',
-        boxShadow: '6px 6px 0 #000000',
-        maxWidth: 'fit-content'
+        boxShadow: 'clamp(4px, 1vw, 6px) clamp(4px, 1vw, 6px) 0 #000000',
+        maxWidth: 'fit-content',
+        wordWrap: 'break-word',
+        overflowWrap: 'break-word'
       }}>
         {t.subtitle}
       </p>
+
+      <style>{`
+        .home-container {
+          margin-left: 0;
+        }
+        
+        @media (min-width: 768px) {
+          .home-container {
+            margin-left: 20px;
+          }
+        }
+      `}</style>
     </div>
   );
 }
