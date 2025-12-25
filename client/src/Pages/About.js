@@ -189,49 +189,53 @@ export default function About() {
       </div>
 
       <style>{`
-        @media (min-width: 1101px) {
-          .profile-image {
-            float: left;
-            margin-right: 24px;
-            margin-bottom: 16px;
-            max-width: 300px;
-          }
-          
-          .float-image {
-            max-width: 45%;
-          }
-          
-          .float-right {
-            float: right;
-            margin-left: 24px;
-            margin-bottom: 16px;
-          }
-          
-          .float-left {
-            float: left;
-            margin-right: 24px;
-            margin-bottom: 16px;
-          }
-        }
-        
-        @media (max-width: 1100px) {
-          .profile-image {
-            width: 100%;
-            max-width: 300px;
-            display: block;
-            margin-left: auto;
-            margin-right: auto;
-            float: none;
-          }
-          
-          .float-image {
-            width: 100%;
-            float: none;
-            margin-left: 0;
-            margin-right: 0;
-          }
-        }
-      `}</style>
+  .content-card {
+    overflow: auto;
+  }
+  
+  @media (min-width: 808px) {
+    .profile-image {
+      float: left;
+      margin-right: 24px;
+      margin-bottom: 16px;
+      max-width: 300px;
+    }
+    
+    .float-image {
+      max-width: 45%;
+    }
+    
+    .float-right {
+      float: right;
+      margin-left: 24px;
+      margin-bottom: 16px;
+    }
+    
+    .float-left {
+      float: left;
+      margin-right: 24px;
+      margin-bottom: 16px;
+    }
+  }
+  
+  @media (max-width: 807px) {
+    .profile-image {
+      width: 100%;
+      max-width: 300px;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+      float: none;
+    }
+    
+    .float-image {
+      width: 100%;
+      float: none;
+      margin-left: 0;
+      margin-right: 0;
+    }
+  }
+`}</style>
     </div>
   );
 }

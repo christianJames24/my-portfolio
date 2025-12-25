@@ -101,7 +101,7 @@ export default function BackgroundGradient() {
         fontWeight: '900',
         color: config.color1,
         opacity: 0.08,
-        fontFamily: 'var(--font-display)',
+        fontFamily: 'var(--font-countdown)',
         letterSpacing: '-0.05em',
         lineHeight: 1,
         textShadow: `
@@ -128,7 +128,7 @@ export default function BackgroundGradient() {
           fontWeight: '900',
           color: config.color2,
           opacity: 0.15,
-          fontFamily: 'var(--font-display)',
+          fontFamily: 'var(--font-countdown)',
           letterSpacing: '0.2em',
           textShadow: `3px 3px 0 ${config.color1}`,
           userSelect: 'none',

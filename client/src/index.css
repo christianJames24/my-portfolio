@@ -1,8 +1,117 @@
 :root {
-  --font-display: 'Impact', 'Arial Black', sans-serif;
-  --font-body: 'Arial', sans-serif;
-  --font-bold: 'Arial Black', sans-serif;
-  --font-special: 'Comfortaa', sans-serif;
+  --font-display: 'TheNeue-Black', 'Arial Black', sans-serif;
+  --font-body: 'Comfortaa','Arial', sans-serif;
+  --font-bold: 'Chintzy', sans-serif;
+  --font-special: 'Chintzy', sans-serif;
+  --font-countdown: 'Gothica', sans-serif;
+}
+
+@font-face {
+    font-family: Comfortaa;
+    src: url("../public/assets/Fonts/fonts/Comfortaa-Regular.ttf");
+}
+
+@font-face {
+    font-family: Comfortaa;
+    src: url("../public/assets/Fonts/fonts/Comfortaa-Light.ttf");
+    font-weight: light;
+}
+
+@font-face {
+    font-family: Comfortaa;
+    src: url("../public/assets/Fonts/fonts/Comfortaa-Bold.ttf");
+    font-weight: bold;
+}
+
+@font-face {
+    font-family: Lollipoptron;
+    src: url("../public/assets/Fonts/fonts/Lollipoptron-7GPD.ttf");
+}
+
+@font-face {
+    font-family: Emoji Font;
+    src: url("../public/assets/Fonts/dingbatFonts/EmojiFont.ttf");
+}
+
+@font-face {
+    font-family: SimpleDirectionArrows;
+    src: url("../public/assets/Fonts/dingbatFonts/SimpleDirectionArrows.ttf");
+}
+
+@font-face {
+    font-family: Star Things;
+    src: url("../public/assets/Fonts/dingbatFonts/starthings.ttf");
+}
+
+@font-face {
+    font-family: Burnstown Dam Back;
+    src: url("../public/assets/Fonts/fonts/Burnstown\ Dam\ Back.otf");
+}
+
+@font-face {
+    font-family: Burnstown Dam;
+    src: url("../public/assets/Fonts/fonts/Burnstown\ Dam.otf");
+}
+
+@font-face {
+    font-family: Chintzy;
+    src: url("../public/assets/Fonts/fonts/chintzy.ttf");
+}
+
+@font-face {
+    font-family: EHSMB;
+    src: url("../public/assets/Fonts/fonts/EHSMB.TTF");
+}
+
+@font-face {
+    font-family: Gothica;
+    src: url("../public/assets/Fonts/fonts/Gothica-Bold.ttf");
+}
+
+@font-face {
+    font-family: Hypik;
+    src: url("../public/assets/Fonts/fonts/hypik.otf");
+}
+
+@font-face {
+    font-family: Metal Lord;
+    src: url("../public/assets/Fonts/fonts/Metal\ Lord.otf");
+}
+
+@font-face {
+    font-family: RobloxFont;
+    src: url("../public/assets/Fonts/fonts/RobloxFont-Regular.ttf");
+}
+
+@font-face {
+    font-family: TheNeue-Black;
+    src: url("../public/assets/Fonts/fonts/TheNeue-Black.ttf");
+}
+
+
+@font-face {
+    font-family: TimesNewArial;
+    src: url("../public/assets/Fonts/fonts/timesnewarial.ttf");
+}
+
+@font-face {
+    font-family: Transit;
+    src: url("../public/assets/Fonts/fonts/Transit\ CAT.ttf");
+}
+
+@font-face {
+    font-family: Ubuntu Title;
+    src: url("../public/assets/Fonts/fonts/Ubuntu-Title.ttf");
+}
+
+@font-face {
+    font-family: Ubuntu Title Fr;
+    src: url("../public/assets/Fonts/fonts/ubuntu-title-fr-1.1.ttf");
+}
+
+@font-face {
+    font-family: ZeroAnd;
+    src: url("../public/assets/Fonts/fonts/zero&.ttf");
 }
 
 body {
@@ -101,7 +210,8 @@ body::before {
 }
 
 h1 {
-  font-size: clamp(32px, 8vw, 140px);
+  /* font-size: clamp(32px, 8vw, 140px); */
+  font-size: clamp(32px, 8vw, 120px);
   color: #ffffff;
   margin: 0 0 20px 0;
   font-weight: 900;
@@ -121,7 +231,8 @@ h1 {
 }
 
 h2 {
-  font-size: clamp(28px, 6vw, 72px);
+  /* font-size: clamp(28px, 6vw, 72px); */
+  font-size: clamp(28px, 6vw, 64px);
   color: #39ff14;
   margin: 60px 0 20px 0;
   font-weight: 900;
