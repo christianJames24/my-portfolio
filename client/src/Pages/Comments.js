@@ -138,14 +138,17 @@ export default function Comments() {
               disabled={loading}
               style={{
                 width: '100%',
-                minHeight: '100px',
-                padding: '12px',
-                border: '3px solid #000000',
-                borderRadius: '8px',
+                minHeight: '120px',
+                padding: '16px',
+                border: '4px solid #39ff14',
+                background: '#000000',
+                color: '#ffffff',
                 fontSize: '16px',
                 fontFamily: 'var(--font-body)',
                 resize: 'vertical',
-                marginBottom: '16px'
+                marginBottom: '20px',
+                boxShadow: '6px 6px 0 #ff00ff',
+                outline: 'none'
               }}
             />
             <button type="submit" className="btn-primary" disabled={loading}>
@@ -176,25 +179,41 @@ export default function Comments() {
 
       <div className="comments-list">
         {comments.length === 0 ? (
-          <div className="content-card empty-state">{t.noComments}</div>
+          <div className="content-card empty-state">
+            <p style={{ margin: 0, fontSize: 'clamp(16px, 2.5vw, 19px)' }}>{t.noComments}</p>
+          </div>
         ) : (
-          comments.map((comment) => (
+          comments.map((comment, index) => (
             <div
               key={comment.id}
               className="comment-card"
               style={{
-                background: "white",
-                padding: "15px",
-                margin: "10px 0",
-                borderRadius: "8px",
-                boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                background: "#0a0a0a",
+                padding: "20px",
+                margin: "20px 0",
+                border: `4px solid ${index % 3 === 0 ? '#39ff14' : index % 3 === 1 ? '#ff00ff' : '#00ffff'}`,
+                boxShadow: `8px 8px 0 ${index % 3 === 0 ? '#ff00ff' : index % 3 === 1 ? '#00ffff' : '#39ff14'}`,
+                transform: `skewY(${index % 2 === 0 ? '-1deg' : '1deg'})`,
+                transition: 'all 0.2s',
+                clipPath: index % 2 === 0 
+                  ? 'polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px))'
+                  : 'polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'skewY(0deg) translateY(-3px)';
+                e.currentTarget.style.boxShadow = `12px 12px 0 ${index % 3 === 0 ? '#ff00ff' : index % 3 === 1 ? '#00ffff' : '#39ff14'}`;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = `skewY(${index % 2 === 0 ? '-1deg' : '1deg'})`;
+                e.currentTarget.style.boxShadow = `8px 8px 0 ${index % 3 === 0 ? '#ff00ff' : index % 3 === 1 ? '#00ffff' : '#39ff14'}`;
               }}
             >
               <div
                 style={{
                   display: "flex",
                   alignItems: "center",
-                  marginBottom: "10px",
+                  marginBottom: "12px",
+                  gap: "12px"
                 }}
               >
                 {comment.user_picture && (
@@ -202,33 +221,70 @@ export default function Comments() {
                     src={comment.user_picture}
                     alt={comment.user_name}
                     style={{
-                      width: "32px",
-                      height: "32px",
+                      width: "40px",
+                      height: "40px",
                       borderRadius: "50%",
-                      marginRight: "10px",
+                      border: "3px solid #39ff14",
+                      boxShadow: "2px 2px 0 #ff00ff"
                     }}
                   />
                 )}
-                <strong>{comment.user_name}</strong>
+                <strong style={{ 
+                  color: "#39ff14",
+                  fontSize: "18px",
+                  fontFamily: "var(--font-bold)",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.05em"
+                }}>
+                  {comment.user_name}
+                </strong>
                 {isAdmin && (
                   <button
                     onClick={() => handleDelete(comment.id)}
                     style={{
                       marginLeft: "auto",
-                      background: "#ef4444",
-                      color: "white",
-                      border: "none",
-                      padding: "5px 10px",
-                      borderRadius: "4px",
+                      background: "#ff0055",
+                      color: "#ffffff",
+                      border: "3px solid #000000",
+                      padding: "8px 16px",
                       cursor: "pointer",
+                      fontWeight: "900",
+                      fontFamily: "var(--font-bold)",
+                      textTransform: "uppercase",
+                      fontSize: "12px",
+                      letterSpacing: "0.05em",
+                      boxShadow: "3px 3px 0 #000000",
+                      transition: "all 0.2s"
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = "translate(-2px, -2px)";
+                      e.currentTarget.style.boxShadow = "5px 5px 0 #000000";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = "translate(0, 0)";
+                      e.currentTarget.style.boxShadow = "3px 3px 0 #000000";
                     }}
                   >
                     {t.delete}
                   </button>
                 )}
               </div>
-              <p>{comment.text}</p>
-              <span style={{ fontSize: "12px", color: "#666" }}>
+              <p style={{
+                color: "#ffffff",
+                fontSize: "16px",
+                lineHeight: "1.6",
+                margin: "0 0 12px 0",
+                fontFamily: "var(--font-body)"
+              }}>
+                {comment.text}
+              </p>
+              <span style={{ 
+                fontSize: "13px", 
+                color: "#00ffff",
+                fontFamily: "var(--font-bold)",
+                textTransform: "uppercase",
+                letterSpacing: "0.05em"
+              }}>
                 {new Date(comment.created_at).toLocaleDateString()}
               </span>
             </div>

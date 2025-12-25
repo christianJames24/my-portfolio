@@ -137,6 +137,11 @@ function App() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // Scroll to top on route change
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
+
   useEffect(() => {
     if (displayLocation === null) {
       setDisplayLocation(location);
