@@ -123,6 +123,10 @@
   transform: skewX(-5deg) translate(2px, 2px);
 }
 
+.bottom-bar.instant-hide {
+  display: none !important;
+}
+
 @media (max-width: 768px) {
   .bottom-bar-content {
     flex-direction: column;

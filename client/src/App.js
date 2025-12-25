@@ -63,6 +63,7 @@ function App() {
   const [transitionStage, setTransitionStage] = useState("idle");
   const [direction, setDirection] = useState("forward");
   const [showFooter, setShowFooter] = useState(true);
+  const [instantHide, setInstantHide] = useState(false);
   // const mobileWidth = 768;
   const mobileWidth = 1100;
   const [isMobile, setIsMobile] = useState(window.innerWidth < mobileWidth);
@@ -149,43 +150,47 @@ function App() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // useEffect(() => {
+  //   window.scrollTo(0, 0);
+  // }, [location.pathname]);
+
   useEffect(() => {
+  if (displayLocation === null) {
+    setDisplayLocation(location);
+    setTransitionStage('idle');
+    setShowFooter(true);
+    setInstantHide(false);
+    return;
+  }
+
+  if (location.pathname !== displayLocation.pathname) {
+    const currentIndex = pages.findIndex(p => p.path === displayLocation.pathname);
+    const nextIndex = pages.findIndex(p => p.path === location.pathname);
+    
+    const isForward = nextIndex > currentIndex;
+    setDirection(isForward ? 'forward' : 'backward');
+    
+    setInstantHide(true); // Hide instantly
+    setShowFooter(false);
+    setTransitionStage('exiting');
+  }
+}, [location, displayLocation]);
+
+// Update handleTransitionEnd:
+const handleTransitionEnd = () => {
+  if (transitionStage === 'exiting') {
     window.scrollTo(0, 0);
-  }, [location.pathname]);
-
-  useEffect(() => {
-    if (displayLocation === null) {
-      setDisplayLocation(location);
-      setTransitionStage("idle");
+    setDisplayLocation(location);
+    setTransitionStage('entering');
+  } else if (transitionStage === 'entering') {
+    setTransitionStage('idle');
+    setInstantHide(false); // Allow animations again
+    setTimeout(() => {
       setShowFooter(true);
-      return;
-    }
+    }, 50);
+  }
+};
 
-    if (location.pathname !== displayLocation.pathname) {
-      const currentIndex = pages.findIndex(
-        (p) => p.path === displayLocation.pathname
-      );
-      const nextIndex = pages.findIndex((p) => p.path === location.pathname);
-
-      const isForward = nextIndex > currentIndex;
-      setDirection(isForward ? "forward" : "backward");
-
-      setShowFooter(false);
-      setTransitionStage("exiting");
-    }
-  }, [location, displayLocation]);
-
-  const handleTransitionEnd = () => {
-    if (transitionStage === "exiting") {
-      setDisplayLocation(location);
-      setTransitionStage("entering");
-    } else if (transitionStage === "entering") {
-      setTransitionStage("idle");
-      setTimeout(() => {
-        setShowFooter(true);
-      }, 50);
-    }
-  };
 
   const handleMenuItemClick = (item) => {
     navigate(item.path);
@@ -287,7 +292,8 @@ function App() {
           </div>
         </div>
 
-        <BottomBar show={showFooter} />
+        {/* <BottomBar show={showFooter} /> */}
+        {transitionStage === 'idle' && <BottomBar show={showFooter} instantHide={instantHide} />}
       </div>
     </LanguageContext.Provider>
   );
