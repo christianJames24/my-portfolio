@@ -1,8 +1,9 @@
+// BottomBar.js
 import React, { useContext } from 'react';
 import { LanguageContext } from '../App';
 import '../styles/BottomBar.css';
 
-export default function BottomBar() {
+export default function BottomBar({ show }) {
   const { language } = useContext(LanguageContext);
 
   const content = {
@@ -19,7 +20,7 @@ export default function BottomBar() {
   const t = content[language];
 
   return (
-    <footer className="bottom-bar">
+    <footer className={`bottom-bar ${show ? 'visible' : 'hidden'}`}>
       <div className="bottom-bar-content">
         <div className="bottom-bar-section">
           <span className="copyright">{t.rights}</span>

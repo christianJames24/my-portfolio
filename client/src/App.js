@@ -66,6 +66,7 @@ function App() {
   const [displayLocation, setDisplayLocation] = useState(null);
   const [transitionStage, setTransitionStage] = useState('idle');
   const [direction, setDirection] = useState('forward');
+  const [showFooter, setShowFooter] = useState(true);
   // const mobileWidth = 768;
   const mobileWidth = 1100;
   const [isMobile, setIsMobile] = useState(window.innerWidth < mobileWidth);
@@ -137,7 +138,6 @@ function App() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Scroll to top on route change
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [location.pathname]);
@@ -146,6 +146,7 @@ function App() {
     if (displayLocation === null) {
       setDisplayLocation(location);
       setTransitionStage('idle');
+      setShowFooter(true);
       return;
     }
 
@@ -156,6 +157,7 @@ function App() {
       const isForward = nextIndex > currentIndex;
       setDirection(isForward ? 'forward' : 'backward');
       
+      setShowFooter(false);
       setTransitionStage('exiting');
     }
   }, [location, displayLocation]);
@@ -166,6 +168,9 @@ function App() {
       setTransitionStage('entering');
     } else if (transitionStage === 'entering') {
       setTransitionStage('idle');
+      setTimeout(() => {
+        setShowFooter(true);
+      }, 50);
     }
   };
 
@@ -208,7 +213,6 @@ function App() {
     }
   };
 
-  // Check if we should show the cow (only on home page)
   const showCow = location.pathname === '/';
 
   const cowStyles = {
@@ -229,6 +233,7 @@ function App() {
       <div style={{
         minHeight: '100vh',
         position: 'relative',
+        paddingBottom: '0'
       }}>
         <BackgroundGradient scrollY={scrollY} />
         
@@ -248,7 +253,6 @@ function App() {
 
         <PageNavigation isTransitioning={transitionStage !== 'idle'} />
 
-        {/* Cow - outside transition wrapper so it stays stable */}
         <div style={cowStyles}>
           <ThreeD />
         </div>
@@ -262,7 +266,7 @@ function App() {
           </div>
         </div>
 
-        <BottomBar />
+        <BottomBar show={showFooter} />
       </div>
     </LanguageContext.Provider>
   );

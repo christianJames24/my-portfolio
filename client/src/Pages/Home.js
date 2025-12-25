@@ -17,12 +17,12 @@ export default function Home({ backendData }) {
 
   const t = content[language];
 
-  useEffect(() => {
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = 'auto';
-    };
-  }, []);
+  // useEffect(() => {
+  //   document.body.style.overflow = 'hidden';
+  //   return () => {
+  //     document.body.style.overflow = 'auto';
+  //   };
+  // }, []);
 
   return (
     <div className="home-container" style={{
@@ -32,7 +32,7 @@ export default function Home({ backendData }) {
       padding: '2.5%',
       maxWidth: '800px',
       marginTop: '-2%',
-      height: '100vh',
+      height: '98vh',
       display: 'flex',
       flexDirection: 'column',
       justifyContent: 'center',
