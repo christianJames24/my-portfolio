@@ -141,6 +141,40 @@
   --color-blue-3: #ffffff;
 }
 
+/* OSHAWOTT LIGHT THEME */
+/* :root {
+  --font-display: 'TheNeue-Black', 'Arial Black', sans-serif;
+  --font-body: 'Comfortaa','Arial', sans-serif;
+  --font-bold: 'Chintzy', sans-serif;
+  --font-special: 'Chintzy', sans-serif;
+  --font-countdown: 'Gothica', sans-serif;
+
+  --color-black: #FFFDF8;
+  --color-white: #0E2A3B;
+  --color-dark-gray: #EEF4F7;
+
+  --color-menu-bg: #2F6F95;
+  --color-menu-content: #FFFFFF;
+
+  --color-stripe-1: rgba(79, 195, 247, 0.08);
+  --color-stripe-2: rgba(13, 71, 161, 0.08);
+
+  --color-neon-green: #1A3A4A;
+  --color-magenta: #24485C81;
+  --color-cyan: #B7D9E8;
+  --color-yellow: #AFC6D4;
+  --color-red-pink: #C9DBE6;
+  --color-light-blue: #BDD6E3;
+  --color-dark-magenta: #E8F1F6;
+  --color-purple: #DAE9F1;
+  --color-blue-1: #C8DDEA;
+  --color-blue-2: #B7D9E8;
+  --color-purple-2: #DAE9F1;
+  --color-pink-1: #FFFDF8;
+  --color-pink-2: #EEF4F7;
+  --color-blue-3: #FFFDF8;
+} */
+
  
 
 @font-face {
