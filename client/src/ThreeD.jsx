@@ -1,3 +1,4 @@
+// ThreeD.jsx
 import { Canvas, useLoader, useFrame } from "@react-three/fiber"; //uses react-three-fiber
 //npm install three @react-three/fiber
 //npm install three
@@ -200,7 +201,7 @@ export default function ThreeD() {
         <directionalLight
           position={[-5, 0, -5]}
           intensity={1}
-          color="#6d45ffff"
+          color="var(--color-purple)"
         />
         <CowModel
           onCenterCalculated={handleCenter}

@@ -1,11 +1,7 @@
+// App.js
 import React, { useEffect, useState, createContext } from "react";
-import { useAuth0 } from '@auth0/auth0-react';
-import {
-  Routes,
-  Route,
-  useNavigate,
-  useLocation,
-} from "react-router-dom";
+import { useAuth0 } from "@auth0/auth0-react";
+import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import BubbleMenu from "./components/BubbleMenu";
 import BackgroundGradient from "./components/BackgroundGradient";
 import TopNav from "./components/TopNav";
@@ -29,48 +25,48 @@ export const LanguageContext = createContext();
 const translations = {
   en: {
     nav: {
-      home: 'home',
-      about: 'about',
-      projects: 'projects',
-      resume: 'resume',
-      comments: 'comments',
-      login: 'login',
-      logout: 'logout'
-    }
+      home: "home",
+      about: "about",
+      projects: "projects",
+      resume: "resume",
+      comments: "comments",
+      login: "login",
+      logout: "logout",
+    },
   },
   fr: {
     nav: {
-      home: 'accueil',
-      about: 'à propos',
-      projects: 'projets',
-      resume: 'cv',
-      comments: 'commentaires',
-      login: 'connexion',
-      logout: 'déconnexion'
-    }
-  }
+      home: "accueil",
+      about: "à propos",
+      projects: "projets",
+      resume: "cv",
+      comments: "commentaires",
+      login: "connexion",
+      logout: "déconnexion",
+    },
+  },
 };
 
 const pages = [
-  { path: '/', name: 'home' },
-  { path: '/about', name: 'about' },
-  { path: '/projects', name: 'projects' },
-  { path: '/resume', name: 'resume' },
-  { path: '/comments', name: 'comments' }
+  { path: "/", name: "home" },
+  { path: "/about", name: "about" },
+  { path: "/projects", name: "projects" },
+  { path: "/resume", name: "resume" },
+  { path: "/comments", name: "comments" },
 ];
 
 function App() {
   const [backendData, setBackendData] = useState([{}]);
   const [scrollY, setScrollY] = useState(0);
-  const [language, setLanguage] = useState('en');
+  const [language, setLanguage] = useState("en");
   const [displayLocation, setDisplayLocation] = useState(null);
-  const [transitionStage, setTransitionStage] = useState('idle');
-  const [direction, setDirection] = useState('forward');
+  const [transitionStage, setTransitionStage] = useState("idle");
+  const [direction, setDirection] = useState("forward");
   const [showFooter, setShowFooter] = useState(true);
   // const mobileWidth = 768;
   const mobileWidth = 1100;
   const [isMobile, setIsMobile] = useState(window.innerWidth < mobileWidth);
-  
+
   const navigate = useNavigate();
   const location = useLocation();
   const { isLoading } = useAuth0();
@@ -82,50 +78,65 @@ function App() {
       label: t.nav.home,
       ariaLabel: t.nav.home,
       rotation: -8,
-      hoverStyles: { bgColor: '#4CC9F0', textColor: '#ffffff' },
-      path: '/'
+      hoverStyles: {
+        bgColor: "var(--color-blue-1)",
+        textColor: "var(--color-white)",
+      },
+      path: "/",
     },
     {
       label: t.nav.about,
       ariaLabel: t.nav.about,
       rotation: 8,
-      hoverStyles: { bgColor: '#4895EF', textColor: '#ffffff' },
-      path: '/about'
+      hoverStyles: {
+        bgColor: "var(--color-blue-2)",
+        textColor: "var(--color-white)",
+      },
+      path: "/about",
     },
     {
       label: t.nav.projects,
       ariaLabel: t.nav.projects,
       rotation: -8,
-      hoverStyles: { bgColor: '#7209B7', textColor: '#ffffff' },
-      path: '/projects'
+      hoverStyles: {
+        bgColor: "var(--color-purple-2)",
+        textColor: "var(--color-white)",
+      },
+      path: "/projects",
     },
     {
       label: t.nav.resume,
       ariaLabel: t.nav.resume,
       rotation: 8,
-      hoverStyles: { bgColor: '#F72585', textColor: '#ffffff' },
-      path: '/resume'
+      hoverStyles: {
+        bgColor: "var(--color-pink-1)",
+        textColor: "var(--color-white)",
+      },
+      path: "/resume",
     },
     {
       label: t.nav.comments,
       ariaLabel: t.nav.comments,
       rotation: -8,
-      hoverStyles: { bgColor: '#FF006E', textColor: '#ffffff' },
-      path: '/comments'
-    }
+      hoverStyles: {
+        bgColor: "var(--color-pink-2)",
+        textColor: "var(--color-white)",
+      },
+      path: "/comments",
+    },
   ];
 
   useEffect(() => {
-    fetch('/api')
-      .then(response => response.json())
-      .then(data => setBackendData(data))
-      .catch(err => console.log(err));
+    fetch("/api")
+      .then((response) => response.json())
+      .then((data) => setBackendData(data))
+      .catch((err) => console.log(err));
   }, []);
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   useEffect(() => {
@@ -134,8 +145,8 @@ function App() {
     };
 
     handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   useEffect(() => {
@@ -145,29 +156,31 @@ function App() {
   useEffect(() => {
     if (displayLocation === null) {
       setDisplayLocation(location);
-      setTransitionStage('idle');
+      setTransitionStage("idle");
       setShowFooter(true);
       return;
     }
 
     if (location.pathname !== displayLocation.pathname) {
-      const currentIndex = pages.findIndex(p => p.path === displayLocation.pathname);
-      const nextIndex = pages.findIndex(p => p.path === location.pathname);
-      
+      const currentIndex = pages.findIndex(
+        (p) => p.path === displayLocation.pathname
+      );
+      const nextIndex = pages.findIndex((p) => p.path === location.pathname);
+
       const isForward = nextIndex > currentIndex;
-      setDirection(isForward ? 'forward' : 'backward');
-      
+      setDirection(isForward ? "forward" : "backward");
+
       setShowFooter(false);
-      setTransitionStage('exiting');
+      setTransitionStage("exiting");
     }
   }, [location, displayLocation]);
 
   const handleTransitionEnd = () => {
-    if (transitionStage === 'exiting') {
+    if (transitionStage === "exiting") {
       setDisplayLocation(location);
-      setTransitionStage('entering');
-    } else if (transitionStage === 'entering') {
-      setTransitionStage('idle');
+      setTransitionStage("entering");
+    } else if (transitionStage === "entering") {
+      setTransitionStage("idle");
       setTimeout(() => {
         setShowFooter(true);
       }, 50);
@@ -179,7 +192,7 @@ function App() {
   };
 
   const toggleLanguage = () => {
-    setLanguage(prev => prev === 'en' ? 'fr' : 'en');
+    setLanguage((prev) => (prev === "en" ? "fr" : "en"));
   };
 
   if (isLoading) {
@@ -187,63 +200,69 @@ function App() {
   }
 
   const getTransitionClass = () => {
-    if (transitionStage === 'exiting') {
-      return direction === 'forward' ? 'page-transition-exit-forward' : 'page-transition-exit-backward';
+    if (transitionStage === "exiting") {
+      return direction === "forward"
+        ? "page-transition-exit-forward"
+        : "page-transition-exit-backward";
     }
-    if (transitionStage === 'entering') {
-      return direction === 'forward' ? 'page-transition-enter-forward' : 'page-transition-enter-backward';
+    if (transitionStage === "entering") {
+      return direction === "forward"
+        ? "page-transition-enter-forward"
+        : "page-transition-enter-backward";
     }
-    return '';
+    return "";
   };
 
   const renderPage = (pathname) => {
-    switch(pathname) {
-      case '/':
+    switch (pathname) {
+      case "/":
         return <Home backendData={backendData} />;
-      case '/about':
+      case "/about":
         return <About backendData={backendData} />;
-      case '/projects':
+      case "/projects":
         return <Projects backendData={backendData} />;
-      case '/resume':
+      case "/resume":
         return <Resume backendData={backendData} />;
-      case '/comments':
+      case "/comments":
         return <Comments backendData={backendData} />;
       default:
         return <Home backendData={backendData} />;
     }
   };
 
-  const showCow = location.pathname === '/';
+  const showCow = location.pathname === "/";
 
   const cowStyles = {
-    pointerEvents: 'none',
-    position: 'fixed',
-    bottom: isMobile ? '-10%' : '0',
-    right: isMobile ? '-20%' : '0',
-    width: isMobile ? '75vw' : '50vw',
-    height: isMobile ? '100vh' : '80vh',
+    pointerEvents: "none",
+    position: "fixed",
+    bottom: isMobile ? "-10%" : "0",
+    right: isMobile ? "-20%" : "0",
+    width: isMobile ? "75vw" : "50vw",
+    height: isMobile ? "100vh" : "80vh",
     zIndex: 1,
     opacity: showCow ? (isMobile ? 0.3 : 1) : 0,
-    transform: isMobile ? 'scale(0.7)' : 'scale(1)',
-    transition: 'opacity 0.5s ease-in-out'
+    transform: isMobile ? "scale(0.7)" : "scale(1)",
+    transition: "opacity 0.5s ease-in-out",
   };
 
   return (
     <LanguageContext.Provider value={{ language, t, toggleLanguage }}>
-      <div style={{
-        minHeight: '100vh',
-        position: 'relative',
-        paddingBottom: '0'
-      }}>
+      <div
+        style={{
+          minHeight: "100vh",
+          position: "relative",
+          paddingBottom: "0",
+        }}
+      >
         <BackgroundGradient scrollY={scrollY} />
-        
+
         <TopNav />
-        
+
         <BubbleMenu
           items={menuItems}
           menuAriaLabel="Toggle navigation"
-          menuBg="rgba(255, 255, 255, 0.9)"
-          menuContentColor="#0288D1"
+          menuBg="var(--color-menu-bg)"
+          menuContentColor="var(--color-menu-content)"
           useFixedPosition={true}
           animationEase="back.out(1.5)"
           animationDuration={0.5}
@@ -251,15 +270,17 @@ function App() {
           onItemClick={handleMenuItemClick}
         />
 
-        <PageNavigation isTransitioning={transitionStage !== 'idle'} />
+        <PageNavigation isTransitioning={transitionStage !== "idle"} />
 
         <div style={cowStyles}>
           <ThreeD />
         </div>
 
         <div className="page-transition-wrapper">
-          <div 
-            className={`page-transition-content ${transitionStage !== 'idle' ? 'transitioning' : ''} ${getTransitionClass()}`}
+          <div
+            className={`page-transition-content ${
+              transitionStage !== "idle" ? "transitioning" : ""
+            } ${getTransitionClass()}`}
             onAnimationEnd={handleTransitionEnd}
           >
             {displayLocation && renderPage(displayLocation.pathname)}

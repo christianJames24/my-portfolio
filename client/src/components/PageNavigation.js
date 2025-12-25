@@ -1,3 +1,4 @@
+// PageNavigation.js
 import React, { useContext, useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { LanguageContext } from "../App";
@@ -74,15 +75,15 @@ export default function PageNavigation({ isTransitioning }) {
     top: "50%",
     transform: "translateY(-50%)",
     padding: "20px",
-    border: "4px solid #000000",
-    background: "#ffffff",
+    border: "4px solid var(--color-black)",
+    background: "var(--color-white)",
     cursor: "pointer",
     fontSize: "32px",
     fontWeight: "900",
-    boxShadow: "8px 8px 0 #000000",
+    boxShadow: "8px 8px 0 var(--color-black)",
     transition: "all 0.2s",
     zIndex: 50,
-    color: "#000000",
+    color: "var(--color-black)",
     width: "70px",
     height: "70px",
     display: "flex",
@@ -93,11 +94,11 @@ export default function PageNavigation({ isTransitioning }) {
 
   const labelStyle = (isVisible) => ({
     position: "absolute",
-    background: "#000000",
-    color: "#ffffff",
+    background: "var(--color-black)",
+    color: "var(--color-white)",
     padding: "12px 20px",
-    border: "3px solid #000000",
-    boxShadow: "6px 6px 0 #ffff00",
+    border: "3px solid var(--color-black)",
+    boxShadow: "6px 6px 0 var(--color-yellow)",
     fontSize: "16px",
     fontWeight: "900",
     textTransform: "uppercase",
@@ -142,20 +143,20 @@ export default function PageNavigation({ isTransitioning }) {
                 setHoveredButton("prev");
                 e.currentTarget.style.transform =
                   "rotate(0deg) translate(-4px, 0)";
-                e.currentTarget.style.boxShadow = "12px 12px 0 #000000";
-                e.currentTarget.style.background = "#00ffff";
-                e.currentTarget.style.color = "#000000";
+                e.currentTarget.style.boxShadow = "12px 12px 0 var(--color-black)";
+                e.currentTarget.style.background = "var(--color-cyan)";
+                e.currentTarget.style.color = "var(--color-black)";
               }}
               onMouseLeave={(e) => {
                 setHoveredButton(null);
                 e.currentTarget.style.transform = "rotate(-3deg)";
-                e.currentTarget.style.boxShadow = "8px 8px 0 #000000";
-                e.currentTarget.style.background = "#ffffff";
-                e.currentTarget.style.color = "#000000";
+                e.currentTarget.style.boxShadow = "8px 8px 0 var(--color-black)";
+                e.currentTarget.style.background = "var(--color-white)";
+                e.currentTarget.style.color = "var(--color-black)";
               }}
               onMouseDown={(e) => {
                 e.currentTarget.style.transform = "translate(2px, 2px)";
-                e.currentTarget.style.boxShadow = "4px 4px 0 #000000";
+                e.currentTarget.style.boxShadow = "4px 4px 0 var(--color-black)";
               }}
             >
               ←
@@ -194,20 +195,20 @@ export default function PageNavigation({ isTransitioning }) {
                 setHoveredButton("next");
                 e.currentTarget.style.transform =
                   "rotate(0deg) translate(4px, 0)";
-                e.currentTarget.style.boxShadow = "12px 12px 0 #000000";
-                e.currentTarget.style.background = "#ff00ff";
-                e.currentTarget.style.color = "#ffffff";
+                e.currentTarget.style.boxShadow = "12px 12px 0 var(--color-black)";
+                e.currentTarget.style.background = "var(--color-magenta)";
+                e.currentTarget.style.color = "var(--color-white)";
               }}
               onMouseLeave={(e) => {
                 setHoveredButton(null);
                 e.currentTarget.style.transform = "rotate(3deg)";
-                e.currentTarget.style.boxShadow = "8px 8px 0 #000000";
-                e.currentTarget.style.background = "#ffffff";
-                e.currentTarget.style.color = "#000000";
+                e.currentTarget.style.boxShadow = "8px 8px 0 var(--color-black)";
+                e.currentTarget.style.background = "var(--color-white)";
+                e.currentTarget.style.color = "var(--color-black)";
               }}
               onMouseDown={(e) => {
                 e.currentTarget.style.transform = "translate(2px, 2px)";
-                e.currentTarget.style.boxShadow = "4px 4px 0 #000000";
+                e.currentTarget.style.boxShadow = "4px 4px 0 var(--color-black)";
               }}
             >
               →
@@ -245,12 +246,12 @@ export default function PageNavigation({ isTransitioning }) {
             aria-label={t.prev}
             style={{
               padding: "12px 16px",
-              border: "3px solid #000000",
-              background: "#00ffff",
-              color: "#000000",
+              border: "3px solid var(--color-black)",
+              background: "var(--color-cyan)",
+              color: "var(--color-black)",
               fontSize: "20px",
               fontWeight: "900",
-              boxShadow: "4px 4px 0 #000000",
+              boxShadow: "4px 4px 0 var(--color-black)",
               cursor: "pointer",
               width: "50px",
               height: "50px",
@@ -266,15 +267,15 @@ export default function PageNavigation({ isTransitioning }) {
 
         <div
           style={{
-            background: "#000000",
-            color: "#ffffffff",
+            background: "var(--color-black)",
+            color: "var(--color-white)",
             padding: "8px 16px",
-            border: "3px solid #39ff14",
+            border: "3px solid var(--color-neon-green)",
             fontSize: "13px",
             // fontWeight: '900',
             textTransform: "uppercase",
             borderRadius: "8px",
-            boxShadow: "4px 4px 0 #ff00ff",
+            boxShadow: "4px 4px 0 var(--color-magenta)",
           }}
         >
           {t.pages[pages[currentIndex].name]}
@@ -286,12 +287,12 @@ export default function PageNavigation({ isTransitioning }) {
             aria-label={t.next}
             style={{
               padding: "12px 16px",
-              border: "3px solid #000000",
-              background: "#ff00ff",
-              color: "#ffffff",
+              border: "3px solid var(--color-black)",
+              background: "var(--color-magenta)",
+              color: "var(--color-white)",
               fontSize: "20px",
               fontWeight: "900",
-              boxShadow: "4px 4px 0 #000000",
+              boxShadow: "4px 4px 0 var(--color-black)",
               cursor: "pointer",
               width: "50px",
               height: "50px",

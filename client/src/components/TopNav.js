@@ -1,3 +1,4 @@
+// TopNav.js
 import React, { useContext } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useLocation } from 'react-router-dom';
@@ -33,13 +34,13 @@ export default function TopNav() {
           style={{
             padding: '12px 24px',
             borderRadius: '8px',
-            border: '3px solid #000000',
-            background: '#ffffff',
-            color: '#000000',
+            border: '3px solid var(--color-black)',
+            background: 'var(--color-white)',
+            color: 'var(--color-black)',
             fontSize: '16px',
             fontWeight: '900',
             cursor: 'pointer',
-            boxShadow: '4px 4px 0 #000000',
+            boxShadow: '4px 4px 0 var(--color-black)',
             transition: 'all 0.2s',
             fontFamily: 'var(--font-special)',
             textTransform: 'uppercase',
@@ -48,17 +49,17 @@ export default function TopNav() {
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.transform = 'rotate(0deg) translate(-2px, -2px)';
-            e.currentTarget.style.boxShadow = '6px 6px 0 #000000';
-            e.currentTarget.style.background = '#ffff00';
+            e.currentTarget.style.boxShadow = '6px 6px 0 var(--color-black)';
+            e.currentTarget.style.background = 'var(--color-yellow)';
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.transform = 'rotate(-2deg)';
-            e.currentTarget.style.boxShadow = '4px 4px 0 #000000';
-            e.currentTarget.style.background = '#ffffff';
+            e.currentTarget.style.boxShadow = '4px 4px 0 var(--color-black)';
+            e.currentTarget.style.background = 'var(--color-white)';
           }}
           onMouseDown={(e) => {
             e.currentTarget.style.transform = 'rotate(0deg) translate(2px, 2px)';
-            e.currentTarget.style.boxShadow = '2px 2px 0 #000000';
+            e.currentTarget.style.boxShadow = '2px 2px 0 var(--color-black)';
           }}
         >
           {language === 'en' ? 'FR' : 'EN'}
@@ -73,13 +74,13 @@ export default function TopNav() {
           style={{
             padding: '12px 24px',
             borderRadius: '8px',
-            border: '3px solid #000000',
-            background: isAuthenticated ? '#ff0055' : '#00d4ff',
-            color: '#ffffff',
+            border: '3px solid var(--color-black)',
+            background: isAuthenticated ? 'var(--color-red-pink)' : 'var(--color-light-blue)',
+            color: 'var(--color-white)',
             fontSize: '16px',
             fontWeight: '900',
             cursor: 'pointer',
-            boxShadow: '4px 4px 0 #000000',
+            boxShadow: '4px 4px 0 var(--color-black)',
             transition: 'all 0.2s',
             fontFamily: 'var(--font-special)',
             textTransform: 'uppercase',
@@ -89,15 +90,15 @@ export default function TopNav() {
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.transform = 'rotate(0deg) translate(-2px, -2px)';
-            e.currentTarget.style.boxShadow = '6px 6px 0 #000000';
+            e.currentTarget.style.boxShadow = '6px 6px 0 var(--color-black)';
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.transform = 'rotate(2deg)';
-            e.currentTarget.style.boxShadow = '4px 4px 0 #000000';
+            e.currentTarget.style.boxShadow = '4px 4px 0 var(--color-black)';
           }}
           onMouseDown={(e) => {
             e.currentTarget.style.transform = 'rotate(0deg) translate(2px, 2px)';
-            e.currentTarget.style.boxShadow = '2px 2px 0 #000000';
+            e.currentTarget.style.boxShadow = '2px 2px 0 var(--color-black)';
           }}
         >
           {isAuthenticated ? t.nav.logout : t.nav.login}

@@ -1,3 +1,4 @@
+// Comments.js
 import React, { useContext, useState, useEffect } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useLocation } from "react-router-dom";
@@ -21,7 +22,7 @@ export default function Comments() {
       loginMessage: "You must be logged in to comment",
       delete: "Delete",
       noComments: "No comments yet. Be the first!",
-      posting: "Posting..."
+      posting: "Posting...",
     },
     fr: {
       title: "Commentaires",
@@ -31,7 +32,7 @@ export default function Comments() {
       loginMessage: "Vous devez être connecté pour commenter",
       delete: "Supprimer",
       noComments: "Pas encore de commentaires.",
-      posting: "Publication..."
+      posting: "Publication...",
     },
   };
 
@@ -123,9 +124,18 @@ export default function Comments() {
     }
   };
 
+  const getCardColors = (index) => {
+    const colors = [
+      { border: "var(--color-neon-green)", shadow: "var(--color-magenta)" },
+      { border: "var(--color-magenta)", shadow: "var(--color-cyan)" },
+      { border: "var(--color-cyan)", shadow: "var(--color-neon-green)" },
+    ];
+    return colors[index % 3];
+  };
+
   return (
     <div className="page-container comments-page">
-      <h1 style={{ whiteSpace: 'nowrap' }}>{t.title}</h1>
+      <h1 style={{ whiteSpace: "nowrap" }}>{t.title}</h1>
 
       <div className="content-card">
         {isAuthenticated ? (
@@ -137,18 +147,19 @@ export default function Comments() {
               className="comment-input"
               disabled={loading}
               style={{
-                width: '100%',
-                minHeight: '120px',
-                padding: '16px',
-                border: '4px solid #39ff14',
-                background: '#000000',
-                color: '#ffffff',
-                fontSize: '16px',
-                fontFamily: 'var(--font-body)',
-                resize: 'vertical',
-                marginBottom: '20px',
-                boxShadow: '6px 6px 0 #ff00ff',
-                outline: 'none'
+                width: "100%",
+                minHeight: "120px",
+                padding: "16px",
+                border: "4px solid var(--color-neon-green)",
+                background: "var(--color-black)",
+                color: "var(--color-white)",
+                fontSize: "16px",
+                fontFamily: "var(--font-body)",
+                resize: "vertical",
+                marginBottom: "20px",
+                boxShadow: "6px 6px 0 var(--color-magenta)",
+                outline: "none",
+                boxSizing: "border-box", // ADD THIS LINE
               }}
             />
             <button type="submit" className="btn-primary" disabled={loading}>
@@ -157,10 +168,13 @@ export default function Comments() {
           </form>
         ) : (
           <div>
-            <p className="login-message" style={{
-              fontSize: 'clamp(16px, 2.5vw, 19px)',
-              marginBottom: '20px'
-            }}>
+            <p
+              className="login-message"
+              style={{
+                fontSize: "clamp(16px, 2.5vw, 19px)",
+                marginBottom: "20px",
+              }}
+            >
               {t.loginMessage}
             </p>
             <button
@@ -180,115 +194,133 @@ export default function Comments() {
       <div className="comments-list">
         {comments.length === 0 ? (
           <div className="content-card empty-state">
-            <p style={{ margin: 0, fontSize: 'clamp(16px, 2.5vw, 19px)' }}>{t.noComments}</p>
+            <p style={{ margin: 0, fontSize: "clamp(16px, 2.5vw, 19px)" }}>
+              {t.noComments}
+            </p>
           </div>
         ) : (
-          comments.map((comment, index) => (
-            <div
-              key={comment.id}
-              className="comment-card"
-              style={{
-                background: "#0a0a0a",
-                padding: "20px",
-                margin: "20px 0",
-                border: `4px solid ${index % 3 === 0 ? '#39ff14' : index % 3 === 1 ? '#ff00ff' : '#00ffff'}`,
-                boxShadow: `8px 8px 0 ${index % 3 === 0 ? '#ff00ff' : index % 3 === 1 ? '#00ffff' : '#39ff14'}`,
-                transform: `skewY(${index % 2 === 0 ? '-1deg' : '1deg'})`,
-                transition: 'all 0.2s',
-                clipPath: index % 2 === 0 
-                  ? 'polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px))'
-                  : 'polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'skewY(0deg) translateY(-3px)';
-                e.currentTarget.style.boxShadow = `12px 12px 0 ${index % 3 === 0 ? '#ff00ff' : index % 3 === 1 ? '#00ffff' : '#39ff14'}`;
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = `skewY(${index % 2 === 0 ? '-1deg' : '1deg'})`;
-                e.currentTarget.style.boxShadow = `8px 8px 0 ${index % 3 === 0 ? '#ff00ff' : index % 3 === 1 ? '#00ffff' : '#39ff14'}`;
-              }}
-            >
+          comments.map((comment, index) => {
+            const colors = getCardColors(index);
+            return (
               <div
+                key={comment.id}
+                className="comment-card"
                 style={{
-                  display: "flex",
-                  alignItems: "center",
-                  marginBottom: "12px",
-                  gap: "12px"
+                  background: "var(--color-dark-gray)",
+                  padding: "20px",
+                  margin: "20px 0",
+                  border: `4px solid ${colors.border}`,
+                  boxShadow: `8px 8px 0 ${colors.shadow}`,
+                  transform: `skewY(${index % 2 === 0 ? "-1deg" : "1deg"})`,
+                  transition: "all 0.2s",
+                  clipPath:
+                    index % 2 === 0
+                      ? "polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px))"
+                      : "polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform =
+                    "skewY(0deg) translateY(-3px)";
+                  e.currentTarget.style.boxShadow = `12px 12px 0 ${colors.shadow}`;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = `skewY(${
+                    index % 2 === 0 ? "-1deg" : "1deg"
+                  })`;
+                  e.currentTarget.style.boxShadow = `8px 8px 0 ${colors.shadow}`;
                 }}
               >
-                {comment.user_picture && (
-                  <img
-                    src={comment.user_picture}
-                    alt={comment.user_name}
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    marginBottom: "12px",
+                    gap: "12px",
+                  }}
+                >
+                  {comment.user_picture && (
+                    <img
+                      src={comment.user_picture}
+                      alt={comment.user_name}
+                      style={{
+                        width: "40px",
+                        height: "40px",
+                        borderRadius: "50%",
+                        border: "3px solid var(--color-neon-green)",
+                        boxShadow: "2px 2px 0 var(--color-magenta)",
+                      }}
+                    />
+                  )}
+                  <strong
                     style={{
-                      width: "40px",
-                      height: "40px",
-                      borderRadius: "50%",
-                      border: "3px solid #39ff14",
-                      boxShadow: "2px 2px 0 #ff00ff"
-                    }}
-                  />
-                )}
-                <strong style={{ 
-                  color: "#39ff14",
-                  fontSize: "18px",
-                  fontFamily: "var(--font-bold)",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.05em"
-                }}>
-                  {comment.user_name}
-                </strong>
-                {isAdmin && (
-                  <button
-                    onClick={() => handleDelete(comment.id)}
-                    style={{
-                      marginLeft: "auto",
-                      background: "#ff0055",
-                      color: "#ffffff",
-                      border: "3px solid #000000",
-                      padding: "8px 16px",
-                      cursor: "pointer",
-                      fontWeight: "900",
+                      color: "var(--color-neon-green)",
+                      fontSize: "18px",
                       fontFamily: "var(--font-bold)",
                       textTransform: "uppercase",
-                      fontSize: "12px",
                       letterSpacing: "0.05em",
-                      boxShadow: "3px 3px 0 #000000",
-                      transition: "all 0.2s"
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.transform = "translate(-2px, -2px)";
-                      e.currentTarget.style.boxShadow = "5px 5px 0 #000000";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.transform = "translate(0, 0)";
-                      e.currentTarget.style.boxShadow = "3px 3px 0 #000000";
                     }}
                   >
-                    {t.delete}
-                  </button>
-                )}
+                    {comment.user_name}
+                  </strong>
+                  {isAdmin && (
+                    <button
+                      onClick={() => handleDelete(comment.id)}
+                      style={{
+                        marginLeft: "auto",
+                        background: "var(--color-red-pink)",
+                        color: "var(--color-white)",
+                        border: "3px solid var(--color-black)",
+                        padding: "8px 16px",
+                        cursor: "pointer",
+                        fontWeight: "900",
+                        fontFamily: "var(--font-bold)",
+                        textTransform: "uppercase",
+                        fontSize: "12px",
+                        letterSpacing: "0.05em",
+                        boxShadow: "3px 3px 0 var(--color-black)",
+                        transition: "all 0.2s",
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.transform =
+                          "translate(-2px, -2px)";
+                        e.currentTarget.style.boxShadow =
+                          "5px 5px 0 var(--color-black)";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = "translate(0, 0)";
+                        e.currentTarget.style.boxShadow =
+                          "3px 3px 0 var(--color-black)";
+                      }}
+                    >
+                      {t.delete}
+                    </button>
+                  )}
+                </div>
+                <p
+                  style={{
+                    color: "var(--color-white)",
+                    fontSize: "16px",
+                    lineHeight: "1.6",
+                    margin: "0 0 12px 0",
+                    fontFamily: "var(--font-body)",
+                  }}
+                >
+                  {comment.text}
+                </p>
+                <span
+                  style={{
+                    fontSize: "13px",
+                    color: "var(--color-cyan)",
+                    fontFamily: "var(--font-bold)",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.05em",
+                  }}
+                >
+                  {new Date(comment.created_at).toLocaleDateString()}
+                </span>
               </div>
-              <p style={{
-                color: "#ffffff",
-                fontSize: "16px",
-                lineHeight: "1.6",
-                margin: "0 0 12px 0",
-                fontFamily: "var(--font-body)"
-              }}>
-                {comment.text}
-              </p>
-              <span style={{ 
-                fontSize: "13px", 
-                color: "#00ffff",
-                fontFamily: "var(--font-bold)",
-                textTransform: "uppercase",
-                letterSpacing: "0.05em"
-              }}>
-                {new Date(comment.created_at).toLocaleDateString()}
-              </span>
-            </div>
-          ))
+            );
+          })
         )}
       </div>
     </div>

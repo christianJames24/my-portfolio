@@ -1,3 +1,4 @@
+// Home.js
 import React, { useContext, useEffect } from 'react';
 import { LanguageContext } from '../App';
 
@@ -44,17 +45,17 @@ export default function Home({ backendData }) {
       
       <p style={{
         fontSize: 'clamp(16px, 3vw, 32px)',
-        color: '#000000',
+        color: 'var(--color-black)',
         fontWeight: '400',
         margin: '0',
         position: 'relative',
         zIndex: 2,
-        background: '#ffff00',
+        background: 'var(--color-yellow)',
         display: 'inline-block',
         padding: 'clamp(6px, 1.5vw, 8px) clamp(12px, 3vw, 16px)',
         transform: 'rotate(1deg)',
-        border: '2px solid #000000',
-        boxShadow: 'clamp(4px, 1vw, 6px) clamp(4px, 1vw, 6px) 0 #000000',
+        border: '2px solid var(--color-black)',
+        boxShadow: 'clamp(4px, 1vw, 6px) clamp(4px, 1vw, 6px) 0 var(--color-black)',
         maxWidth: 'fit-content',
         wordWrap: 'break-word',
         overflowWrap: 'break-word',

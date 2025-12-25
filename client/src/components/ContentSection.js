@@ -1,3 +1,4 @@
+// ContentSection.js
 import React from 'react';
 
 export default function ContentSection({ backendData }) {
@@ -10,7 +11,7 @@ export default function ContentSection({ backendData }) {
     }}>
       <h1 style={{
         fontSize: '48px',
-        color: '#0288D1',
+        color: 'var(--color-blue-3)',
         textShadow: '0 2px 4px rgba(255, 255, 255, 0.5)',
         // fontFamily: 'system-ui, -apple-system, sans-serif',
         // fontWeight: '300',
@@ -20,10 +21,10 @@ export default function ContentSection({ backendData }) {
       </h1>
       
       {/* {(typeof backendData.users === 'undefined') ? (
-        <p style={{ color: '#0288D1', fontSize: '18px' }}>Loading...</p>
+        <p style={{ color: 'var(--color-blue-3)', fontSize: '18px' }}>Loading...</p>
       ) : (
         backendData.users.map((user, i) => (
-          <p key={i} style={{ color: '#0288D1', fontSize: '18px', margin: '8px 0' }}>{user}</p>
+          <p key={i} style={{ color: 'var(--color-blue-3)', fontSize: '18px', margin: '8px 0' }}>{user}</p>
         ))
       )} */}
     </div>

@@ -1,3 +1,4 @@
+// BubbleMenu.js
 import { useState, useRef, useEffect, useCallback } from "react";
 import { gsap } from "gsap";
 
@@ -9,35 +10,35 @@ const DEFAULT_ITEMS = [
     href: "#",
     ariaLabel: "Home",
     rotation: -8,
-    hoverStyles: { bgColor: "#ff0055", textColor: "#ffffff" },
+    hoverStyles: { bgColor: "var(--color-red-pink)", textColor: "var(--color-white)" },
   },
   {
     label: "about",
     href: "#",
     ariaLabel: "About",
     rotation: 8,
-    hoverStyles: { bgColor: "#00d4ff", textColor: "#ffffff" },
+    hoverStyles: { bgColor: "var(--color-light-blue)", textColor: "var(--color-white)" },
   },
   {
     label: "projects",
     href: "#",
     ariaLabel: "Documentation",
     rotation: 8,
-    hoverStyles: { bgColor: "#ffff00", textColor: "#000000" },
+    hoverStyles: { bgColor: "var(--color-yellow)", textColor: "var(--color-black)" },
   },
   {
     label: "blog",
     href: "#",
     ariaLabel: "Blog",
     rotation: 8,
-    hoverStyles: { bgColor: "#8b5cf6", textColor: "#ffffff" },
+    hoverStyles: { bgColor: "#8b5cf6", textColor: "var(--color-white)" },
   },
   {
     label: "contact",
     href: "#",
     ariaLabel: "Contact",
     rotation: -8,
-    hoverStyles: { bgColor: "#10b981", textColor: "#ffffff" },
+    hoverStyles: { bgColor: "#10b981", textColor: "var(--color-white)" },
   },
 ];
 
@@ -48,8 +49,8 @@ export default function BubbleMenu({
   className,
   style,
   menuAriaLabel = "Toggle menu",
-  menuBg = "#fff",
-  menuContentColor = "#000",
+  menuBg = "var(--color-white)",
+  menuContentColor = "var(--color-black)",
   useFixedPosition = false,
   items,
   animationEase = "back.out(1.5)",
@@ -97,15 +98,15 @@ export default function BubbleMenu({
 
       const item = menuItems[idx];
       if (isHovering) {
-        bubble.style.background = item.hoverStyles?.bgColor || "#ffffff";
+        bubble.style.background = item.hoverStyles?.bgColor || "var(--color-white)";
         bubble.style.color = item.hoverStyles?.textColor || menuContentColor;
         // bubble.style.transform = `rotate(0deg) scale(1.05) translate(-4px, -4px)`;
-        bubble.style.boxShadow = "12px 12px 0 #000000";
+        bubble.style.boxShadow = "12px 12px 0 var(--color-black)";
       } else {
         bubble.style.background = menuBg;
         bubble.style.color = menuContentColor;
         // bubble.style.transform = `rotate(${item.rotation ?? 0}deg) scale(1)`;
-        bubble.style.boxShadow = "8px 8px 0 #000000";
+        bubble.style.boxShadow = "8px 8px 0 var(--color-black)";
       }
     },
     [isDisabled, menuItems, menuContentColor, menuBg]
@@ -250,18 +251,18 @@ export default function BubbleMenu({
           aria-pressed={isMenuOpen}
           style={{ 
             background: menuBg,
-            border: '4px solid #000000',
-            boxShadow: '6px 6px 0 #000000',
+            border: '4px solid var(--color-black)',
+            boxShadow: '6px 6px 0 var(--color-black)',
             transition: 'all 0.2s'
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.transform = 'rotate(0deg) translate(-2px, -2px)';
-            e.currentTarget.style.boxShadow = '8px 8px 0 #000000';
-            e.currentTarget.style.background = '#ffff00';
+            e.currentTarget.style.boxShadow = '8px 8px 0 var(--color-black)';
+            e.currentTarget.style.background = 'var(--color-yellow)';
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.transform = 'rotate(-2deg)';
-            e.currentTarget.style.boxShadow = '6px 6px 0 #000000';
+            e.currentTarget.style.boxShadow = '6px 6px 0 var(--color-black)';
             e.currentTarget.style.background = menuBg;
           }}
         >
@@ -314,15 +315,15 @@ export default function BubbleMenu({
                       "--item-rot": `${item.rotation ?? 0}deg`,
                       "--pill-bg": menuBg,
                       "--pill-color": menuContentColor,
-                      "--hover-bg": item.hoverStyles?.bgColor || "#ffffff",
+                      "--hover-bg": item.hoverStyles?.bgColor || "var(--color-white)",
                       "--hover-color": item.hoverStyles?.textColor || menuContentColor,
                       pointerEvents: isDisabled ? "none" : "auto",
                       opacity: isDisabled ? 0.5 : 1,
                       cursor: isDisabled ? "default" : "pointer",
                       userSelect: "none",
-                      border: "4px solid #000000",
+                      border: "4px solid var(--color-black)",
                       background: menuBg,
-                      boxShadow: "8px 8px 0 #000000",
+                      boxShadow: "8px 8px 0 var(--color-black)",
                       fontWeight: "900",
                       textTransform: "uppercase",
                       letterSpacing: "0.05em"

@@ -1,3 +1,4 @@
+// About.js
 import React, { useContext } from "react";
 import { LanguageContext } from "../App";
 
@@ -77,18 +78,18 @@ export default function About() {
             maxWidth: '300px',
             height: 'auto',
             marginBottom: '20px',
-            border: '6px solid #39ff14',
-            boxShadow: '12px 12px 0 #ff00ff, -6px -6px 0 #00ffff',
+            border: '6px solid var(--color-neon-green)',
+            boxShadow: '12px 12px 0 var(--color-magenta), -6px -6px 0 var(--color-cyan)',
             transform: 'rotate(-2deg)',
             transition: 'all 0.3s'
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.transform = 'rotate(0deg) scale(1.05)';
-            e.currentTarget.style.boxShadow = '16px 16px 0 #ff00ff, -8px -8px 0 #00ffff';
+            e.currentTarget.style.boxShadow = '16px 16px 0 var(--color-magenta), -8px -8px 0 var(--color-cyan)';
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.transform = 'rotate(-2deg)';
-            e.currentTarget.style.boxShadow = '12px 12px 0 #ff00ff, -6px -6px 0 #00ffff';
+            e.currentTarget.style.boxShadow = '12px 12px 0 var(--color-magenta), -6px -6px 0 var(--color-cyan)';
           }}
         />
         <p>{t.introText}</p>
@@ -105,8 +106,8 @@ export default function About() {
             width: '100%',
             height: 'auto',
             marginBottom: '20px',
-            border: '5px solid #00ffff',
-            boxShadow: '10px 10px 0 #39ff14',
+            border: '5px solid var(--color-cyan)',
+            boxShadow: '10px 10px 0 var(--color-neon-green)',
             clipPath: 'polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 0 100%)'
           }}
         />
@@ -134,8 +135,8 @@ export default function About() {
             style={{
               width: '100%',
               height: 'auto',
-              border: '4px solid #ff00ff',
-              boxShadow: '6px 6px 0 #000000',
+              border: '4px solid var(--color-magenta)',
+              boxShadow: '6px 6px 0 var(--color-black)',
               transform: 'rotate(1deg)'
             }}
           />
@@ -145,8 +146,8 @@ export default function About() {
             style={{
               width: '100%',
               height: 'auto',
-              border: '4px solid #39ff14',
-              boxShadow: '6px 6px 0 #000000',
+              border: '4px solid var(--color-neon-green)',
+              boxShadow: '6px 6px 0 var(--color-black)',
               transform: 'rotate(-2deg)'
             }}
           />
@@ -156,8 +157,8 @@ export default function About() {
             style={{
               width: '100%',
               height: 'auto',
-              border: '4px solid #00ffff',
-              boxShadow: '6px 6px 0 #000000',
+              border: '4px solid var(--color-cyan)',
+              boxShadow: '6px 6px 0 var(--color-black)',
               transform: 'rotate(2deg)'
             }}
           />
@@ -180,8 +181,8 @@ export default function About() {
             width: '100%',
             height: 'auto',
             marginBottom: '20px',
-            border: '5px solid #ff00ff',
-            boxShadow: '-10px 10px 0 #39ff14',
+            border: '5px solid var(--color-magenta)',
+            boxShadow: '-10px 10px 0 var(--color-neon-green)',
             clipPath: 'polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px)'
           }}
         />

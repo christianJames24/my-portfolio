@@ -1,3 +1,4 @@
+// BackgroundGradient.js
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
@@ -62,11 +63,11 @@ export default function BackgroundGradient() {
   const location = useLocation();
   
   const pageConfig = {
-    '/': { number: 1, color1: '#ff00ff', color2: '#39ff14', title: 'HOME' },
-    '/about': { number: 2, color1: '#00ffff', color2: '#ff00ff', title: 'ABOUT' },
-    '/projects': { number: 3, color1: '#39ff14', color2: '#00ffff', title: 'PROJECTS' },
-    '/resume': { number: 4, color1: '#ff00ff', color2: '#00ffff', title: 'RESUME' },
-    '/comments': { number: 5, color1: '#00ffff', color2: '#39ff14', title: 'COMMENTS' }
+    '/': { number: 1, color1: 'var(--color-magenta)', color2: 'var(--color-neon-green)', title: 'HOME' },
+    '/about': { number: 2, color1: 'var(--color-cyan)', color2: 'var(--color-magenta)', title: 'ABOUT' },
+    '/projects': { number: 3, color1: 'var(--color-neon-green)', color2: 'var(--color-cyan)', title: 'PROJECTS' },
+    '/resume': { number: 4, color1: 'var(--color-magenta)', color2: 'var(--color-cyan)', title: 'RESUME' },
+    '/comments': { number: 5, color1: 'var(--color-cyan)', color2: 'var(--color-neon-green)', title: 'COMMENTS' }
   };
 
   const config = pageConfig[location.pathname] || pageConfig['/'];
@@ -88,7 +89,7 @@ export default function BackgroundGradient() {
       width: '100%',
       height: '100%',
       zIndex: 0,
-      background: '#000000',
+      background: 'var(--color-black)',
       overflow: 'hidden'
     }}>
       {/* HUGE page number background - slots up/down */}
@@ -104,9 +105,7 @@ export default function BackgroundGradient() {
         fontFamily: 'var(--font-countdown)',
         letterSpacing: '-0.05em',
         lineHeight: 1,
-        textShadow: `
-          20px 20px 0 ${config.color2}
-        `,
+        textShadow: `20px 20px 0 ${config.color2}`,
         userSelect: 'none',
         pointerEvents: 'none',
         whiteSpace: 'nowrap',

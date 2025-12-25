@@ -1,3 +1,4 @@
+// Modal.js
 import React, { useState, useEffect } from "react";
 import { MODAL_CONTENT, getModalContent } from "../constants/Navigation";
 
@@ -43,9 +44,9 @@ export default function Modal({ activeModal, onClose, backendData }) {
           maxWidth: "900px",
           minHeight: "60vh",
           maxHeight: "85%",
-          background: "#ffffff",
-          border: "5px solid #000000",
-          boxShadow: "16px 16px 0 #000000",
+          background: "var(--color-white)",
+          border: "5px solid var(--color-black)",
+          boxShadow: "16px 16px 0 var(--color-black)",
           padding: "20px 50px 50px 50px",
           position: "relative",
           overflow: "visible",
@@ -65,8 +66,8 @@ export default function Modal({ activeModal, onClose, backendData }) {
             left: 0,
             right: 0,
             height: "12px",
-            background: "#ffff00",
-            borderBottom: "3px solid #000000"
+            background: "var(--color-yellow)",
+            borderBottom: "3px solid var(--color-black)"
           }}
         />
         
@@ -78,14 +79,14 @@ export default function Modal({ activeModal, onClose, backendData }) {
             right: "30px",
             width: "56px",
             height: "56px",
-            border: "3px solid #000000",
-            background: "#ff0055",
-            boxShadow: "4px 4px 0 #000000",
+            border: "3px solid var(--color-black)",
+            background: "var(--color-red-pink)",
+            boxShadow: "4px 4px 0 var(--color-black)",
             cursor: "pointer",
             fontSize: "28px",
             fontWeight: "900",
             lineHeight: "1",
-            color: "#ffffff",
+            color: "var(--color-white)",
             transition: "all 0.2s",
             zIndex: 100,
             display: "flex",
@@ -96,15 +97,15 @@ export default function Modal({ activeModal, onClose, backendData }) {
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.transform = "translate(-2px, -2px)";
-            e.currentTarget.style.boxShadow = "6px 6px 0 #000000";
+            e.currentTarget.style.boxShadow = "6px 6px 0 var(--color-black)";
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.transform = "translate(0, 0)";
-            e.currentTarget.style.boxShadow = "4px 4px 0 #000000";
+            e.currentTarget.style.boxShadow = "4px 4px 0 var(--color-black)";
           }}
           onMouseDown={(e) => {
             e.currentTarget.style.transform = "translate(2px, 2px)";
-            e.currentTarget.style.boxShadow = "2px 2px 0 #000000";
+            e.currentTarget.style.boxShadow = "2px 2px 0 var(--color-black)";
           }}
         >
           ×
@@ -114,7 +115,7 @@ export default function Modal({ activeModal, onClose, backendData }) {
           <h2
             style={{
               fontSize: "clamp(40px, 6vw, 72px)",
-              color: "#000000",
+              color: "var(--color-black)",
               marginBottom: "30px",
               fontWeight: "900",
               textTransform: "uppercase",
@@ -131,7 +132,7 @@ export default function Modal({ activeModal, onClose, backendData }) {
               left: "-10px",
               right: "-10px",
               height: "50%",
-              background: "#ffff00",
+              background: "var(--color-yellow)",
               zIndex: -1
             }} />
           </h2>

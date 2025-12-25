@@ -1,3 +1,4 @@
+// Projects.js
 import React, { useContext } from "react";
 import { LanguageContext } from "../App";
 
@@ -103,72 +104,84 @@ export default function Projects() {
 
   const t = content[language];
 
+  const getProjectColors = (index) => {
+    const colors = [
+      { border: 'var(--color-neon-green)', shadow: 'var(--color-magenta)' },
+      { border: 'var(--color-magenta)', shadow: 'var(--color-cyan)' },
+      { border: 'var(--color-cyan)', shadow: 'var(--color-neon-green)' }
+    ];
+    return colors[index % 3];
+  };
+
   return (
     <div className="page-container projects-page">
       <h1>{t.title}</h1>
 
-      {t.projects.map((project, index) => (
-        <div key={index} className="content-card">
-          {/* Project Image */}
-          <img 
-            src={project.image}
-            alt={project.name}
-            className={`project-image ${index % 2 === 0 ? 'float-right' : 'float-left'}`}
-            style={{
-              width: '100%',
-              height: 'auto',
-              marginBottom: '20px',
-              border: `5px solid ${index % 3 === 0 ? '#39ff14' : index % 3 === 1 ? '#ff00ff' : '#00ffff'}`,
-              boxShadow: `10px 10px 0 ${index % 3 === 0 ? '#ff00ff' : index % 3 === 1 ? '#00ffff' : '#39ff14'}`,
-              clipPath: index % 2 === 0 
-                ? 'polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 0 100%)'
-                : 'polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px)',
-              transition: 'all 0.3s'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-5px)';
-              e.currentTarget.style.boxShadow = `15px 15px 0 ${index % 3 === 0 ? '#ff00ff' : index % 3 === 1 ? '#00ffff' : '#39ff14'}`;
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = `10px 10px 0 ${index % 3 === 0 ? '#ff00ff' : index % 3 === 1 ? '#00ffff' : '#39ff14'}`;
-            }}
-          />
-          
-          <div style={{ 
-            display: 'flex', 
-            justifyContent: 'space-between', 
-            alignItems: 'baseline',
-            marginBottom: '12px',
-            flexWrap: 'wrap',
-            gap: '8px'
-          }}>
-            <h2 style={{ margin: 0 }}>{project.name}</h2>
-            <span style={{ 
-              color: '#00ffff',
-              fontSize: 'clamp(14px, 2vw, 18px)',
-              fontWeight: '900',
+      {t.projects.map((project, index) => {
+        const colors = getProjectColors(index);
+        return (
+          <div key={index} className="content-card">
+            {/* Project Image */}
+            <img 
+              src={project.image}
+              alt={project.name}
+              className={`project-image ${index % 2 === 0 ? 'float-right' : 'float-left'}`}
+              style={{
+                width: '100%',
+                height: 'auto',
+                marginBottom: '20px',
+                border: `5px solid ${colors.border}`,
+                boxShadow: `10px 10px 0 ${colors.shadow}`,
+                clipPath: index % 2 === 0 
+                  ? 'polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 0 100%)'
+                  : 'polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px)',
+                transition: 'all 0.3s'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-5px)';
+                e.currentTarget.style.boxShadow = `15px 15px 0 ${colors.shadow}`;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = `10px 10px 0 ${colors.shadow}`;
+              }}
+            />
+            
+            <div style={{ 
+              display: 'flex', 
+              justifyContent: 'space-between', 
+              alignItems: 'baseline',
+              marginBottom: '12px',
+              flexWrap: 'wrap',
+              gap: '8px'
+            }}>
+              <h2 style={{ margin: 0 }}>{project.name}</h2>
+              <span style={{ 
+                color: 'var(--color-cyan)',
+                fontSize: 'clamp(14px, 2vw, 18px)',
+                fontWeight: '900',
+                fontFamily: 'var(--font-bold)',
+                textTransform: 'uppercase',
+                letterSpacing: '0.1em'
+              }}>
+                {project.year}
+              </span>
+            </div>
+            <p>{project.description}</p>
+            <p style={{ 
+              color: 'var(--color-neon-green)',
+              fontSize: 'clamp(14px, 2vw, 16px)',
               fontFamily: 'var(--font-bold)',
               textTransform: 'uppercase',
-              letterSpacing: '0.1em'
+              letterSpacing: '0.05em',
+              marginTop: '16px',
+              clear: 'both'
             }}>
-              {project.year}
-            </span>
+              {project.tech}
+            </p>
           </div>
-          <p>{project.description}</p>
-          <p style={{ 
-            color: '#39ff14',
-            fontSize: 'clamp(14px, 2vw, 16px)',
-            fontFamily: 'var(--font-bold)',
-            textTransform: 'uppercase',
-            letterSpacing: '0.05em',
-            marginTop: '16px',
-            clear: 'both'
-          }}>
-            {project.tech}
-          </p>
-        </div>
-      ))}
+        );
+      })}
 
       <style>{`
       .content-card {

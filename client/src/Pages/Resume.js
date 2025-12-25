@@ -1,3 +1,4 @@
+// Resume.js
 import React, { useContext } from 'react';
 import { LanguageContext } from '../App';
 
@@ -145,7 +146,7 @@ export default function Resume() {
             }}>
               <h3 style={{ 
                 fontSize: 'clamp(20px, 3vw, 28px)',
-                color: '#39ff14',
+                color: 'var(--color-neon-green)',
                 margin: 0,
                 fontWeight: '900',
                 textTransform: 'uppercase'
@@ -153,7 +154,7 @@ export default function Resume() {
                 {job.title}
               </h3>
               <span style={{ 
-                color: '#00ffff',
+                color: 'var(--color-cyan)',
                 fontSize: 'clamp(14px, 2vw, 16px)',
                 fontWeight: '900',
                 fontFamily: 'var(--font-bold)'
@@ -162,7 +163,7 @@ export default function Resume() {
               </span>
             </div>
             <p style={{ 
-              color: '#ff00ff',
+              color: 'var(--color-magenta)',
               fontSize: 'clamp(16px, 2.5vw, 18px)',
               fontWeight: '700',
               margin: '0 0 12px 0'
@@ -188,7 +189,7 @@ export default function Resume() {
             }}>
               <h3 style={{ 
                 fontSize: 'clamp(20px, 3vw, 28px)',
-                color: '#39ff14',
+                color: 'var(--color-neon-green)',
                 margin: 0,
                 fontWeight: '900',
                 textTransform: 'uppercase'
@@ -196,7 +197,7 @@ export default function Resume() {
                 {school.degree}
               </h3>
               <span style={{ 
-                color: '#00ffff',
+                color: 'var(--color-cyan)',
                 fontSize: 'clamp(14px, 2vw, 16px)',
                 fontWeight: '900',
                 fontFamily: 'var(--font-bold)'
@@ -205,7 +206,7 @@ export default function Resume() {
               </span>
             </div>
             <p style={{ 
-              color: '#ff00ff',
+              color: 'var(--color-magenta)',
               fontSize: 'clamp(16px, 2.5vw, 18px)',
               fontWeight: '700',
               margin: '0 0 12px 0'
@@ -227,7 +228,7 @@ export default function Resume() {
         {t.certs.map((cert, index) => (
           <p key={index} style={{ 
             margin: '8px 0',
-            color: '#39ff14',
+            color: 'var(--color-neon-green)',
             fontSize: 'clamp(16px, 2.5vw, 18px)',
             fontWeight: '700'
           }}>
