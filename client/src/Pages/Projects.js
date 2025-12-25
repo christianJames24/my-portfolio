@@ -171,6 +171,9 @@ export default function Projects() {
       ))}
 
       <style>{`
+      .content-card {
+    overflow: hidden;
+  }
         @media (min-width: 808px) {
           .project-image {
             max-width: 50%;

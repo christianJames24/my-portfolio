@@ -257,7 +257,7 @@ h2 {
   padding: 20px;
   margin-bottom: 75px;
   position: relative;
-  /* Hard offset shadows - NO BLUR */
+  overflow: visible;
   box-shadow: 
     10px 10px 0 #ff00ff,
     -5px -5px 0 #00ffff;

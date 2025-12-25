@@ -190,7 +190,7 @@ export default function About() {
 
       <style>{`
   .content-card {
-    overflow: auto;
+    overflow: hidden;
   }
   
   @media (min-width: 808px) {
