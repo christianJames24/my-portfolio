@@ -7,11 +7,11 @@ export default function BottomBar() {
 
   const content = {
     en: {
-      rights: '© 2025 All rights reserved',
+      rights: '© 2026 All rights reserved',
       social: 'Connect with me'
     },
     fr: {
-      rights: '© 2025 Tous droits réservés',
+      rights: '© 2026 Tous droits réservés',
       social: 'Connectez-vous avec moi'
     }
   };

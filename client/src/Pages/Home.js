@@ -28,23 +28,15 @@ export default function Home({ backendData }) {
     <div className="home-container" style={{
       position: 'relative',
       zIndex: 10,
-      padding: '20px',
+      marginLeft: '7.5%',
+      padding: '2.5%',
       maxWidth: '800px',
+      marginTop: '-2%',
       height: '100vh',
       display: 'flex',
       flexDirection: 'column',
       justifyContent: 'center',
     }}>
-      <div style={{
-        position: 'absolute',
-        top: '20%',
-        left: '20px',
-        width: 'clamp(60px, 15vw, 120px)',
-        height: 'clamp(6px, 1.5vw, 8px)',
-        background: '#ff0055',
-        transform: 'rotate(-3deg)',
-        marginBottom: '40px'
-      }} />
       
       <h1>
         {t.title}
@@ -65,7 +57,8 @@ export default function Home({ backendData }) {
         boxShadow: 'clamp(4px, 1vw, 6px) clamp(4px, 1vw, 6px) 0 #000000',
         maxWidth: 'fit-content',
         wordWrap: 'break-word',
-        overflowWrap: 'break-word'
+        overflowWrap: 'break-word',
+        fontFamily: 'var(--font-body)'
       }}>
         {t.subtitle}
       </p>

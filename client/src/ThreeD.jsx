@@ -196,11 +196,11 @@ export default function ThreeD() {
         <perspectiveCamera makeDefault fov={40} />
         <CameraController sizeRef={sizeRef} isReady={isReady} />
         <ambientLight intensity={0.4} />
-        <directionalLight position={[5, 5, 5]} intensity={1.5} castShadow />
+        <directionalLight position={[5, 5, 5]} intensity={2.5} castShadow />
         <directionalLight
           position={[-5, 0, -5]}
           intensity={1}
-          color="#ffdd45"
+          color="#6d45ffff"
         />
         <CowModel
           onCenterCalculated={handleCenter}

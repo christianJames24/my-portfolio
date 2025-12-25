@@ -41,7 +41,7 @@ export default function TopNav() {
             cursor: 'pointer',
             boxShadow: '4px 4px 0 #000000',
             transition: 'all 0.2s',
-            fontFamily: 'Comfortaa, sans-serif',
+            fontFamily: 'var(--font-special)',
             textTransform: 'uppercase',
             letterSpacing: '0.05em',
             transform: 'rotate(-2deg)'
@@ -81,7 +81,7 @@ export default function TopNav() {
             cursor: 'pointer',
             boxShadow: '4px 4px 0 #000000',
             transition: 'all 0.2s',
-            fontFamily: 'Comfortaa, sans-serif',
+            fontFamily: 'var(--font-special)',
             textTransform: 'uppercase',
             letterSpacing: '0.05em',
             transform: 'rotate(2deg)',

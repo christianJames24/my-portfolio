@@ -1,6 +1,85 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 
-export default function BackgroundGradient({ scrollY }) {
+function AnimatedDigit({ digit, direction }) {
+  const [currentDigit, setCurrentDigit] = useState(digit);
+  const [prevDigit, setPrevDigit] = useState(digit);
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  useEffect(() => {
+    if (digit !== currentDigit) {
+      setPrevDigit(currentDigit);
+      setIsAnimating(true);
+      
+      const timer = setTimeout(() => {
+        setCurrentDigit(digit);
+        setIsAnimating(false);
+      }, 400);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [digit, currentDigit]);
+
+  return (
+    <div style={{
+      position: 'relative',
+      display: 'inline-block',
+      overflow: 'hidden',
+      width: '0.6em',
+      height: '1em',
+      verticalAlign: 'top'
+    }}>
+      {/* Previous digit sliding out */}
+      <div style={{
+        position: 'absolute',
+        width: '100%',
+        transition: isAnimating ? 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease' : 'none',
+        transform: isAnimating 
+          ? `translateY(${direction === 'up' ? '-100%' : '100%'})`
+          : 'translateY(0)',
+        opacity: isAnimating ? 0 : 1
+      }}>
+        {isAnimating ? prevDigit : currentDigit}
+      </div>
+      
+      {/* New digit sliding in */}
+      <div style={{
+        position: 'absolute',
+        width: '100%',
+        transition: isAnimating ? 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease' : 'none',
+        transform: isAnimating 
+          ? 'translateY(0)'
+          : `translateY(${direction === 'up' ? '100%' : '-100%'})`,
+        opacity: isAnimating ? 1 : 0
+      }}>
+        {digit}
+      </div>
+    </div>
+  );
+}
+
+export default function BackgroundGradient() {
+  const location = useLocation();
+  
+  const pageConfig = {
+    '/': { number: 1, color1: '#ff00ff', color2: '#39ff14', title: 'HOME' },
+    '/about': { number: 2, color1: '#00ffff', color2: '#ff00ff', title: 'ABOUT' },
+    '/projects': { number: 3, color1: '#39ff14', color2: '#00ffff', title: 'PROJECTS' },
+    '/resume': { number: 4, color1: '#ff00ff', color2: '#00ffff', title: 'RESUME' },
+    '/comments': { number: 5, color1: '#00ffff', color2: '#39ff14', title: 'COMMENTS' }
+  };
+
+  const config = pageConfig[location.pathname] || pageConfig['/'];
+  const [prevNumber, setPrevNumber] = useState(config.number);
+
+  const direction = config.number > prevNumber ? 'up' : 'down';
+
+  useEffect(() => {
+    setPrevNumber(config.number);
+  }, [config.number]);
+
+  const numberString = String(config.number).padStart(2, '0');
+
   return (
     <div style={{
       position: 'fixed',
@@ -9,97 +88,95 @@ export default function BackgroundGradient({ scrollY }) {
       width: '100%',
       height: '100%',
       zIndex: 0,
-      background: '#fafafa',
+      background: '#000000',
       overflow: 'hidden'
     }}>
-      <svg style={{
+      {/* HUGE page number background - slots up/down */}
+      <div style={{
         position: 'absolute',
-        width: '100%',
-        height: '100%',
-        opacity: 0.08
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%) rotate(-15deg)',
+        fontSize: 'clamp(200px, 35vw, 600px)',
+        fontWeight: '900',
+        color: config.color1,
+        opacity: 0.08,
+        fontFamily: 'var(--font-display)',
+        letterSpacing: '-0.05em',
+        lineHeight: 1,
+        textShadow: `
+          20px 20px 0 ${config.color2}
+        `,
+        userSelect: 'none',
+        pointerEvents: 'none',
+        whiteSpace: 'nowrap',
+        transition: 'color 0.6s ease-in-out, text-shadow 0.6s ease-in-out'
       }}>
-        <defs>
-          <pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse">
-            <path d="M 50 0 L 0 0 0 50" fill="none" stroke="rgba(0, 0, 0, 0.3)" strokeWidth="1"/>
-          </pattern>
-        </defs>
-        <rect width="100%" height="100%" fill="url(#grid)"/>
-      </svg>
-
-      <div style={{
-        position: 'absolute',
-        width: '150%',
-        height: '150%',
-        top: '-25%',
-        right: '-25%',
-        background: 'linear-gradient(130deg, transparent 0%, transparent 45%, rgba(0, 0, 0, 0.03) 45%, rgba(0, 0, 0, 0.08) 75%)',
-        transform: 'rotate(-22deg)',
-        clipPath: 'polygon(100% 0, 100% 100%, 0 100%)'
-      }} />
-
-      <div style={{
-        position: 'absolute',
-        top: '10%',
-        right: '8%',
-        width: '40vw',
-        height: '45vh',
-        background: 'rgba(255, 255, 0, 0.06)',
-        clipPath: 'polygon(0 0, 100% 8%, 92% 100%, 0 92%)',
-        transform: 'rotate(10deg)',
-        border: '2px solid rgba(255, 255, 0, 0.15)'
-      }} />
-
-      <div style={{
-        position: 'absolute',
-        bottom: '15%',
-        left: '6%',
-        width: '38vw',
-        height: '42vh',
-        background: 'rgba(0, 212, 255, 0.06)',
-        clipPath: 'polygon(8% 0, 100% 0, 100% 100%, 0 92%)',
-        transform: 'rotate(-12deg)',
-        border: '2px solid rgba(0, 212, 255, 0.15)'
-      }} />
-
-      <div style={{
-        position: 'absolute',
-        top: '30px',
-        left: '30px',
-        width: '120px',
-        height: '120px',
-        borderLeft: '3px solid rgba(0, 0, 0, 0.12)',
-        borderTop: '3px solid rgba(0, 0, 0, 0.12)'
-      }}>
-        <div style={{
-          position: 'absolute',
-          top: '-2px',
-          left: '-2px',
-          width: '35px',
-          height: '35px',
-          borderLeft: '2px solid rgba(255, 0, 85, 0.4)',
-          borderTop: '2px solid rgba(255, 0, 85, 0.4)'
-        }}/>
+        <AnimatedDigit digit={numberString[0]} direction={direction} />
+        <AnimatedDigit digit={numberString[1]} direction={direction} />
       </div>
 
+      {/* Page title - vertical - simple fade */}
+      <div 
+        key={`title-${location.pathname}`}
+        style={{
+          position: 'absolute',
+          right: '5%',
+          top: '50%',
+          transform: 'translateY(-50%) rotate(90deg)',
+          fontSize: 'clamp(40px, 8vw, 120px)',
+          fontWeight: '900',
+          color: config.color2,
+          opacity: 0.15,
+          fontFamily: 'var(--font-display)',
+          letterSpacing: '0.2em',
+          textShadow: `3px 3px 0 ${config.color1}`,
+          userSelect: 'none',
+          pointerEvents: 'none',
+          animation: 'fadeInTitle 0.6s ease-in-out'
+        }}>
+        {config.title}
+      </div>
+
+      {/* Sharp geometric chaos */}
       <div style={{
         position: 'absolute',
-        bottom: '30px',
-        right: '30px',
-        width: '120px',
-        height: '120px',
-        borderRight: '3px solid rgba(0, 0, 0, 0.12)',
-        borderBottom: '3px solid rgba(0, 0, 0, 0.12)'
-      }}>
-        <div style={{
-          position: 'absolute',
-          bottom: '-2px',
-          right: '-2px',
-          width: '35px',
-          height: '35px',
-          borderRight: '2px solid rgba(0, 212, 255, 0.4)',
-          borderBottom: '2px solid rgba(0, 212, 255, 0.4)'
-        }}/>
-      </div>
+        top: '15%',
+        right: '10%',
+        width: '35vw',
+        height: '40vh',
+        background: config.color1,
+        opacity: 0.12,
+        clipPath: 'polygon(0 0, 95% 5%, 100% 50%, 90% 100%, 5% 95%, 0 60%)',
+        transform: 'rotate(25deg) skewX(-10deg)',
+        border: `4px solid ${config.color2}`,
+        transition: 'background 0.6s ease-in-out, border-color 0.6s ease-in-out'
+      }} />
+
+      <div style={{
+        position: 'absolute',
+        bottom: '20%',
+        left: '8%',
+        width: '30vw',
+        height: '35vh',
+        background: config.color2,
+        opacity: 0.12,
+        clipPath: 'polygon(5% 0, 100% 10%, 95% 100%, 0 90%)',
+        transform: 'rotate(-20deg) skewY(8deg)',
+        border: `4px solid ${config.color1}`,
+        transition: 'background 0.6s ease-in-out, border-color 0.6s ease-in-out'
+      }} />
+
+      <style>{`
+        @keyframes fadeInTitle {
+          0% {
+            opacity: 0;
+          }
+          100% {
+            opacity: 0.15;
+          }
+        }
+      `}</style>
     </div>
   );
 }

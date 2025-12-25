@@ -143,7 +143,7 @@ export default function Comments() {
                 border: '3px solid #000000',
                 borderRadius: '8px',
                 fontSize: '16px',
-                fontFamily: 'inherit',
+                fontFamily: 'var(--font-body)',
                 resize: 'vertical',
                 marginBottom: '16px'
               }}

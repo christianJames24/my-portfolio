@@ -130,8 +130,8 @@ export default function PageNavigation({ isTransitioning }) {
                 setHoveredButton('prev');
                 e.currentTarget.style.transform = 'rotate(0deg) translate(-4px, 0)';
                 e.currentTarget.style.boxShadow = '12px 12px 0 #000000';
-                e.currentTarget.style.background = '#00d4ff';
-                e.currentTarget.style.color = '#ffffff';
+                e.currentTarget.style.background = '#00ffff';
+                e.currentTarget.style.color = '#000000';
               }}
               onMouseLeave={(e) => {
                 setHoveredButton(null);
@@ -171,7 +171,7 @@ export default function PageNavigation({ isTransitioning }) {
                 setHoveredButton('next');
                 e.currentTarget.style.transform = 'rotate(0deg) translate(4px, 0)';
                 e.currentTarget.style.boxShadow = '12px 12px 0 #000000';
-                e.currentTarget.style.background = '#ff0055';
+                e.currentTarget.style.background = '#ff00ff';
                 e.currentTarget.style.color = '#ffffff';
               }}
               onMouseLeave={(e) => {
@@ -202,10 +202,10 @@ export default function PageNavigation({ isTransitioning }) {
       {/* Mobile Navigation - Bottom bar ABOVE footer */}
       <div className="mobile-nav" style={{
         position: 'fixed',
-        bottom: '160px', // Changed from 100px to 160px to sit above footer
+        bottom: '200px',
         left: '50%',
         transform: 'translateX(-50%)',
-        zIndex: 95, // Increased from 50 to be above footer content but below footer itself
+        zIndex: 95,
         display: 'none',
         gap: '16px',
         alignItems: 'center'
@@ -217,8 +217,8 @@ export default function PageNavigation({ isTransitioning }) {
             style={{
               padding: '12px 16px',
               border: '3px solid #000000',
-              background: '#00d4ff',
-              color: '#ffffff',
+              background: '#00ffff',
+              color: '#000000',
               fontSize: '20px',
               fontWeight: '900',
               boxShadow: '4px 4px 0 #000000',
@@ -237,14 +237,14 @@ export default function PageNavigation({ isTransitioning }) {
         
         <div style={{
           background: '#000000',
-          color: '#ffffff',
+          color: '#ffffffff',
           padding: '8px 16px',
-          border: '3px solid #000000',
+          border: '3px solid #39ff14',
           fontSize: '13px',
-          fontWeight: '900',
+          // fontWeight: '900',
           textTransform: 'uppercase',
           borderRadius: '8px',
-          boxShadow: '4px 4px 0 #ffff00'
+          boxShadow: '4px 4px 0 #ff00ff'
         }}>
           {t.pages[pages[currentIndex].name]}
         </div>
@@ -256,7 +256,7 @@ export default function PageNavigation({ isTransitioning }) {
             style={{
               padding: '12px 16px',
               border: '3px solid #000000',
-              background: '#ff0055',
+              background: '#ff00ff',
               color: '#ffffff',
               fontSize: '20px',
               fontWeight: '900',
@@ -295,7 +295,7 @@ export default function PageNavigation({ isTransitioning }) {
         /* Adjust for very tall mobile footers */
         @media (max-width: 480px) {
           .mobile-nav {
-            bottom: 180px !important;
+            bottom: 220px !important;
           }
         }
       `}</style>
