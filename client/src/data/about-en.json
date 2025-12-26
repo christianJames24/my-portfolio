@@ -2,14 +2,22 @@
   "title": "About Me",
   "intro": "Hey, I'm a Developer",
   "introText": "I build things for the web. Sometimes they break. Most of the time they work. I'm passionate about creating digital experiences that don't suck—clean code, smooth interfaces, and solutions that actually solve problems.",
+  "profileImage": "https://picsum.photos/400/400?random=1",
   "journey": "The Journey",
   "journeyText": "Started coding because I wanted to make a game. Ended up building websites, apps, and everything in between. Along the way, I've picked up a ridiculous amount of frameworks, broken more things than I can count, and learned that Stack Overflow is humanity's greatest achievement.",
+  "journeyImage": "https://picsum.photos/800/400?random=2",
   "whatIDo": "What I Do",
   "whatIDoText": "I specialize in full-stack development with a focus on modern web technologies. Frontend? Backend? DevOps? Yeah, I mess with all of it. Jack of all trades, master of Googling error messages.",
   "skills": "Skills & Tech",
   "skillsText": "**Frontend:** React, Next.js, TypeScript, Tailwind CSS, GSAP, Three.js\n\n**Backend:** Node.js, Express, Python, PostgreSQL, MongoDB, Redis\n\n**Tools:** Git, Docker, AWS, Vercel, Figma, VS Code (obviously)\n\n**Currently Learning:** Rust, WebAssembly, whatever new framework dropped this week",
+  "skillsImages": [
+    "https://picsum.photos/300/200?random=3",
+    "https://picsum.photos/300/200?random=4",
+    "https://picsum.photos/300/200?random=5"
+  ],
   "philosophy": "My Philosophy",
   "philosophyText": "Code should be clean, comments should be honest, and coffee should be strong. I believe in building things that matter, iterating fast, and never being afraid to scrap everything and start over when something doesn't feel right.",
   "outside": "Outside of Code",
-  "outsideText": "When I'm not staring at a screen, you'll find me staring at a different screen (gaming), or occasionally touching grass. I'm into music production, photography, mechanical keyboards, and convincing myself I need another monitor."
+  "outsideText": "When I'm not staring at a screen, you'll find me staring at a different screen (gaming), or occasionally touching grass. I'm into music production, photography, mechanical keyboards, and convincing myself I need another monitor.",
+  "outsideImage": "https://picsum.photos/800/500?random=6"
 }

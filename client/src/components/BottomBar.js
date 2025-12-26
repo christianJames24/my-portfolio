@@ -3,16 +3,17 @@ import React, { useContext } from 'react';
 import { LanguageContext } from '../App';
 import '../styles/BottomBar.css';
 
-export default function BottomBar({ show }) {
+export default function BottomBar({ show, instantHide }) {
   const { language } = useContext(LanguageContext);
+  const currentYear = new Date().getFullYear();
 
   const content = {
     en: {
-      rights: '© 2026 All rights reserved',
+      rights: `© ${currentYear} All rights reserved`,
       social: 'Connect with me'
     },
     fr: {
-      rights: '© 2026 Tous droits réservés',
+      rights: `© ${currentYear} Tous droits réservés`,
       social: 'Connectez-vous avec moi'
     }
   };
@@ -20,7 +21,7 @@ export default function BottomBar({ show }) {
   const t = content[language];
 
   return (
-    <footer className={`bottom-bar ${show ? 'visible' : 'hidden'}`}>
+    <footer className={`bottom-bar ${show ? 'visible' : 'hidden'} ${instantHide ? 'instant-hide' : ''}`}>
       <div className="bottom-bar-content">
         <div className="bottom-bar-section">
           <span className="copyright">{t.rights}</span>

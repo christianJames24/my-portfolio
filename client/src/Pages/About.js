@@ -15,7 +15,7 @@ export default function About() {
       <div className="content-card">
         <h2>{t.intro}</h2>
         <img
-          src="https://picsum.photos/400/400?random=1"
+          src={t.profileImage}
           alt="Profile"
           className="profile-image float-left"
           style={{
@@ -46,7 +46,7 @@ export default function About() {
       <div className="content-card">
         <h2>{t.journey}</h2>
         <img
-          src="https://picsum.photos/800/400?random=2"
+          src={t.journeyImage}
           alt="Journey"
           className="float-image float-right"
           style={{
@@ -78,39 +78,24 @@ export default function About() {
             marginTop: "24px",
           }}
         >
-          <img
-            src="https://picsum.photos/300/200?random=3"
-            alt="Tech 1"
-            style={{
-              width: "100%",
-              height: "auto",
-              border: "4px solid var(--color-magenta)",
-              boxShadow: "6px 6px 0 var(--color-black)",
-              transform: "rotate(1deg)",
-            }}
-          />
-          <img
-            src="https://picsum.photos/300/200?random=4"
-            alt="Tech 2"
-            style={{
-              width: "100%",
-              height: "auto",
-              border: "4px solid var(--color-neon-green)",
-              boxShadow: "6px 6px 0 var(--color-black)",
-              transform: "rotate(-2deg)",
-            }}
-          />
-          <img
-            src="https://picsum.photos/300/200?random=5"
-            alt="Tech 3"
-            style={{
-              width: "100%",
-              height: "auto",
-              border: "4px solid var(--color-cyan)",
-              boxShadow: "6px 6px 0 var(--color-black)",
-              transform: "rotate(2deg)",
-            }}
-          />
+          {t.skillsImages.map((image, index) => (
+            <img
+              key={index}
+              src={image}
+              alt={`Tech ${index + 1}`}
+              style={{
+                width: "100%",
+                height: "auto",
+                border: `4px solid ${
+                  index === 0 ? 'var(--color-magenta)' : 
+                  index === 1 ? 'var(--color-neon-green)' : 
+                  'var(--color-cyan)'
+                }`,
+                boxShadow: "6px 6px 0 var(--color-black)",
+                transform: `rotate(${index === 0 ? '1deg' : index === 1 ? '-2deg' : '2deg'})`,
+              }}
+            />
+          ))}
         </div>
       </div>
 
@@ -122,7 +107,7 @@ export default function About() {
       <div className="content-card">
         <h2>{t.outside}</h2>
         <img
-          src="https://picsum.photos/800/500?random=6"
+          src={t.outsideImage}
           alt="Hobbies"
           className="float-image float-left"
           style={{
