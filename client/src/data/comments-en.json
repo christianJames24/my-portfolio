@@ -1,0 +1,10 @@
+{
+  "title": "Comments",
+  "placeholder": "Leave a comment...",
+  "submit": "Submit",
+  "login": "Login to Comment",
+  "loginMessage": "You must be logged in to comment",
+  "delete": "Delete",
+  "noComments": "No comments yet. Be the first!",
+  "posting": "Posting..."
+}

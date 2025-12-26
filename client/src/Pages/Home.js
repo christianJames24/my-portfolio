@@ -1,29 +1,12 @@
 // Home.js
-import React, { useContext, useEffect } from 'react';
+import React, { useContext } from 'react';
 import { LanguageContext } from '../App';
+import contentEn from '../data/home-en.json';
+import contentFr from '../data/home-fr.json';
 
 export default function Home({ backendData }) {
   const { language } = useContext(LanguageContext);
-
-  const content = {
-    en: {
-      title: 'Welcome to My Portfolio',
-      subtitle: 'Building amazing digital experiences'
-    },
-    fr: {
-      title: 'Bienvenue sur Mon Portfolio',
-      subtitle: 'Créer des expériences numériques incroyables'
-    }
-  };
-
-  const t = content[language];
-
-  // useEffect(() => {
-  //   document.body.style.overflow = 'hidden';
-  //   return () => {
-  //     document.body.style.overflow = 'auto';
-  //   };
-  // }, []);
+  const t = language === 'en' ? contentEn : contentFr;
 
   return (
     <div className="home-container" style={{

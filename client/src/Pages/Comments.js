@@ -3,6 +3,8 @@ import React, { useContext, useState, useEffect } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useLocation } from "react-router-dom";
 import { LanguageContext } from "../App";
+import contentEn from "../data/comments-en.json";
+import contentFr from "../data/comments-fr.json";
 
 export default function Comments() {
   const { language } = useContext(LanguageContext);
@@ -13,30 +15,7 @@ export default function Comments() {
   const [loading, setLoading] = useState(false);
   const [permissions, setPermissions] = useState([]);
 
-  const content = {
-    en: {
-      title: "Comments",
-      placeholder: "Leave a comment...",
-      submit: "Submit",
-      login: "Login to Comment",
-      loginMessage: "You must be logged in to comment",
-      delete: "Delete",
-      noComments: "No comments yet. Be the first!",
-      posting: "Posting...",
-    },
-    fr: {
-      title: "Commentaires",
-      placeholder: "Laisser un commentaire...",
-      submit: "Soumettre",
-      login: "Connexion pour commenter",
-      loginMessage: "Vous devez être connecté pour commenter",
-      delete: "Supprimer",
-      noComments: "Pas encore de commentaires.",
-      posting: "Publication...",
-    },
-  };
-
-  const t = content[language];
+  const t = language === "en" ? contentEn : contentFr;
   const isAdmin = permissions.includes("delete:comments");
   const location = useLocation();
 
@@ -159,7 +138,7 @@ export default function Comments() {
                 marginBottom: "20px",
                 boxShadow: "6px 6px 0 var(--color-magenta)",
                 outline: "none",
-                boxSizing: "border-box", // ADD THIS LINE
+                boxSizing: "border-box",
               }}
             />
             <button type="submit" className="btn-primary" disabled={loading}>

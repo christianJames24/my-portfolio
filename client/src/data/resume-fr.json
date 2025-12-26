@@ -1,0 +1,42 @@
+{
+  "title": "CV",
+  "download": "Télécharger PDF",
+  "experience": "Expérience",
+  "jobs": [
+    {
+      "title": "Développeur Full-Stack Senior",
+      "company": "TechCorp Inc.",
+      "period": "2022 - Présent",
+      "description": "Direction du développement d'applications web évolutives servant 100k+ utilisateurs. Architecture d'infrastructure de microservices, réduction des temps de chargement de 60%, et mentorat de développeurs juniors. Stack technique: React, Node.js, PostgreSQL, AWS."
+    },
+    {
+      "title": "Développeur Full-Stack",
+      "company": "StartupXYZ",
+      "period": "2020 - 2022",
+      "description": "Construit et expédié des fonctionnalités pour une plateforme SaaS de MVP à Série A. Implémentation de fonctionnalités de collaboration en temps réel, APIs RESTful, et frontend responsive. Porté plusieurs chapeaux, cassé des choses, réparé des choses."
+    },
+    {
+      "title": "Développeur Frontend",
+      "company": "Digital Agency Co.",
+      "period": "2019 - 2020",
+      "description": "Créé des sites web responsives pixel-perfect pour divers clients. Spécialisé en React, bibliothèques d'animation, et rendre les designers heureux. Appris que \"fais-le ressortir\" n'est pas un retour utile."
+    }
+  ],
+  "education": "Éducation",
+  "schools": [
+    {
+      "degree": "B.S. Informatique",
+      "school": "Université de Technologie",
+      "period": "2015 - 2019",
+      "description": "Diplômé avec mention. Cours pertinents: Structures de Données, Algorithmes, Développement Web, Systèmes de Base de Données, Génie Logiciel."
+    }
+  ],
+  "skills": "Compétences Techniques",
+  "skillsList": "**Langages:** JavaScript/TypeScript, Python, HTML/CSS, SQL, Bash\n\n**Frontend:** React, Next.js, Vue, Tailwind CSS, GSAP, Three.js, Redux\n\n**Backend:** Node.js, Express, Django, REST APIs, GraphQL, WebSockets\n\n**Base de Données:** PostgreSQL, MongoDB, Redis, Prisma, Supabase\n\n**DevOps:** Docker, AWS, Vercel, GitHub Actions, CI/CD, Nginx\n\n**Outils:** Git, VS Code, Figma, Postman, Linux, Vim (je peux en sortir)",
+  "certifications": "Certifications",
+  "certs": [
+    "AWS Certified Developer - Associate",
+    "MongoDB Certified Developer",
+    "Meta Frontend Developer Professional Certificate"
+  ]
+}

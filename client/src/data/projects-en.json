@@ -1,0 +1,47 @@
+{
+  "title": "Projects",
+  "projects": [
+    {
+      "name": "HyperTask",
+      "description": "A brutalist task management app that doesn't try to be your therapist. Built with React, Node.js, and PostgreSQL. Features real-time collaboration, keyboard shortcuts for everything, and a UI that gets out of your way.",
+      "tech": "React • Node.js • PostgreSQL • WebSockets • Redis",
+      "year": "2024",
+      "image": "https://picsum.photos/800/500?random=10"
+    },
+    {
+      "name": "DevJournal",
+      "description": "Markdown-based developer journal with syntax highlighting, git integration, and daily commit stats. Because documenting your debugging journey is cheaper than therapy.",
+      "tech": "Next.js • MongoDB • CodeMirror • GitHub API",
+      "year": "2024",
+      "image": "https://picsum.photos/800/500?random=11"
+    },
+    {
+      "name": "SoundScape",
+      "description": "Interactive audio visualizer built with Three.js and Web Audio API. Generates 3D landscapes that react to your music in real-time. It's like WinAmp visualizations but you can actually show people.",
+      "tech": "Three.js • Web Audio API • GLSL • React",
+      "year": "2023",
+      "image": "https://picsum.photos/800/500?random=12"
+    },
+    {
+      "name": "CLI Portfolio",
+      "description": "A terminal-style portfolio website because I thought it would be cool. It was. Features a custom shell interpreter, file system navigation, and easter eggs for people who actually read documentation.",
+      "tech": "TypeScript • Node.js • Custom Parser • Vercel",
+      "year": "2023",
+      "image": "https://picsum.photos/800/500?random=13"
+    },
+    {
+      "name": "QuickPoll",
+      "description": "Real-time polling app for presentations and meetings. Create a poll, share a link, watch votes come in live. No login required because nobody wants another account.",
+      "tech": "React • Express • Socket.io • Chart.js",
+      "year": "2023",
+      "image": "https://picsum.photos/800/500?random=14"
+    },
+    {
+      "name": "CodeSnap",
+      "description": "Beautiful code screenshot generator with tons of themes and customization. For when your code is actually clean enough to share on Twitter.",
+      "tech": "React • Prism.js • Canvas API • Tailwind",
+      "year": "2022",
+      "image": "https://picsum.photos/800/500?random=15"
+    }
+  ]
+}

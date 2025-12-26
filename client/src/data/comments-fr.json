@@ -1,0 +1,10 @@
+{
+  "title": "Commentaires",
+  "placeholder": "Laisser un commentaire...",
+  "submit": "Soumettre",
+  "login": "Connexion pour commenter",
+  "loginMessage": "Vous devez être connecté pour commenter",
+  "delete": "Supprimer",
+  "noComments": "Pas encore de commentaires.",
+  "posting": "Publication..."
+}

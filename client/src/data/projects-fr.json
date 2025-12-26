@@ -1,0 +1,47 @@
+{
+  "title": "Projets",
+  "projects": [
+    {
+      "name": "HyperTask",
+      "description": "Une application brutale de gestion des tâches qui n'essaie pas d'être votre thérapeute. Construit avec React, Node.js et PostgreSQL. Fonctionnalités de collaboration en temps réel, raccourcis clavier pour tout, et une interface qui se retire de votre chemin.",
+      "tech": "React • Node.js • PostgreSQL • WebSockets • Redis",
+      "year": "2024",
+      "image": "https://picsum.photos/800/500?random=10"
+    },
+    {
+      "name": "DevJournal",
+      "description": "Journal de développeur basé sur Markdown avec coloration syntaxique, intégration git et statistiques de commit quotidiennes. Parce que documenter votre parcours de débogage est moins cher qu'une thérapie.",
+      "tech": "Next.js • MongoDB • CodeMirror • GitHub API",
+      "year": "2024",
+      "image": "https://picsum.photos/800/500?random=11"
+    },
+    {
+      "name": "SoundScape",
+      "description": "Visualiseur audio interactif construit avec Three.js et Web Audio API. Génère des paysages 3D qui réagissent à votre musique en temps réel. C'est comme les visualisations WinAmp mais vous pouvez vraiment montrer aux gens.",
+      "tech": "Three.js • Web Audio API • GLSL • React",
+      "year": "2023",
+      "image": "https://picsum.photos/800/500?random=12"
+    },
+    {
+      "name": "CLI Portfolio",
+      "description": "Un site portfolio de style terminal parce que je pensais que ce serait cool. C'était. Fonctionnalités d'un interpréteur shell personnalisé, navigation du système de fichiers et œufs de Pâques pour les gens qui lisent vraiment la documentation.",
+      "tech": "TypeScript • Node.js • Custom Parser • Vercel",
+      "year": "2023",
+      "image": "https://picsum.photos/800/500?random=13"
+    },
+    {
+      "name": "QuickPoll",
+      "description": "Application de sondage en temps réel pour les présentations et les réunions. Créez un sondage, partagez un lien, regardez les votes arriver en direct. Pas de connexion requise parce que personne ne veut un autre compte.",
+      "tech": "React • Express • Socket.io • Chart.js",
+      "year": "2023",
+      "image": "https://picsum.photos/800/500?random=14"
+    },
+    {
+      "name": "CodeSnap",
+      "description": "Générateur de captures d'écran de code magnifique avec des tonnes de thèmes et de personnalisation. Pour quand votre code est assez propre pour partager sur Twitter.",
+      "tech": "React • Prism.js • Canvas API • Tailwind",
+      "year": "2022",
+      "image": "https://picsum.photos/800/500?random=15"
+    }
+  ]
+}
