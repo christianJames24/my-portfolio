@@ -12,32 +12,46 @@ if (isProduction) {
   });
   db = pool;
 
-  // Initialize tables
-  db.query(`
-    CREATE TABLE IF NOT EXISTS comments (
-      id SERIAL PRIMARY KEY,
-      user_id VARCHAR(255) NOT NULL,
-      user_name VARCHAR(255) NOT NULL,
-      user_picture TEXT,
-      text TEXT NOT NULL,
-      status VARCHAR(20) DEFAULT 'pending',
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );
+  const runMigrations = async () => {
+    try {
+      await db.query(`
+        CREATE TABLE IF NOT EXISTS comments (
+          id SERIAL PRIMARY KEY,
+          user_id VARCHAR(255) NOT NULL,
+          user_name VARCHAR(255) NOT NULL,
+          user_picture TEXT,
+          text TEXT NOT NULL,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+      `);
 
-    CREATE TABLE IF NOT EXISTS projects (
-      id SERIAL PRIMARY KEY,
-      sort_order INTEGER DEFAULT 0,
-      name_en VARCHAR(255) NOT NULL,
-      name_fr VARCHAR(255) NOT NULL,
-      description_en TEXT,
-      description_fr TEXT,
-      tech VARCHAR(255),
-      year VARCHAR(10),
-      image TEXT,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );
-  `).catch((err) => console.error("Error creating tables:", err));
+      await db.query(`
+        ALTER TABLE comments ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'approved'
+      `);
+
+      await db.query(`
+        CREATE TABLE IF NOT EXISTS projects (
+          id SERIAL PRIMARY KEY,
+          sort_order INTEGER DEFAULT 0,
+          name_en VARCHAR(255) NOT NULL,
+          name_fr VARCHAR(255) NOT NULL,
+          description_en TEXT,
+          description_fr TEXT,
+          tech VARCHAR(255),
+          year VARCHAR(10),
+          image TEXT,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+      `);
+
+      console.log("Database migrations completed successfully");
+    } catch (err) {
+      console.error("Error running migrations:", err);
+    }
+  };
+
+  runMigrations();
 } else {
   const Database = require("better-sqlite3");
   const sqliteDb = new Database(":memory:");
@@ -73,7 +87,7 @@ if (isProduction) {
       return new Promise((resolve, reject) => {
         try {
           const normalizedText = text.replace(/\$\d+/g, "?");
-          
+
           if (text.trim().toUpperCase().startsWith("DELETE")) {
             const stmt = sqliteDb.prepare(normalizedText);
             const info = stmt.run(...params);
@@ -91,7 +105,6 @@ if (isProduction) {
             const cleanText = normalizedText.replace(" RETURNING *", "");
             const stmt = sqliteDb.prepare(cleanText);
             const info = stmt.run(...params);
-            const idMatch = text.match(/WHERE\s+id\s*=\s*\$?\d*/i);
             const idParam = params[params.length - 1];
             const tableName = text.match(/UPDATE\s+(\w+)/i)?.[1] || "comments";
             const row = sqliteDb
@@ -102,6 +115,8 @@ if (isProduction) {
             const stmt = sqliteDb.prepare(normalizedText);
             const rows = params.length > 0 ? stmt.all(...params) : stmt.all();
             resolve({ rows });
+          } else {
+            resolve({ rows: [] });
           }
         } catch (err) {
           reject(err);
