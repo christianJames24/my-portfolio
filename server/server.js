@@ -25,9 +25,7 @@ if (isProduction) {
 
   const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
-    ssl: {
-      rejectUnauthorized: true, // Secure!
-    },
+    ssl: true,
   });
   db = pool;
 
