@@ -1,7 +1,9 @@
 const express = require("express");
 const cors = require("cors");
 const { auth } = require("express-oauth2-jwt-bearer");
-require("dotenv").config();
+if (process.env.NODE_ENV !== "production") {
+  require("dotenv").config();
+}
 
 // Initialize database on startup (local only)
 if (process.env.NODE_ENV !== "production") {
@@ -20,10 +22,12 @@ const isProduction = process.env.NODE_ENV === "production";
 
 if (isProduction) {
   const { Pool } = require("pg");
-  
+
   const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
-    ssl: true  // Just use true!
+    ssl: {
+      rejectUnauthorized: true, // Secure!
+    },
   });
   db = pool;
 
