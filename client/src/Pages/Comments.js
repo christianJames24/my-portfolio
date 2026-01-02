@@ -14,10 +14,16 @@ export default function Comments() {
   const [newComment, setNewComment] = useState("");
   const [loading, setLoading] = useState(false);
   const [permissions, setPermissions] = useState([]);
+  const [submitMessage, setSubmitMessage] = useState("");
 
   const t = language === "en" ? contentEn : contentFr;
   const isAdmin = permissions.includes("delete:comments");
   const location = useLocation();
+
+  const pendingMessage = {
+    en: "Comment submitted! It will appear after admin approval.",
+    fr: "Commentaire soumis! Il apparaîtra après approbation de l'administrateur.",
+  };
 
   useEffect(() => {
     fetchComments();
@@ -57,6 +63,7 @@ export default function Comments() {
     if (!newComment.trim()) return;
 
     setLoading(true);
+    setSubmitMessage("");
     try {
       const token = await getAccessTokenSilently();
 
@@ -75,6 +82,7 @@ export default function Comments() {
 
       if (response.ok) {
         setNewComment("");
+        setSubmitMessage(pendingMessage[language]);
         fetchComments();
       }
     } catch (err) {
@@ -144,6 +152,21 @@ export default function Comments() {
             <button type="submit" className="btn-primary" disabled={loading}>
               {loading ? t.posting : t.submit}
             </button>
+            {submitMessage && (
+              <p
+                style={{
+                  marginTop: "16px",
+                  padding: "12px 16px",
+                  background: "var(--color-neon-green)",
+                  color: "var(--color-black)",
+                  fontWeight: "700",
+                  border: "3px solid var(--color-black)",
+                  boxShadow: "4px 4px 0 var(--color-black)",
+                }}
+              >
+                {submitMessage}
+              </p>
+            )}
           </form>
         ) : (
           <div>

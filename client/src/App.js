@@ -13,6 +13,7 @@ import About from "./Pages/About";
 import Projects from "./Pages/Projects";
 import Resume from "./Pages/Resume";
 import Comments from "./Pages/Comments";
+import Dashboard from "./Pages/Dashboard";
 import "./styles/animations.css";
 import "./styles/pageTransitions.css";
 
@@ -30,6 +31,7 @@ const translations = {
       projects: "projects",
       resume: "resume",
       comments: "comments",
+      dashboard: "dashboard",
       login: "login",
       logout: "logout",
     },
@@ -41,19 +43,12 @@ const translations = {
       projects: "projets",
       resume: "cv",
       comments: "commentaires",
+      dashboard: "tableau",
       login: "connexion",
       logout: "déconnexion",
     },
   },
 };
-
-const pages = [
-  { path: "/", name: "home" },
-  { path: "/about", name: "about" },
-  { path: "/projects", name: "projects" },
-  { path: "/resume", name: "resume" },
-  { path: "/comments", name: "comments" },
-];
 
 function App() {
   const [backendData, setBackendData] = useState([{}]);
@@ -64,15 +59,25 @@ function App() {
   const [direction, setDirection] = useState("forward");
   const [showFooter, setShowFooter] = useState(true);
   const [instantHide, setInstantHide] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   // const mobileWidth = 768;
   const mobileWidth = 1100;
   const [isMobile, setIsMobile] = useState(window.innerWidth < mobileWidth);
 
   const navigate = useNavigate();
   const location = useLocation();
-  const { isLoading } = useAuth0();
+  const { isLoading, isAuthenticated, getAccessTokenSilently } = useAuth0();
 
   const t = translations[language];
+
+  const pages = [
+    { path: "/", name: "home" },
+    { path: "/about", name: "about" },
+    { path: "/projects", name: "projects" },
+    { path: "/resume", name: "resume" },
+    { path: "/comments", name: "comments" },
+    ...(isAdmin ? [{ path: "/dashboard", name: "dashboard" }] : []),
+  ];
 
   const menuItems = [
     {
@@ -125,7 +130,42 @@ function App() {
       },
       path: "/comments",
     },
+    ...(isAdmin
+      ? [
+          {
+            label: t.nav.dashboard,
+            ariaLabel: t.nav.dashboard,
+            rotation: 8,
+            hoverStyles: {
+              bgColor: "var(--color-neon-green)",
+              textColor: "var(--color-black)",
+            },
+            path: "/dashboard",
+          },
+        ]
+      : []),
   ];
+
+  useEffect(() => {
+    const checkAdmin = async () => {
+      if (isAuthenticated) {
+        try {
+          const token = await getAccessTokenSilently();
+          const response = await fetch("/api/me", {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          const data = await response.json();
+          setIsAdmin(data.permissions?.includes("admin:dashboard") || false);
+        } catch (err) {
+          console.error("Error checking admin:", err);
+          setIsAdmin(false);
+        }
+      } else {
+        setIsAdmin(false);
+      }
+    };
+    checkAdmin();
+  }, [isAuthenticated, getAccessTokenSilently]);
 
   useEffect(() => {
     fetch("/api")
@@ -155,42 +195,42 @@ function App() {
   // }, [location.pathname]);
 
   useEffect(() => {
-  if (displayLocation === null) {
-    setDisplayLocation(location);
-    setTransitionStage('idle');
-    setShowFooter(true);
-    setInstantHide(false);
-    return;
-  }
-
-  if (location.pathname !== displayLocation.pathname) {
-    const currentIndex = pages.findIndex(p => p.path === displayLocation.pathname);
-    const nextIndex = pages.findIndex(p => p.path === location.pathname);
-    
-    const isForward = nextIndex > currentIndex;
-    setDirection(isForward ? 'forward' : 'backward');
-    
-    setInstantHide(true); // Hide instantly
-    setShowFooter(false);
-    setTransitionStage('exiting');
-  }
-}, [location, displayLocation]);
-
-// Update handleTransitionEnd:
-const handleTransitionEnd = () => {
-  if (transitionStage === 'exiting') {
-    window.scrollTo(0, 0);
-    setDisplayLocation(location);
-    setTransitionStage('entering');
-  } else if (transitionStage === 'entering') {
-    setTransitionStage('idle');
-    setInstantHide(false); // Allow animations again
-    setTimeout(() => {
+    if (displayLocation === null) {
+      setDisplayLocation(location);
+      setTransitionStage("idle");
       setShowFooter(true);
-    }, 50);
-  }
-};
+      setInstantHide(false);
+      return;
+    }
 
+    if (location.pathname !== displayLocation.pathname) {
+      const currentIndex = pages.findIndex(
+        (p) => p.path === displayLocation.pathname
+      );
+      const nextIndex = pages.findIndex((p) => p.path === location.pathname);
+
+      const isForward = nextIndex > currentIndex;
+      setDirection(isForward ? "forward" : "backward");
+
+      setInstantHide(true);
+      setShowFooter(false);
+      setTransitionStage("exiting");
+    }
+  }, [location, displayLocation]);
+
+  const handleTransitionEnd = () => {
+    if (transitionStage === "exiting") {
+      window.scrollTo(0, 0);
+      setDisplayLocation(location);
+      setTransitionStage("entering");
+    } else if (transitionStage === "entering") {
+      setTransitionStage("idle");
+      setInstantHide(false);
+      setTimeout(() => {
+        setShowFooter(true);
+      }, 50);
+    }
+  };
 
   const handleMenuItemClick = (item) => {
     navigate(item.path);
@@ -230,6 +270,8 @@ const handleTransitionEnd = () => {
         return <Resume backendData={backendData} />;
       case "/comments":
         return <Comments backendData={backendData} />;
+      case "/dashboard":
+        return isAdmin ? <Dashboard /> : <Home backendData={backendData} />;
       default:
         return <Home backendData={backendData} />;
     }
@@ -275,7 +317,10 @@ const handleTransitionEnd = () => {
           onItemClick={handleMenuItemClick}
         />
 
-        <PageNavigation isTransitioning={transitionStage !== "idle"} />
+        <PageNavigation
+          isTransitioning={transitionStage !== "idle"}
+          pages={pages}
+        />
 
         <div style={cowStyles}>
           <ThreeD />
@@ -293,7 +338,9 @@ const handleTransitionEnd = () => {
         </div>
 
         {/* <BottomBar show={showFooter} /> */}
-        {transitionStage === 'idle' && <BottomBar show={showFooter} instantHide={instantHide} />}
+        {transitionStage === "idle" && (
+          <BottomBar show={showFooter} instantHide={instantHide} />
+        )}
       </div>
     </LanguageContext.Provider>
   );

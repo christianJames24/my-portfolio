@@ -1,18 +1,42 @@
 // Projects.js
-import React, { useContext } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { LanguageContext } from "../App";
 import contentEn from "../data/projects-en.json";
 import contentFr from "../data/projects-fr.json";
 
 export default function Projects() {
   const { language } = useContext(LanguageContext);
-  const t = language === "en" ? contentEn : contentFr;
+  const [projectsData, setProjectsData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const res = await fetch(`/api/projects?lang=${language}`);
+        const data = await res.json();
+
+        if (data.useClientFallback || data.projects.length === 0) {
+          setProjectsData(language === "en" ? contentEn : contentFr);
+        } else {
+          setProjectsData(data);
+        }
+      } catch (err) {
+        console.error("Error fetching projects:", err);
+        setProjectsData(language === "en" ? contentEn : contentFr);
+      }
+      setLoading(false);
+    };
+
+    fetchProjects();
+  }, [language]);
+
+  const t = projectsData || (language === "en" ? contentEn : contentFr);
 
   const getProjectColors = (index) => {
     const colors = [
-      { border: 'var(--color-neon-green)', shadow: 'var(--color-magenta)' },
-      { border: 'var(--color-magenta)', shadow: 'var(--color-cyan)' },
-      { border: 'var(--color-cyan)', shadow: 'var(--color-neon-green)' }
+      { border: "var(--color-neon-green)", shadow: "var(--color-magenta)" },
+      { border: "var(--color-magenta)", shadow: "var(--color-cyan)" },
+      { border: "var(--color-cyan)", shadow: "var(--color-neon-green)" },
     ];
     return colors[index % 3];
   };
@@ -25,61 +49,70 @@ export default function Projects() {
         const colors = getProjectColors(index);
         return (
           <div key={index} className="content-card">
-            <img 
+            <img
               src={project.image}
               alt={project.name}
-              className={`project-image ${index % 2 === 0 ? 'float-right' : 'float-left'}`}
+              className={`project-image ${
+                index % 2 === 0 ? "float-right" : "float-left"
+              }`}
               style={{
-                width: '100%',
-                height: 'auto',
-                marginBottom: '20px',
+                width: "100%",
+                height: "auto",
+                marginBottom: "20px",
                 border: `5px solid ${colors.border}`,
                 boxShadow: `10px 10px 0 ${colors.shadow}`,
-                clipPath: index % 2 === 0 
-                  ? 'polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 0 100%)'
-                  : 'polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px)',
-                transition: 'all 0.3s'
+                clipPath:
+                  index % 2 === 0
+                    ? "polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 0 100%)"
+                    : "polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px)",
+                transition: "all 0.3s",
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-5px)';
+                e.currentTarget.style.transform = "translateY(-5px)";
                 e.currentTarget.style.boxShadow = `15px 15px 0 ${colors.shadow}`;
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.transform = "translateY(0)";
                 e.currentTarget.style.boxShadow = `10px 10px 0 ${colors.shadow}`;
               }}
             />
-            
-            <div style={{ 
-              display: 'flex', 
-              justifyContent: 'space-between', 
-              alignItems: 'baseline',
-              marginBottom: '12px',
-              flexWrap: 'wrap',
-              gap: '8px'
-            }}>
+
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "baseline",
+                marginBottom: "12px",
+                flexWrap: "wrap",
+                gap: "8px",
+              }}
+            >
               <h2 style={{ margin: 0 }}>{project.name}</h2>
-              <span style={{ 
-                color: 'var(--color-cyan)',
-                fontSize: 'clamp(14px, 2vw, 18px)',
-                fontWeight: '900',
-                fontFamily: 'var(--font-bold)',
-                textTransform: 'uppercase',
-                letterSpacing: '0.1em'
-              }}>
+              <span
+                style={{
+                  color: "var(--color-cyan)",
+                  fontSize: "clamp(14px, 2vw, 18px)",
+                  fontWeight: "900",
+                  fontFamily: "var(--font-bold)",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.1em",
+                }}
+              >
                 {project.year}
               </span>
             </div>
             <p>{project.description}</p>
-            <p style={{ 
-              color: 'var(--color-neon-green)',
-              fontSize: 'clamp(14px, 2vw, 16px)',
-              fontFamily: 'var(--font-bold)',
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em',
-              marginTop: '16px',
-              clear: 'both'
-            }}>
+            <p
+              style={{
+                color: "var(--color-neon-green)",
+                fontSize: "clamp(14px, 2vw, 16px)",
+                fontFamily: "var(--font-bold)",
+                textTransform: "uppercase",
+                letterSpacing: "0.05em",
+                marginTop: "16px",
+                clear: "both",
+              }}
+            >
               {project.tech}
             </p>
           </div>

@@ -3,7 +3,7 @@ import React, { useContext, useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { LanguageContext } from "../App";
 
-export default function PageNavigation({ isTransitioning }) {
+export default function PageNavigation({ isTransitioning, pages: propPages }) {
   const navigate = useNavigate();
   const location = useLocation();
   const { language } = useContext(LanguageContext);
@@ -25,6 +25,7 @@ export default function PageNavigation({ isTransitioning }) {
         projects: "Projects",
         resume: "Resume",
         comments: "Comments",
+        dashboard: "Dashboard",
       },
     },
     fr: {
@@ -36,13 +37,14 @@ export default function PageNavigation({ isTransitioning }) {
         projects: "Projets",
         resume: "CV",
         comments: "Commentaires",
+        dashboard: "Tableau",
       },
     },
   };
 
   const t = content[language];
 
-  const pages = [
+  const pages = propPages || [
     { path: "/", name: "home" },
     { path: "/about", name: "about" },
     { path: "/projects", name: "projects" },
@@ -143,7 +145,8 @@ export default function PageNavigation({ isTransitioning }) {
                 setHoveredButton("prev");
                 e.currentTarget.style.transform =
                   "rotate(0deg) translate(-4px, 0)";
-                e.currentTarget.style.boxShadow = "12px 12px 0 var(--color-black)";
+                e.currentTarget.style.boxShadow =
+                  "12px 12px 0 var(--color-black)";
                 e.currentTarget.style.background = "var(--color-cyan)";
                 e.currentTarget.style.color = "var(--color-black)";
               }}
@@ -195,7 +198,8 @@ export default function PageNavigation({ isTransitioning }) {
                 setHoveredButton("next");
                 e.currentTarget.style.transform =
                   "rotate(0deg) translate(4px, 0)";
-                e.currentTarget.style.boxShadow = "12px 12px 0 var(--color-black)";
+                e.currentTarget.style.boxShadow =
+                  "12px 12px 0 var(--color-black)";
                 e.currentTarget.style.background = "var(--color-magenta)";
                 e.currentTarget.style.color = "var(--color-white)";
               }}
@@ -278,7 +282,7 @@ export default function PageNavigation({ isTransitioning }) {
             boxShadow: "4px 4px 0 var(--color-magenta)",
           }}
         >
-          {t.pages[pages[currentIndex].name]}
+          {t.pages[pages[currentIndex]?.name] || ""}
         </div>
 
         {hasNext && (
