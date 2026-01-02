@@ -1,4 +1,4 @@
-// src/Pages/Dashboard.js
+// Dashboard.js
 import React, { useContext, useState, useEffect } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useNavigate } from "react-router-dom";
@@ -42,7 +42,8 @@ export default function Dashboard() {
       add: "Add Project",
       save: "Save",
       cancel: "Cancel",
-      export: "Export JSON",
+      exportEn: "Export EN",
+      exportFr: "Export FR",
       noComments: "No comments to review",
       noProjects: "No projects yet",
       english: "English",
@@ -53,7 +54,6 @@ export default function Dashboard() {
       year: "Year",
       image: "Image URL",
       order: "Sort Order",
-      submittedFor: "Submitted for approval",
     },
     fr: {
       title: "Tableau de Bord",
@@ -69,7 +69,8 @@ export default function Dashboard() {
       add: "Ajouter Projet",
       save: "Sauvegarder",
       cancel: "Annuler",
-      export: "Exporter JSON",
+      exportEn: "Exporter EN",
+      exportFr: "Exporter FR",
       noComments: "Aucun commentaire à examiner",
       noProjects: "Aucun projet pour le moment",
       english: "Anglais",
@@ -80,7 +81,6 @@ export default function Dashboard() {
       year: "Année",
       image: "URL Image",
       order: "Ordre",
-      submittedFor: "Soumis pour approbation",
     },
   }[language];
 
@@ -205,25 +205,29 @@ export default function Dashboard() {
     }
   };
 
-  const handleExport = async () => {
-    try {
-      const token = await getAccessTokenSilently();
-      const res = await fetch("/api/dashboard/projects/export", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await res.json();
+  const handleExport = (lang) => {
+    const isEnglish = lang === "en";
+    
+    const exportData = {
+      title: isEnglish ? "Projects" : "Projets",
+      projects: projects.map((p) => ({
+        name: isEnglish ? p.name_en : p.name_fr,
+        description: isEnglish ? p.description_en : p.description_fr,
+        tech: p.tech,
+        year: p.year,
+        image: p.image,
+      })),
+    };
 
-      const blob = new Blob([JSON.stringify(data, null, 2)], {
-        type: "application/json",
-      });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "projects-export.json";
-      a.click();
-    } catch (err) {
-      console.error("Error exporting:", err);
-    }
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], {
+      type: "application/json",
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `projects-${lang}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   const getStatusColor = (status) => {
@@ -254,7 +258,6 @@ export default function Dashboard() {
     <div className="page-container dashboard-page">
       <h1>{t.title}</h1>
 
-      {/* Tabs */}
       <div
         style={{
           display: "flex",
@@ -333,7 +336,6 @@ export default function Dashboard() {
         </button>
       </div>
 
-      {/* Comments Tab */}
       {activeTab === "comments" && (
         <div>
           {comments.length === 0 ? (
@@ -356,7 +358,9 @@ export default function Dashboard() {
                     gap: "12px",
                   }}
                 >
-                  <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                  <div
+                    style={{ display: "flex", alignItems: "center", gap: "12px" }}
+                  >
                     {comment.user_picture && (
                       <img
                         src={comment.user_picture}
@@ -370,7 +374,7 @@ export default function Dashboard() {
                       />
                     )}
                     <div>
-                      <strong style={{ color: "var(--color-neon-green)" }}>
+                      <strong style={{ color: "var(--color-neon-green)", fontFamily: "var(--font-body)" }}>
                         {comment.user_name}
                       </strong>
                       <span
@@ -400,7 +404,9 @@ export default function Dashboard() {
                   {comment.status === "pending" && (
                     <>
                       <button
-                        onClick={() => handleCommentAction(comment.id, "approve")}
+                        onClick={() =>
+                          handleCommentAction(comment.id, "approve")
+                        }
                         className="btn-small"
                         style={{
                           background: "var(--color-neon-green)",
@@ -438,7 +444,6 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Projects Tab */}
       {activeTab === "projects" && (
         <div>
           <div
@@ -469,11 +474,18 @@ export default function Dashboard() {
               {t.add}
             </button>
             <button
-              onClick={handleExport}
+              onClick={() => handleExport("en")}
               className="btn-primary"
               style={{ background: "var(--color-cyan)" }}
             >
-              {t.export}
+              {t.exportEn}
+            </button>
+            <button
+              onClick={() => handleExport("fr")}
+              className="btn-primary"
+              style={{ background: "var(--color-magenta)" }}
+            >
+              {t.exportFr}
             </button>
           </div>
 
@@ -630,7 +642,10 @@ export default function Dashboard() {
                       setEditingProject(null);
                     }}
                     className="btn-primary"
-                    style={{ background: "var(--color-white)", color: "var(--color-black)" }}
+                    style={{
+                      background: "var(--color-white)",
+                      color: "var(--color-black)",
+                    }}
                   >
                     {t.cancel}
                   </button>
@@ -660,7 +675,7 @@ export default function Dashboard() {
                   }}
                 >
                   <div>
-                    <h3 style={{ color: "var(--color-neon-green)", margin: 0 }}>
+                    <h3 style={{ color: "var(--color-neon-green)", fontFamily: "var(--font-body)", margin: 0 }}>
                       {language === "fr" ? project.name_fr : project.name_en}
                     </h3>
                     <span style={{ color: "var(--color-cyan)", fontSize: "14px" }}>
