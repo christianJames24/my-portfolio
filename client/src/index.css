@@ -74,7 +74,7 @@
 } */
 
 /* DARK THEME */
-:root {
+/* :root {
   --font-display: 'TheNeue-Black', 'Arial Black', sans-serif;
   --font-body: 'Comfortaa','Arial', sans-serif;
   --font-bold: 'Chintzy', sans-serif;
@@ -105,10 +105,10 @@
   --color-pink-1: #000000;
   --color-pink-2: #1A1A1A;
   --color-blue-3: #000000;
-}
+} */
 
 /* LIGHT THEME */
-/* :root {
+:root {
   --font-display: 'TheNeue-Black', 'Arial Black', sans-serif;
   --font-body: 'Comfortaa','Arial', sans-serif;
   --font-bold: 'Chintzy', sans-serif;
@@ -139,7 +139,7 @@
   --color-pink-1: #ffffff;
   --color-pink-2: #f2f2f2;
   --color-blue-3: #ffffff;
-} */
+}
 
 /* OSHAWOTT LIGHT THEME */
 /* :root {
