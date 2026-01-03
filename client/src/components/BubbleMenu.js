@@ -243,13 +243,12 @@ export default function BubbleMenu({
       >
         <button
           type="button"
-          className={`bubble toggle-bubble menu-btn ${
-            isMenuOpen ? "open" : ""
-          }`}
+          className={`bubble toggle-bubble menu-btn ${isMenuOpen ? "open" : ""
+            }`}
           onClick={handleToggle}
           aria-label={menuAriaLabel}
           aria-pressed={isMenuOpen}
-          style={{ 
+          style={{
             background: menuBg,
             border: '4px solid var(--color-black)',
             boxShadow: '6px 6px 0 var(--color-black)',
@@ -295,9 +294,8 @@ export default function BubbleMenu({
 
           <div
             ref={overlayRef}
-            className={`bubble-menu-items ${
-              useFixedPosition ? "fixed" : "absolute"
-            }`}
+            className={`bubble-menu-items ${useFixedPosition ? "fixed" : "absolute"
+              }`}
             aria-hidden={!isMenuOpen}
           >
             <ul className="pill-list" role="menu" aria-label="Menu links">

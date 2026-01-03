@@ -54,6 +54,9 @@ function App() {
   const [backendData, setBackendData] = useState([{}]);
   const [scrollY, setScrollY] = useState(0);
   const [language, setLanguage] = useState("en");
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem("theme") || "light";
+  });
   const [displayLocation, setDisplayLocation] = useState(null);
   const [transitionStage, setTransitionStage] = useState("idle");
   const [direction, setDirection] = useState("forward");
@@ -70,6 +73,16 @@ function App() {
 
   const t = translations[language];
 
+  // Sync theme to document and localStorage
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    localStorage.setItem("theme", theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === "light" ? "dark" : "light"));
+  };
+
   const pages = [
     { path: "/", name: "home" },
     { path: "/about", name: "about" },
@@ -85,7 +98,7 @@ function App() {
       ariaLabel: t.nav.home,
       rotation: -8,
       hoverStyles: {
-        bgColor: "var(--color-blue-1)",
+        bgColor: "var(--color-pink-1)",
         textColor: "var(--color-white)",
       },
       path: "/",
@@ -95,7 +108,7 @@ function App() {
       ariaLabel: t.nav.about,
       rotation: 8,
       hoverStyles: {
-        bgColor: "var(--color-blue-2)",
+        bgColor: "var(--color-pink-1)",
         textColor: "var(--color-white)",
       },
       path: "/about",
@@ -105,7 +118,7 @@ function App() {
       ariaLabel: t.nav.projects,
       rotation: -8,
       hoverStyles: {
-        bgColor: "var(--color-purple-2)",
+        bgColor: "var(--color-pink-1)",
         textColor: "var(--color-white)",
       },
       path: "/projects",
@@ -125,24 +138,24 @@ function App() {
       ariaLabel: t.nav.comments,
       rotation: -8,
       hoverStyles: {
-        bgColor: "var(--color-pink-2)",
+        bgColor: "var(--color-pink-1)",
         textColor: "var(--color-white)",
       },
       path: "/comments",
     },
     ...(isAdmin
       ? [
-          {
-            label: t.nav.dashboard,
-            ariaLabel: t.nav.dashboard,
-            rotation: 8,
-            hoverStyles: {
-              bgColor: "var(--color-neon-green)",
-              textColor: "var(--color-black)",
-            },
-            path: "/dashboard",
+        {
+          label: t.nav.dashboard,
+          ariaLabel: t.nav.dashboard,
+          rotation: 8,
+          hoverStyles: {
+            bgColor: "var(--color-pink-1)",
+            textColor: "var(--color-white)",
           },
-        ]
+          path: "/dashboard",
+        },
+      ]
       : []),
   ];
 
@@ -293,7 +306,7 @@ function App() {
   };
 
   return (
-    <LanguageContext.Provider value={{ language, t, toggleLanguage }}>
+    <LanguageContext.Provider value={{ language, t, toggleLanguage, theme, toggleTheme }}>
       <div
         style={{
           minHeight: "100vh",
@@ -328,9 +341,8 @@ function App() {
 
         <div className="page-transition-wrapper">
           <div
-            className={`page-transition-content ${
-              transitionStage !== "idle" ? "transitioning" : ""
-            } ${getTransitionClass()}`}
+            className={`page-transition-content ${transitionStage !== "idle" ? "transitioning" : ""
+              } ${getTransitionClass()}`}
             onAnimationEnd={handleTransitionEnd}
           >
             {displayLocation && renderPage(displayLocation.pathname)}
