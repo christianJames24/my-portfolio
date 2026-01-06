@@ -24,6 +24,51 @@ router.get("/projects", async (req, res) => {
   }
 });
 
+// Reorder projects (swap sort_order between two projects)
+router.put("/projects/reorder", async (req, res) => {
+  try {
+    const { projectId, direction } = req.body;
+
+    // Get all projects sorted by sort_order
+    const allProjects = await db.query(
+      "SELECT id, sort_order FROM projects ORDER BY sort_order ASC, created_at DESC"
+    );
+
+    const projects = allProjects.rows;
+    const currentIndex = projects.findIndex(p => p.id === projectId);
+
+    if (currentIndex === -1) {
+      return res.status(404).json({ error: "Project not found" });
+    }
+
+    const targetIndex = direction === "up" ? currentIndex - 1 : currentIndex + 1;
+
+    if (targetIndex < 0 || targetIndex >= projects.length) {
+      return res.status(400).json({ error: "Cannot move in that direction" });
+    }
+
+    const currentProject = projects[currentIndex];
+    const targetProject = projects[targetIndex];
+
+    // Swap sort_order values
+    const currentOrder = currentProject.sort_order ?? currentIndex;
+    const targetOrder = targetProject.sort_order ?? targetIndex;
+
+    // Update both in database
+    const updateQuery = isProduction
+      ? "UPDATE projects SET sort_order = $1 WHERE id = $2"
+      : "UPDATE projects SET sort_order = ? WHERE id = ?";
+
+    await db.query(updateQuery, [targetOrder, currentProject.id]);
+    await db.query(updateQuery, [currentOrder, targetProject.id]);
+
+    res.json({ message: "Projects reordered" });
+  } catch (err) {
+    console.error("Error reordering projects:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Create project
 router.post("/projects", async (req, res) => {
   try {

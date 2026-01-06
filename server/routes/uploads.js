@@ -13,7 +13,7 @@ const { requirePermission } = require("../middleware/permissions");
 // Constants
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB per file
 const MAX_TOTAL_STORAGE = 500 * 1024 * 1024; // 500MB total
-const MAX_PROJECTS = 10;
+
 const UPLOADS_DIR = path.join(__dirname, "..", "uploads");
 
 // Ensure uploads directory exists
@@ -94,7 +94,6 @@ router.get("/stats/usage", checkJwt, requirePermission("admin:dashboard"), async
             storageLimit: MAX_TOTAL_STORAGE,
             storagePercent: Math.round((storageUsed / MAX_TOTAL_STORAGE) * 100),
             projectCount,
-            projectLimit: MAX_PROJECTS,
         });
     } catch (err) {
         console.error("Error getting stats:", err);

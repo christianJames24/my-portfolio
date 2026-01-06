@@ -243,6 +243,29 @@ export default function Dashboard() {
     }
   };
 
+  const handleMoveProject = async (projectId, direction) => {
+    const project = projects.find(p => p.id === projectId);
+    if (!project) return;
+
+    const currentOrder = project.sort_order ?? 0;
+    const newOrder = direction === "up" ? currentOrder - 1 : currentOrder + 1;
+
+    try {
+      const token = await getAccessTokenSilently();
+      await fetch(`/api/dashboard/projects/${projectId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ ...project, sort_order: newOrder }),
+      });
+      fetchData();
+    } catch (err) {
+      console.error("Error moving project:", err);
+    }
+  };
+
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -570,7 +593,7 @@ export default function Dashboard() {
               >
                 {t.storageUsed}: {Math.round(storageStats.storageUsed / 1024 / 1024)}MB / {Math.round(storageStats.storageLimit / 1024 / 1024)}MB
                 {" • "}
-                {storageStats.projectCount} / {storageStats.projectLimit} {t.projects.toLowerCase()}
+                {storageStats.projectCount} {t.projects.toLowerCase()}
               </div>
             )}
             <button
@@ -849,7 +872,7 @@ export default function Dashboard() {
               <p>{t.noProjects}</p>
             </div>
           ) : (
-            projects.map((project) => (
+            projects.map((project, index) => (
               <div
                 key={project.id}
                 className="content-card"
@@ -872,7 +895,35 @@ export default function Dashboard() {
                       {project.year} • Order: {project.sort_order || 0}
                     </span>
                   </div>
-                  <div style={{ display: "flex", gap: "8px" }}>
+                  <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+                      <button
+                        onClick={() => handleMoveProject(project.id, "up")}
+                        disabled={index === 0}
+                        className="btn-small"
+                        style={{
+                          background: index === 0 ? "var(--color-white)" : "var(--color-yellow)",
+                          color: "var(--color-black)",
+                          padding: "4px 8px",
+                          opacity: index === 0 ? 0.5 : 1,
+                        }}
+                      >
+                        ▲
+                      </button>
+                      <button
+                        onClick={() => handleMoveProject(project.id, "down")}
+                        disabled={index === projects.length - 1}
+                        className="btn-small"
+                        style={{
+                          background: index === projects.length - 1 ? "var(--color-white)" : "var(--color-yellow)",
+                          color: "var(--color-black)",
+                          padding: "4px 8px",
+                          opacity: index === projects.length - 1 ? 0.5 : 1,
+                        }}
+                      >
+                        ▼
+                      </button>
+                    </div>
                     <button
                       onClick={() => handleEditProject(project)}
                       className="btn-small"
