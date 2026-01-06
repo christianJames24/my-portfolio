@@ -102,6 +102,43 @@ router.get("/stats/usage", checkJwt, requirePermission("admin:dashboard"), async
     }
 });
 
+// List all images (admin only)
+router.get("/list/all", checkJwt, requirePermission("admin:dashboard"), async (req, res) => {
+    try {
+        // Get all images
+        const imagesResult = await db.query(
+            "SELECT * FROM project_images ORDER BY created_at DESC"
+        );
+
+        // Get all projects to find which images are in use
+        const projectsResult = await db.query(
+            "SELECT id, name_en, image_id FROM projects WHERE image_id IS NOT NULL"
+        );
+
+        // Create a map of image_id -> project info
+        const imageUsage = {};
+        projectsResult.rows.forEach(p => {
+            imageUsage[p.image_id] = { projectId: p.id, projectName: p.name_en };
+        });
+
+        // Build response with usage info
+        const images = imagesResult.rows.map(img => ({
+            id: img.id,
+            filename: img.filename,
+            originalName: img.original_name,
+            sizeBytes: img.size_bytes,
+            createdAt: img.created_at,
+            url: `/api/uploads/${img.id}`,
+            usedBy: imageUsage[img.id] || null,
+        }));
+
+        res.json(images);
+    } catch (err) {
+        console.error("Error listing images:", err);
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // Upload image (admin only)
 router.post("/", checkJwt, requirePermission("admin:dashboard"), upload.single("image"), async (req, res) => {
     try {

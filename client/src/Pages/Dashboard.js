@@ -12,6 +12,7 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("comments");
   const [comments, setComments] = useState([]);
   const [projects, setProjects] = useState([]);
+  const [uploadedImages, setUploadedImages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editingProject, setEditingProject] = useState(null);
   const [showProjectForm, setShowProjectForm] = useState(false);
@@ -62,6 +63,11 @@ export default function Dashboard() {
       imageUpload: "Upload",
       uploading: "Uploading...",
       storageUsed: "Storage",
+      images: "Images",
+      noImages: "No uploaded images",
+      inUse: "In use by",
+      unused: "Unused",
+      confirmDeleteImage: "Delete this image?",
       order: "Sort Order",
     },
     fr: {
@@ -93,6 +99,11 @@ export default function Dashboard() {
       imageUpload: "Téléverser",
       uploading: "Téléversement...",
       storageUsed: "Stockage",
+      images: "Images",
+      noImages: "Aucune image téléversée",
+      inUse: "Utilisé par",
+      unused: "Inutilisé",
+      confirmDeleteImage: "Supprimer cette image ?",
       order: "Ordre",
     },
   }[language];
@@ -107,10 +118,11 @@ export default function Dashboard() {
       const token = await getAccessTokenSilently();
       const headers = { Authorization: `Bearer ${token}` };
 
-      const [commentsRes, projectsRes, statsRes] = await Promise.all([
+      const [commentsRes, projectsRes, statsRes, imagesRes] = await Promise.all([
         fetch("/api/dashboard/comments", { headers }),
         fetch("/api/dashboard/projects", { headers }),
         fetch("/api/uploads/stats/usage", { headers }),
+        fetch("/api/uploads/list/all", { headers }),
       ]);
 
       if (commentsRes.status === 403 || projectsRes.status === 403) {
@@ -122,6 +134,9 @@ export default function Dashboard() {
       setProjects(await projectsRes.json());
       if (statsRes.ok) {
         setStorageStats(await statsRes.json());
+      }
+      if (imagesRes.ok) {
+        setUploadedImages(await imagesRes.json());
       }
     } catch (err) {
       console.error("Error fetching dashboard data:", err);
@@ -397,6 +412,29 @@ export default function Dashboard() {
           }}
         >
           {t.projects}
+        </button>
+        <button
+          onClick={() => setActiveTab("images")}
+          className={`btn-tab ${activeTab === "images" ? "active" : ""}`}
+          style={{
+            padding: "12px 24px",
+            border: "4px solid var(--color-black)",
+            background:
+              activeTab === "images"
+                ? "var(--color-neon-green)"
+                : "var(--color-white)",
+            color:
+              activeTab === "images"
+                ? "var(--color-black)"
+                : "var(--color-black)",
+            fontWeight: "900",
+            fontSize: "16px",
+            cursor: "pointer",
+            boxShadow: "4px 4px 0 var(--color-black)",
+            textTransform: "uppercase",
+          }}
+        >
+          {t.images}
         </button>
       </div>
 
@@ -867,6 +905,97 @@ export default function Dashboard() {
                 </p>
               </div>
             ))
+          )}
+        </div>
+      )}
+
+      {activeTab === "images" && (
+        <div>
+          {storageStats && (
+            <div
+              style={{
+                padding: "12px 16px",
+                background: "var(--color-black)",
+                border: "2px solid var(--color-neon-green)",
+                color: "var(--color-white)",
+                fontSize: "14px",
+                marginBottom: "24px",
+              }}
+            >
+              {t.storageUsed}: {Math.round(storageStats.storageUsed / 1024 / 1024)}MB / {Math.round(storageStats.storageLimit / 1024 / 1024)}MB
+              {" ("}{storageStats.storagePercent}%{")"}  •  {uploadedImages.length} {t.images.toLowerCase()}
+            </div>
+          )}
+
+          {uploadedImages.length === 0 ? (
+            <div className="content-card">
+              <p>{t.noImages}</p>
+            </div>
+          ) : (
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
+                gap: "16px",
+              }}
+            >
+              {uploadedImages.map((img) => (
+                <div
+                  key={img.id}
+                  className="content-card"
+                  style={{ padding: "12px" }}
+                >
+                  <img
+                    src={img.url}
+                    alt={img.originalName}
+                    style={{
+                      width: "100%",
+                      height: "120px",
+                      objectFit: "cover",
+                      border: "2px solid var(--color-neon-green)",
+                      marginBottom: "8px",
+                    }}
+                  />
+                  <p style={{ color: "var(--color-white)", fontSize: "12px", margin: "4px 0", wordBreak: "break-all" }}>
+                    {img.originalName}
+                  </p>
+                  <p style={{ color: "var(--color-cyan)", fontSize: "11px", margin: "4px 0" }}>
+                    {Math.round(img.sizeBytes / 1024)}KB
+                  </p>
+                  <p style={{
+                    color: img.usedBy ? "var(--color-neon-green)" : "var(--color-yellow)",
+                    fontSize: "11px",
+                    margin: "4px 0"
+                  }}>
+                    {img.usedBy ? `${t.inUse}: ${img.usedBy.projectName}` : t.unused}
+                  </p>
+                  <button
+                    onClick={async () => {
+                      if (!window.confirm(t.confirmDeleteImage)) return;
+                      try {
+                        const token = await getAccessTokenSilently();
+                        await fetch(`/api/uploads/${img.id}`, {
+                          method: "DELETE",
+                          headers: { Authorization: `Bearer ${token}` },
+                        });
+                        fetchData();
+                      } catch (err) {
+                        console.error("Error deleting image:", err);
+                      }
+                    }}
+                    className="btn-small"
+                    style={{
+                      background: "var(--color-red-pink)",
+                      color: "var(--color-white)",
+                      width: "100%",
+                      marginTop: "8px",
+                    }}
+                  >
+                    {t.delete}
+                  </button>
+                </div>
+              ))}
+            </div>
           )}
         </div>
       )}
