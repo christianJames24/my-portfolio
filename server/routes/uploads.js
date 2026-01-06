@@ -79,6 +79,25 @@ router.get("/:id", async (req, res) => {
     }
 });
 
+// Get image by filename directly (public - no auth required)
+router.get("/file/:filename", (req, res) => {
+    try {
+        const { filename } = req.params;
+        const filePath = path.join(UPLOADS_DIR, filename);
+
+        if (!fs.existsSync(filePath)) {
+            return res.status(404).json({ error: "Image file not found" });
+        }
+
+        res.setHeader("Content-Type", "image/webp");
+        res.setHeader("Cache-Control", "public, max-age=31536000");
+        res.sendFile(filePath);
+    } catch (err) {
+        console.error("Error serving image:", err);
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // ============ ADMIN: Upload and manage ============
 
 // Get storage stats (admin only)
@@ -101,35 +120,51 @@ router.get("/stats/usage", checkJwt, requirePermission("admin:dashboard"), async
     }
 });
 
-// List all images (admin only)
+// List all images (admin only) - scans uploads directory directly
 router.get("/list/all", checkJwt, requirePermission("admin:dashboard"), async (req, res) => {
     try {
-        // Get all images
-        const imagesResult = await db.query(
-            "SELECT * FROM project_images ORDER BY created_at DESC"
-        );
+        // Scan uploads directory directly
+        if (!fs.existsSync(UPLOADS_DIR)) {
+            return res.json([]);
+        }
 
-        // Get all projects to find which images are in use
+        const files = fs.readdirSync(UPLOADS_DIR).filter(f => f.endsWith('.webp'));
+
+        // Get all projects to find which images are in use (by filename match)
         const projectsResult = await db.query(
             "SELECT id, name_en, image_id FROM projects WHERE image_id IS NOT NULL"
         );
 
-        // Create a map of image_id -> project info
-        const imageUsage = {};
-        projectsResult.rows.forEach(p => {
-            imageUsage[p.image_id] = { projectId: p.id, projectName: p.name_en };
+        // Also get project_images to map id -> filename
+        const imagesResult = await db.query("SELECT id, filename FROM project_images");
+        const idToFilename = {};
+        imagesResult.rows.forEach(img => {
+            idToFilename[img.id] = img.filename;
         });
 
-        // Build response with usage info
-        const images = imagesResult.rows.map(img => ({
-            id: img.id,
-            filename: img.filename,
-            originalName: img.original_name,
-            sizeBytes: img.size_bytes,
-            createdAt: img.created_at,
-            url: `/api/uploads/${img.id}`,
-            usedBy: imageUsage[img.id] || null,
-        }));
+        // Create usage map: filename -> project info
+        const imageUsage = {};
+        projectsResult.rows.forEach(p => {
+            const filename = idToFilename[p.image_id];
+            if (filename) {
+                imageUsage[filename] = { projectId: p.id, projectName: p.name_en };
+            }
+        });
+
+        // Build response from filesystem
+        const images = files.map((filename, index) => {
+            const filePath = path.join(UPLOADS_DIR, filename);
+            const stats = fs.statSync(filePath);
+            return {
+                id: index + 1, // Just for display, not a real DB id
+                filename: filename,
+                originalName: filename,
+                sizeBytes: stats.size,
+                createdAt: stats.mtime,
+                url: `/api/uploads/file/${filename}`, // Direct file access
+                usedBy: imageUsage[filename] || null,
+            };
+        });
 
         res.json(images);
     } catch (err) {
