@@ -138,6 +138,53 @@ router.get("/list/all", checkJwt, requirePermission("admin:dashboard"), async (r
     }
 });
 
+// Sync images: scan directory and reconcile with database (admin only)
+router.post("/sync", checkJwt, requirePermission("admin:dashboard"), async (req, res) => {
+    try {
+        // Get all files in uploads directory
+        const files = fs.readdirSync(UPLOADS_DIR).filter(f => f.endsWith('.webp'));
+
+        // Get all images from database
+        const dbResult = await db.query("SELECT * FROM project_images");
+        const dbFiles = new Set(dbResult.rows.map(r => r.filename));
+
+        let added = 0;
+        let removed = 0;
+
+        // Add files that exist on disk but not in database
+        for (const filename of files) {
+            if (!dbFiles.has(filename)) {
+                const filePath = path.join(UPLOADS_DIR, filename);
+                const stats = fs.statSync(filePath);
+
+                const query = isProduction
+                    ? `INSERT INTO project_images (filename, original_name, size_bytes) VALUES ($1, $2, $3)`
+                    : `INSERT INTO project_images (filename, original_name, size_bytes) VALUES (?, ?, ?)`;
+
+                await db.query(query, [filename, filename, stats.size]);
+                added++;
+            }
+        }
+
+        // Remove database entries for files that don't exist on disk
+        const diskFiles = new Set(files);
+        for (const row of dbResult.rows) {
+            if (!diskFiles.has(row.filename)) {
+                const deleteQuery = isProduction
+                    ? "DELETE FROM project_images WHERE id = $1"
+                    : "DELETE FROM project_images WHERE id = ?";
+                await db.query(deleteQuery, [row.id]);
+                removed++;
+            }
+        }
+
+        res.json({ message: `Synced: ${added} added, ${removed} removed` });
+    } catch (err) {
+        console.error("Error syncing images:", err);
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // Upload image (admin only)
 router.post("/", checkJwt, requirePermission("admin:dashboard"), upload.single("image"), async (req, res) => {
     try {

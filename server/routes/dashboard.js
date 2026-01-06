@@ -97,39 +97,6 @@ router.put("/projects/:id", async (req, res) => {
     const { id } = req.params;
     const { name_en, name_fr, description_en, description_fr, tech, year, image, image_id, sort_order } = req.body;
 
-    // If changing image_id, cleanup old uploaded image
-    const selectQuery = isProduction
-      ? "SELECT * FROM projects WHERE id = $1"
-      : "SELECT * FROM projects WHERE id = ?";
-    const existingProject = await db.query(selectQuery, [id]);
-
-    if (existingProject.rows.length > 0) {
-      const oldProject = existingProject.rows[0];
-      // If old project had an image_id and it's different from new one
-      if (oldProject.image_id && oldProject.image_id !== image_id) {
-        const imageSelectQuery = isProduction
-          ? "SELECT * FROM project_images WHERE id = $1"
-          : "SELECT * FROM project_images WHERE id = ?";
-        const imageResult = await db.query(imageSelectQuery, [oldProject.image_id]);
-
-        if (imageResult.rows.length > 0) {
-          const oldImage = imageResult.rows[0];
-          const fs = require("fs");
-          const path = require("path");
-          const filePath = path.join(__dirname, "..", "uploads", oldImage.filename);
-
-          if (fs.existsSync(filePath)) {
-            fs.unlinkSync(filePath);
-          }
-
-          const imageDeleteQuery = isProduction
-            ? "DELETE FROM project_images WHERE id = $1"
-            : "DELETE FROM project_images WHERE id = ?";
-          await db.query(imageDeleteQuery, [oldProject.image_id]);
-        }
-      }
-    }
-
     const query = isProduction
       ? `UPDATE projects SET 
            name_en = $1, name_fr = $2, description_en = $3, description_fr = $4, 
@@ -152,48 +119,10 @@ router.put("/projects/:id", async (req, res) => {
 });
 
 
-// Delete project (and cleanup associated image)
+// Delete project
 router.delete("/projects/:id", async (req, res) => {
   try {
     const { id } = req.params;
-
-    // First get the project to check if it has an uploaded image
-    const selectQuery = isProduction
-      ? "SELECT * FROM projects WHERE id = $1"
-      : "SELECT * FROM projects WHERE id = ?";
-    const projectResult = await db.query(selectQuery, [id]);
-
-    if (projectResult.rows.length > 0) {
-      const project = projectResult.rows[0];
-
-      // If project has an uploaded image, delete it
-      if (project.image_id) {
-        const imageSelectQuery = isProduction
-          ? "SELECT * FROM project_images WHERE id = $1"
-          : "SELECT * FROM project_images WHERE id = ?";
-        const imageResult = await db.query(imageSelectQuery, [project.image_id]);
-
-        if (imageResult.rows.length > 0) {
-          const image = imageResult.rows[0];
-          const fs = require("fs");
-          const path = require("path");
-          const filePath = path.join(__dirname, "..", "uploads", image.filename);
-
-          // Delete the file from disk
-          if (fs.existsSync(filePath)) {
-            fs.unlinkSync(filePath);
-          }
-
-          // Delete from project_images table
-          const imageDeleteQuery = isProduction
-            ? "DELETE FROM project_images WHERE id = $1"
-            : "DELETE FROM project_images WHERE id = ?";
-          await db.query(imageDeleteQuery, [project.image_id]);
-        }
-      }
-    }
-
-    // Delete the project
     const query = isProduction
       ? "DELETE FROM projects WHERE id = $1"
       : "DELETE FROM projects WHERE id = ?";

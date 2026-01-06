@@ -118,11 +118,10 @@ export default function Dashboard() {
       const token = await getAccessTokenSilently();
       const headers = { Authorization: `Bearer ${token}` };
 
-      const [commentsRes, projectsRes, statsRes, imagesRes] = await Promise.all([
+      const [commentsRes, projectsRes, statsRes] = await Promise.all([
         fetch("/api/dashboard/comments", { headers }),
         fetch("/api/dashboard/projects", { headers }),
         fetch("/api/uploads/stats/usage", { headers }),
-        fetch("/api/uploads/list/all", { headers }),
       ]);
 
       if (commentsRes.status === 403 || projectsRes.status === 403) {
@@ -135,6 +134,10 @@ export default function Dashboard() {
       if (statsRes.ok) {
         setStorageStats(await statsRes.json());
       }
+
+      // Sync images with disk, then fetch list
+      await fetch("/api/uploads/sync", { method: "POST", headers });
+      const imagesRes = await fetch("/api/uploads/list/all", { headers });
       if (imagesRes.ok) {
         setUploadedImages(await imagesRes.json());
       }
@@ -289,21 +292,22 @@ export default function Dashboard() {
       }
 
       const data = await res.json();
-      setProjectForm({ ...projectForm, image: null, image_id: data.id });
-      setImagePreview(data.url);
 
-      // Refresh storage stats
-      const statsRes = await fetch("/api/uploads/stats/usage", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (statsRes.ok) {
-        setStorageStats(await statsRes.json());
+      // Only update project form if we're in the project form context
+      if (showProjectForm) {
+        setProjectForm({ ...projectForm, image: null, image_id: data.id });
+        setImagePreview(data.url);
       }
+
+      // Refresh all data (stats + images list)
+      fetchData();
     } catch (err) {
       console.error("Error uploading image:", err);
       alert("Upload failed");
     } finally {
       setUploading(false);
+      // Reset file input
+      e.target.value = "";
     }
   };
 
@@ -971,10 +975,38 @@ export default function Dashboard() {
                 color: "var(--color-white)",
                 fontSize: "14px",
                 marginBottom: "24px",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                flexWrap: "wrap",
+                gap: "12px",
               }}
             >
-              {t.storageUsed}: {Math.round(storageStats.storageUsed / 1024 / 1024)}MB / {Math.round(storageStats.storageLimit / 1024 / 1024)}MB
-              {" ("}{storageStats.storagePercent}%{")"}  •  {uploadedImages.length} {t.images.toLowerCase()}
+              <span>
+                {t.storageUsed}: {Math.round(storageStats.storageUsed / 1024 / 1024)}MB / {Math.round(storageStats.storageLimit / 1024 / 1024)}MB
+                {" ("}{storageStats.storagePercent}%{")"}  •  {uploadedImages.length} {t.images.toLowerCase()}
+              </span>
+              <label
+                style={{
+                  padding: "8px 16px",
+                  background: "var(--color-neon-green)",
+                  color: "var(--color-black)",
+                  fontWeight: "900",
+                  fontSize: "12px",
+                  cursor: "pointer",
+                  border: "2px solid var(--color-black)",
+                  textTransform: "uppercase",
+                }}
+              >
+                {uploading ? t.uploading : t.imageUpload}
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/gif,image/webp"
+                  onChange={handleImageUpload}
+                  disabled={uploading}
+                  style={{ display: "none" }}
+                />
+              </label>
             </div>
           )}
 
