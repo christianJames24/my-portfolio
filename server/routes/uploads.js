@@ -120,58 +120,36 @@ router.get("/stats/usage", checkJwt, requirePermission("admin:dashboard"), async
     }
 });
 
-// List all images (admin only) - scans uploads directory directly
+// List all images (admin only) - queries database
 router.get("/list/all", checkJwt, requirePermission("admin:dashboard"), async (req, res) => {
     try {
-        console.log("List all images - UPLOADS_DIR:", UPLOADS_DIR);
-        console.log("Directory exists:", fs.existsSync(UPLOADS_DIR));
+        // Get all images from database
+        const imagesResult = await db.query(
+            "SELECT * FROM project_images ORDER BY created_at DESC"
+        );
+        console.log("Images from database:", imagesResult.rows.length);
 
-        // Scan uploads directory directly
-        if (!fs.existsSync(UPLOADS_DIR)) {
-            console.log("Directory does not exist, returning empty");
-            return res.json([]);
-        }
-
-        const allFiles = fs.readdirSync(UPLOADS_DIR);
-        console.log("All files in directory:", allFiles);
-        const files = allFiles.filter(f => f.endsWith('.webp'));
-        console.log("WebP files:", files);
-
-        // Get all projects to find which images are in use (by filename match)
+        // Get all projects to find which images are in use
         const projectsResult = await db.query(
             "SELECT id, name_en, image_id FROM projects WHERE image_id IS NOT NULL"
         );
 
-        // Also get project_images to map id -> filename
-        const imagesResult = await db.query("SELECT id, filename FROM project_images");
-        const idToFilename = {};
-        imagesResult.rows.forEach(img => {
-            idToFilename[img.id] = img.filename;
-        });
-
-        // Create usage map: filename -> project info
+        // Create a map of image_id -> project info
         const imageUsage = {};
         projectsResult.rows.forEach(p => {
-            const filename = idToFilename[p.image_id];
-            if (filename) {
-                imageUsage[filename] = { projectId: p.id, projectName: p.name_en };
-            }
+            imageUsage[p.image_id] = { projectId: p.id, projectName: p.name_en };
         });
 
-        // Build response from filesystem
-        const images = files.map((filename, index) => {
-            const filePath = path.join(UPLOADS_DIR, filename);
-            const stats = fs.statSync(filePath);
-            return {
-                id: index + 1, // Just for display, not a real DB id
-                filename: filename,
-                originalName: filename,
-                sizeBytes: stats.size,
-                createdAt: stats.mtime,
-                url: `/api/uploads/file/${filename}`, // Direct file access
-                usedBy: imageUsage[filename] || null,
-            };
-        });
+        // Build response with usage info
+        const images = imagesResult.rows.map(img => ({
+            id: img.id,
+            filename: img.filename,
+            originalName: img.original_name,
+            sizeBytes: img.size_bytes,
+            createdAt: img.created_at,
+            url: `/api/uploads/${img.id}`,
+            usedBy: imageUsage[img.id] || null,
+        }));
 
         res.json(images);
     } catch (err) {
