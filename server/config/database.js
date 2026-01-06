@@ -73,7 +73,7 @@ if (isProduction) {
   const sqliteDb = new Database(":memory:");
 
   sqliteDb.exec(`
-    CREATE TABLE comments (
+    CREATE TABLE IF NOT EXISTS comments (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       user_id TEXT NOT NULL,
       user_name TEXT NOT NULL,
@@ -83,7 +83,7 @@ if (isProduction) {
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
 
-    CREATE TABLE projects (
+    CREATE TABLE IF NOT EXISTS projects (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       sort_order INTEGER DEFAULT 0,
       name_en TEXT NOT NULL,
@@ -98,7 +98,7 @@ if (isProduction) {
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
 
-    CREATE TABLE project_images (
+    CREATE TABLE IF NOT EXISTS project_images (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       filename TEXT NOT NULL,
       original_name TEXT,
@@ -149,32 +149,6 @@ if (isProduction) {
       });
     },
   };
-
-  // Auto-sync uploads directory with database on startup
-  const path = require("path");
-  const fs = require("fs");
-  const UPLOADS_DIR = path.join(__dirname, "..", "uploads");
-
-  if (fs.existsSync(UPLOADS_DIR)) {
-    const files = fs.readdirSync(UPLOADS_DIR).filter(f =>
-      f.endsWith('.webp') || f.endsWith('.jpg') || f.endsWith('.jpeg') ||
-      f.endsWith('.png') || f.endsWith('.gif')
-    );
-
-    for (const filename of files) {
-      const filePath = path.join(UPLOADS_DIR, filename);
-      const stats = fs.statSync(filePath);
-      try {
-        sqliteDb.prepare(
-          "INSERT INTO project_images (filename, original_name, size_bytes) VALUES (?, ?, ?)"
-        ).run(filename, filename, stats.size);
-        console.log("Auto-synced image:", filename);
-      } catch (e) {
-        // Ignore duplicates
-      }
-    }
-    console.log(`Auto-synced ${files.length} images from uploads directory`);
-  }
 }
 
 module.exports = { db, isProduction };
