@@ -123,12 +123,19 @@ router.get("/stats/usage", checkJwt, requirePermission("admin:dashboard"), async
 // List all images (admin only) - scans uploads directory directly
 router.get("/list/all", checkJwt, requirePermission("admin:dashboard"), async (req, res) => {
     try {
+        console.log("List all images - UPLOADS_DIR:", UPLOADS_DIR);
+        console.log("Directory exists:", fs.existsSync(UPLOADS_DIR));
+
         // Scan uploads directory directly
         if (!fs.existsSync(UPLOADS_DIR)) {
+            console.log("Directory does not exist, returning empty");
             return res.json([]);
         }
 
-        const files = fs.readdirSync(UPLOADS_DIR).filter(f => f.endsWith('.webp'));
+        const allFiles = fs.readdirSync(UPLOADS_DIR);
+        console.log("All files in directory:", allFiles);
+        const files = allFiles.filter(f => f.endsWith('.webp'));
+        console.log("WebP files:", files);
 
         // Get all projects to find which images are in use (by filename match)
         const projectsResult = await db.query(
@@ -217,21 +224,8 @@ router.post("/sync", checkJwt, requirePermission("admin:dashboard"), async (req,
             }
         }
 
-        // Remove database entries for files that don't exist on disk
-        const diskFiles = new Set(files);
-        for (const row of dbResult.rows) {
-            if (!diskFiles.has(row.filename)) {
-                console.log("Removing from DB (file missing):", row.filename);
-                const deleteQuery = isProduction
-                    ? "DELETE FROM project_images WHERE id = $1"
-                    : "DELETE FROM project_images WHERE id = ?";
-                await db.query(deleteQuery, [row.id]);
-                removed++;
-            }
-        }
-
-        console.log(`Sync complete: ${added} added, ${removed} removed`);
-        res.json({ message: `Synced: ${added} added, ${removed} removed`, filesOnDisk: files.length, filesInDb: dbResult.rows.length });
+        console.log(`Sync complete: ${added} added`);
+        res.json({ message: `Synced: ${added} added`, filesOnDisk: files.length });
     } catch (err) {
         console.error("Error syncing images:", err);
         res.status(500).json({ error: err.message });
