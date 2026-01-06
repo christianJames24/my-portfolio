@@ -141,11 +141,26 @@ router.get("/list/all", checkJwt, requirePermission("admin:dashboard"), async (r
 // Sync images: scan directory and reconcile with database (admin only)
 router.post("/sync", checkJwt, requirePermission("admin:dashboard"), async (req, res) => {
     try {
-        // Get all files in uploads directory
-        const files = fs.readdirSync(UPLOADS_DIR).filter(f => f.endsWith('.webp'));
+        console.log("Starting image sync...");
+        console.log("Uploads dir:", UPLOADS_DIR);
+
+        // Ensure uploads directory exists
+        if (!fs.existsSync(UPLOADS_DIR)) {
+            fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+            console.log("Created uploads directory");
+        }
+
+        // Get all image files in uploads directory
+        const allFiles = fs.readdirSync(UPLOADS_DIR);
+        const files = allFiles.filter(f =>
+            f.endsWith('.webp') || f.endsWith('.jpg') || f.endsWith('.jpeg') ||
+            f.endsWith('.png') || f.endsWith('.gif')
+        );
+        console.log("Files on disk:", files.length, files);
 
         // Get all images from database
         const dbResult = await db.query("SELECT * FROM project_images");
+        console.log("Files in database:", dbResult.rows.length);
         const dbFiles = new Set(dbResult.rows.map(r => r.filename));
 
         let added = 0;
@@ -156,6 +171,7 @@ router.post("/sync", checkJwt, requirePermission("admin:dashboard"), async (req,
             if (!dbFiles.has(filename)) {
                 const filePath = path.join(UPLOADS_DIR, filename);
                 const stats = fs.statSync(filePath);
+                console.log("Adding to DB:", filename, stats.size);
 
                 const query = isProduction
                     ? `INSERT INTO project_images (filename, original_name, size_bytes) VALUES ($1, $2, $3)`
@@ -170,6 +186,7 @@ router.post("/sync", checkJwt, requirePermission("admin:dashboard"), async (req,
         const diskFiles = new Set(files);
         for (const row of dbResult.rows) {
             if (!diskFiles.has(row.filename)) {
+                console.log("Removing from DB (file missing):", row.filename);
                 const deleteQuery = isProduction
                     ? "DELETE FROM project_images WHERE id = $1"
                     : "DELETE FROM project_images WHERE id = ?";
@@ -178,7 +195,8 @@ router.post("/sync", checkJwt, requirePermission("admin:dashboard"), async (req,
             }
         }
 
-        res.json({ message: `Synced: ${added} added, ${removed} removed` });
+        console.log(`Sync complete: ${added} added, ${removed} removed`);
+        res.json({ message: `Synced: ${added} added, ${removed} removed`, filesOnDisk: files.length, filesInDb: dbResult.rows.length });
     } catch (err) {
         console.error("Error syncing images:", err);
         res.status(500).json({ error: err.message });

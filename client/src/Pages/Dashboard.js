@@ -135,11 +135,14 @@ export default function Dashboard() {
         setStorageStats(await statsRes.json());
       }
 
-      // Sync images with disk, then fetch list
-      await fetch("/api/uploads/sync", { method: "POST", headers });
+      // Fetch images list (don't sync on every load - it might remove valid entries)
       const imagesRes = await fetch("/api/uploads/list/all", { headers });
       if (imagesRes.ok) {
-        setUploadedImages(await imagesRes.json());
+        const images = await imagesRes.json();
+        console.log("Fetched images:", images.length);
+        setUploadedImages(images);
+      } else {
+        console.error("Images fetch failed:", imagesRes.status, await imagesRes.text());
       }
     } catch (err) {
       console.error("Error fetching dashboard data:", err);
