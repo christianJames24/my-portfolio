@@ -47,6 +47,21 @@ const getProjectCount = async () => {
     return parseInt(result.rows[0].count) || 0;
 };
 
+// Debug endpoint to check database contents (public for debugging)
+router.get("/debug/db", async (req, res) => {
+    try {
+        const imagesResult = await db.query("SELECT * FROM project_images");
+        const projectsResult = await db.query("SELECT id, name_en, image_id FROM projects");
+        res.json({
+            imagesCount: imagesResult.rows.length,
+            images: imagesResult.rows,
+            projects: projectsResult.rows
+        });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // ============ PUBLIC: Serve images ============
 
 // Get image by ID (public - no auth required)
@@ -154,6 +169,37 @@ router.get("/list/all", checkJwt, requirePermission("admin:dashboard"), async (r
         res.json(images);
     } catch (err) {
         console.error("Error listing images:", err);
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Register an old image by filename (admin only)
+router.post("/register", checkJwt, requirePermission("admin:dashboard"), async (req, res) => {
+    try {
+        const { filename } = req.body;
+        if (!filename) {
+            return res.status(400).json({ error: "Filename is required" });
+        }
+
+        // Check if already registered
+        const checkQuery = isProduction
+            ? "SELECT id FROM project_images WHERE filename = $1"
+            : "SELECT id FROM project_images WHERE filename = ?";
+        const existing = await db.query(checkQuery, [filename]);
+
+        if (existing.rows.length > 0) {
+            return res.json({ message: "Already registered", id: existing.rows[0].id });
+        }
+
+        // Add to database
+        const insertQuery = isProduction
+            ? "INSERT INTO project_images (filename, original_name, size_bytes) VALUES ($1, $2, $3) RETURNING *"
+            : "INSERT INTO project_images (filename, original_name, size_bytes) VALUES (?, ?, ?) RETURNING *";
+
+        const result = await db.query(insertQuery, [filename, filename, 0]);
+        res.json({ message: "Registered", image: result.rows[0] });
+    } catch (err) {
+        console.error("Error registering image:", err);
         res.status(500).json({ error: err.message });
     }
 });

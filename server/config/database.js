@@ -149,6 +149,29 @@ if (isProduction) {
       });
     },
   };
+
+  // Auto-sync uploads directory for local development (SQLite is in-memory)
+  const path = require("path");
+  const fs = require("fs");
+  const UPLOADS_DIR = path.join(__dirname, "..", "uploads");
+
+  if (fs.existsSync(UPLOADS_DIR)) {
+    const files = fs.readdirSync(UPLOADS_DIR).filter(f => f.endsWith('.webp'));
+    for (const filename of files) {
+      const filePath = path.join(UPLOADS_DIR, filename);
+      const stats = fs.statSync(filePath);
+      try {
+        sqliteDb.prepare(
+          "INSERT INTO project_images (filename, original_name, size_bytes) VALUES (?, ?, ?)"
+        ).run(filename, filename, stats.size);
+      } catch (e) {
+        // Ignore duplicates
+      }
+    }
+    if (files.length > 0) {
+      console.log(`Auto-synced ${files.length} images for local development`);
+    }
+  }
 }
 
 module.exports = { db, isProduction };
