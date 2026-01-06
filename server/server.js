@@ -14,6 +14,7 @@ app.use(express.json());
 const commentsRoutes = require("./routes/comments");
 const projectsRoutes = require("./routes/projects");
 const dashboardRoutes = require("./routes/dashboard");
+const uploadsRoutes = require("./routes/uploads");
 
 app.get("/api", (req, res) => {
   res.json({ status: "API is running" });
@@ -30,12 +31,12 @@ app.get("/api/me", checkJwt, (req, res) => {
 app.use("/api/comments", commentsRoutes);
 app.use("/api/projects", projectsRoutes);
 app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/uploads", uploadsRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, "0.0.0.0", () => {
   console.log(
-    `Server running on port ${PORT} (${
-      process.env.NODE_ENV === "production" ? "production" : "development"
+    `Server running on port ${PORT} (${process.env.NODE_ENV === "production" ? "production" : "development"
     } mode)`
   );
 });

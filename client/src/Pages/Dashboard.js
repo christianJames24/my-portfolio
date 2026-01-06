@@ -15,6 +15,10 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [editingProject, setEditingProject] = useState(null);
   const [showProjectForm, setShowProjectForm] = useState(false);
+  const [imageMode, setImageMode] = useState("url"); // "url" or "upload"
+  const [uploading, setUploading] = useState(false);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [storageStats, setStorageStats] = useState(null);
 
   const [projectForm, setProjectForm] = useState({
     name_en: "",
@@ -24,6 +28,7 @@ export default function Dashboard() {
     tech: "",
     year: "",
     image: "",
+    image_id: null,
     sort_order: 0,
   });
 
@@ -52,7 +57,11 @@ export default function Dashboard() {
       description: "Description",
       tech: "Technologies",
       year: "Year",
-      image: "Image URL",
+      image: "Image",
+      imageUrl: "URL",
+      imageUpload: "Upload",
+      uploading: "Uploading...",
+      storageUsed: "Storage",
       order: "Sort Order",
     },
     fr: {
@@ -79,7 +88,11 @@ export default function Dashboard() {
       description: "Description",
       tech: "Technologies",
       year: "Année",
-      image: "URL Image",
+      image: "Image",
+      imageUrl: "URL",
+      imageUpload: "Téléverser",
+      uploading: "Téléversement...",
+      storageUsed: "Stockage",
       order: "Ordre",
     },
   }[language];
@@ -94,9 +107,10 @@ export default function Dashboard() {
       const token = await getAccessTokenSilently();
       const headers = { Authorization: `Bearer ${token}` };
 
-      const [commentsRes, projectsRes] = await Promise.all([
+      const [commentsRes, projectsRes, statsRes] = await Promise.all([
         fetch("/api/dashboard/comments", { headers }),
         fetch("/api/dashboard/projects", { headers }),
+        fetch("/api/uploads/stats/usage", { headers }),
       ]);
 
       if (commentsRes.status === 403 || projectsRes.status === 403) {
@@ -106,6 +120,9 @@ export default function Dashboard() {
 
       setComments(await commentsRes.json());
       setProjects(await projectsRes.json());
+      if (statsRes.ok) {
+        setStorageStats(await statsRes.json());
+      }
     } catch (err) {
       console.error("Error fetching dashboard data:", err);
       navigate("/");
@@ -168,8 +185,11 @@ export default function Dashboard() {
         tech: "",
         year: "",
         image: "",
+        image_id: null,
         sort_order: 0,
       });
+      setImagePreview(null);
+      setImageMode("url");
       fetchData();
     } catch (err) {
       console.error("Error saving project:", err);
@@ -185,9 +205,12 @@ export default function Dashboard() {
       description_fr: project.description_fr,
       tech: project.tech,
       year: project.year,
-      image: project.image,
+      image: project.image || "",
+      image_id: project.image_id || null,
       sort_order: project.sort_order || 0,
     });
+    setImageMode(project.image_id ? "upload" : "url");
+    setImagePreview(project.image_id ? `/api/uploads/${project.image_id}` : null);
     setShowProjectForm(true);
   };
 
@@ -205,9 +228,50 @@ export default function Dashboard() {
     }
   };
 
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const token = await getAccessTokenSilently();
+      const formData = new FormData();
+      formData.append("image", file);
+
+      const res = await fetch("/api/uploads", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
+      });
+
+      if (!res.ok) {
+        const error = await res.json();
+        alert(error.error || "Upload failed");
+        return;
+      }
+
+      const data = await res.json();
+      setProjectForm({ ...projectForm, image: null, image_id: data.id });
+      setImagePreview(data.url);
+
+      // Refresh storage stats
+      const statsRes = await fetch("/api/uploads/stats/usage", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (statsRes.ok) {
+        setStorageStats(await statsRes.json());
+      }
+    } catch (err) {
+      console.error("Error uploading image:", err);
+      alert("Upload failed");
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const handleExport = (lang) => {
     const isEnglish = lang === "en";
-    
+
     const exportData = {
       title: isEnglish ? "Projects" : "Projets",
       projects: projects.map((p) => ({
@@ -452,8 +516,25 @@ export default function Dashboard() {
               gap: "12px",
               marginBottom: "24px",
               flexWrap: "wrap",
+              alignItems: "center",
             }}
           >
+            {storageStats && (
+              <div
+                style={{
+                  padding: "8px 16px",
+                  background: "var(--color-black)",
+                  border: "2px solid var(--color-cyan)",
+                  color: "var(--color-white)",
+                  fontSize: "12px",
+                  marginRight: "auto",
+                }}
+              >
+                {t.storageUsed}: {Math.round(storageStats.storageUsed / 1024 / 1024)}MB / {Math.round(storageStats.storageLimit / 1024 / 1024)}MB
+                {" • "}
+                {storageStats.projectCount} / {storageStats.projectLimit} {t.projects.toLowerCase()}
+              </div>
+            )}
             <button
               onClick={() => {
                 setEditingProject(null);
@@ -465,8 +546,11 @@ export default function Dashboard() {
                   tech: "",
                   year: "",
                   image: "",
+                  image_id: null,
                   sort_order: 0,
                 });
+                setImageMode("url");
+                setImagePreview(null);
                 setShowProjectForm(true);
               }}
               className="btn-primary"
@@ -599,15 +683,83 @@ export default function Dashboard() {
                   </div>
                   <div>
                     <label className="form-label">{t.image}</label>
-                    <input
-                      type="text"
-                      value={projectForm.image}
-                      onChange={(e) =>
-                        setProjectForm({ ...projectForm, image: e.target.value })
-                      }
-                      className="form-input"
-                      placeholder="https://..."
-                    />
+                    <div style={{ display: "flex", gap: "8px", marginBottom: "8px" }}>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setImageMode("url");
+                          setProjectForm({ ...projectForm, image_id: null });
+                          setImagePreview(null);
+                        }}
+                        style={{
+                          padding: "6px 12px",
+                          border: "2px solid var(--color-black)",
+                          background: imageMode === "url" ? "var(--color-cyan)" : "var(--color-white)",
+                          color: imageMode === "url" ? "var(--color-white)" : "var(--color-black)",
+                          fontWeight: "700",
+                          fontSize: "12px",
+                          cursor: "pointer",
+                        }}
+                      >
+                        {t.imageUrl}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setImageMode("upload");
+                          setProjectForm({ ...projectForm, image: "" });
+                        }}
+                        style={{
+                          padding: "6px 12px",
+                          border: "2px solid var(--color-black)",
+                          background: imageMode === "upload" ? "var(--color-magenta)" : "var(--color-white)",
+                          color: imageMode === "upload" ? "var(--color-white)" : "var(--color-black)",
+                          fontWeight: "700",
+                          fontSize: "12px",
+                          cursor: "pointer",
+                        }}
+                      >
+                        {t.imageUpload}
+                      </button>
+                    </div>
+                    {imageMode === "url" ? (
+                      <input
+                        type="text"
+                        value={projectForm.image || ""}
+                        onChange={(e) =>
+                          setProjectForm({ ...projectForm, image: e.target.value })
+                        }
+                        className="form-input"
+                        placeholder="https://..."
+                      />
+                    ) : (
+                      <div>
+                        <input
+                          type="file"
+                          accept="image/jpeg,image/png,image/gif,image/webp"
+                          onChange={handleImageUpload}
+                          disabled={uploading}
+                          style={{ marginBottom: "8px" }}
+                        />
+                        {uploading && (
+                          <p style={{ color: "var(--color-yellow)", fontSize: "12px" }}>
+                            {t.uploading}
+                          </p>
+                        )}
+                        {imagePreview && (
+                          <img
+                            src={imagePreview}
+                            alt="Preview"
+                            style={{
+                              maxWidth: "100%",
+                              maxHeight: "150px",
+                              marginTop: "8px",
+                              border: "2px solid var(--color-neon-green)",
+                            }}
+                          />
+                        )}
+                      </div>
+                    )}
                   </div>
                   <div>
                     <label className="form-label">{t.order}</label>

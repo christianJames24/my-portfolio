@@ -21,7 +21,7 @@ router.get("/", async (req, res) => {
       description: lang === "fr" ? p.description_fr : p.description_en,
       tech: p.tech,
       year: p.year,
-      image: p.image,
+      image: p.image_id ? `/api/uploads/${p.image_id}` : p.image,
     }));
 
     res.json({

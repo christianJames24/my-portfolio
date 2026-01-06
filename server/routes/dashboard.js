@@ -27,16 +27,16 @@ router.get("/projects", async (req, res) => {
 // Create project
 router.post("/projects", async (req, res) => {
   try {
-    const { name_en, name_fr, description_en, description_fr, tech, year, image, sort_order } = req.body;
+    const { name_en, name_fr, description_en, description_fr, tech, year, image, image_id, sort_order } = req.body;
 
     const query = isProduction
-      ? `INSERT INTO projects (name_en, name_fr, description_en, description_fr, tech, year, image, sort_order) 
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`
-      : `INSERT INTO projects (name_en, name_fr, description_en, description_fr, tech, year, image, sort_order) 
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?) RETURNING *`;
+      ? `INSERT INTO projects (name_en, name_fr, description_en, description_fr, tech, year, image, image_id, sort_order) 
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *`
+      : `INSERT INTO projects (name_en, name_fr, description_en, description_fr, tech, year, image, image_id, sort_order) 
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING *`;
 
     const result = await db.query(query, [
-      name_en, name_fr, description_en, description_fr, tech, year, image, sort_order || 0
+      name_en, name_fr, description_en, description_fr, tech, year, image || null, image_id || null, sort_order || 0
     ]);
 
     res.json(result.rows[0]);
@@ -50,20 +50,53 @@ router.post("/projects", async (req, res) => {
 router.put("/projects/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const { name_en, name_fr, description_en, description_fr, tech, year, image, sort_order } = req.body;
+    const { name_en, name_fr, description_en, description_fr, tech, year, image, image_id, sort_order } = req.body;
+
+    // If changing image_id, cleanup old uploaded image
+    const selectQuery = isProduction
+      ? "SELECT * FROM projects WHERE id = $1"
+      : "SELECT * FROM projects WHERE id = ?";
+    const existingProject = await db.query(selectQuery, [id]);
+
+    if (existingProject.rows.length > 0) {
+      const oldProject = existingProject.rows[0];
+      // If old project had an image_id and it's different from new one
+      if (oldProject.image_id && oldProject.image_id !== image_id) {
+        const imageSelectQuery = isProduction
+          ? "SELECT * FROM project_images WHERE id = $1"
+          : "SELECT * FROM project_images WHERE id = ?";
+        const imageResult = await db.query(imageSelectQuery, [oldProject.image_id]);
+
+        if (imageResult.rows.length > 0) {
+          const oldImage = imageResult.rows[0];
+          const fs = require("fs");
+          const path = require("path");
+          const filePath = path.join(__dirname, "..", "uploads", oldImage.filename);
+
+          if (fs.existsSync(filePath)) {
+            fs.unlinkSync(filePath);
+          }
+
+          const imageDeleteQuery = isProduction
+            ? "DELETE FROM project_images WHERE id = $1"
+            : "DELETE FROM project_images WHERE id = ?";
+          await db.query(imageDeleteQuery, [oldProject.image_id]);
+        }
+      }
+    }
 
     const query = isProduction
       ? `UPDATE projects SET 
            name_en = $1, name_fr = $2, description_en = $3, description_fr = $4, 
-           tech = $5, year = $6, image = $7, sort_order = $8, updated_at = CURRENT_TIMESTAMP
-         WHERE id = $9 RETURNING *`
+           tech = $5, year = $6, image = $7, image_id = $8, sort_order = $9, updated_at = CURRENT_TIMESTAMP
+         WHERE id = $10 RETURNING *`
       : `UPDATE projects SET 
            name_en = ?, name_fr = ?, description_en = ?, description_fr = ?, 
-           tech = ?, year = ?, image = ?, sort_order = ?, updated_at = CURRENT_TIMESTAMP
+           tech = ?, year = ?, image = ?, image_id = ?, sort_order = ?, updated_at = CURRENT_TIMESTAMP
          WHERE id = ? RETURNING *`;
 
     const result = await db.query(query, [
-      name_en, name_fr, description_en, description_fr, tech, year, image, sort_order || 0, id
+      name_en, name_fr, description_en, description_fr, tech, year, image || null, image_id || null, sort_order || 0, id
     ]);
 
     res.json(result.rows[0]);
@@ -73,10 +106,49 @@ router.put("/projects/:id", async (req, res) => {
   }
 });
 
-// Delete project
+
+// Delete project (and cleanup associated image)
 router.delete("/projects/:id", async (req, res) => {
   try {
     const { id } = req.params;
+
+    // First get the project to check if it has an uploaded image
+    const selectQuery = isProduction
+      ? "SELECT * FROM projects WHERE id = $1"
+      : "SELECT * FROM projects WHERE id = ?";
+    const projectResult = await db.query(selectQuery, [id]);
+
+    if (projectResult.rows.length > 0) {
+      const project = projectResult.rows[0];
+
+      // If project has an uploaded image, delete it
+      if (project.image_id) {
+        const imageSelectQuery = isProduction
+          ? "SELECT * FROM project_images WHERE id = $1"
+          : "SELECT * FROM project_images WHERE id = ?";
+        const imageResult = await db.query(imageSelectQuery, [project.image_id]);
+
+        if (imageResult.rows.length > 0) {
+          const image = imageResult.rows[0];
+          const fs = require("fs");
+          const path = require("path");
+          const filePath = path.join(__dirname, "..", "uploads", image.filename);
+
+          // Delete the file from disk
+          if (fs.existsSync(filePath)) {
+            fs.unlinkSync(filePath);
+          }
+
+          // Delete from project_images table
+          const imageDeleteQuery = isProduction
+            ? "DELETE FROM project_images WHERE id = $1"
+            : "DELETE FROM project_images WHERE id = ?";
+          await db.query(imageDeleteQuery, [project.image_id]);
+        }
+      }
+    }
+
+    // Delete the project
     const query = isProduction
       ? "DELETE FROM projects WHERE id = $1"
       : "DELETE FROM projects WHERE id = ?";
@@ -93,7 +165,7 @@ router.delete("/projects/:id", async (req, res) => {
 router.get("/projects/export", async (req, res) => {
   try {
     const result = await db.query("SELECT * FROM projects ORDER BY sort_order ASC");
-    
+
     const exportEn = {
       title: "Projects",
       projects: result.rows.map(p => ({

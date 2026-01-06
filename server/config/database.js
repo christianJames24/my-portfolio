@@ -40,8 +40,24 @@ if (isProduction) {
           tech VARCHAR(255),
           year VARCHAR(10),
           image TEXT,
+          image_id INTEGER,
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
           updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+      `);
+
+      // Add image_id column if it doesn't exist
+      await db.query(`
+        ALTER TABLE projects ADD COLUMN IF NOT EXISTS image_id INTEGER
+      `);
+
+      await db.query(`
+        CREATE TABLE IF NOT EXISTS project_images (
+          id SERIAL PRIMARY KEY,
+          filename VARCHAR(255) NOT NULL,
+          original_name VARCHAR(255),
+          size_bytes INTEGER DEFAULT 0,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
       `);
 
@@ -77,8 +93,17 @@ if (isProduction) {
       tech TEXT,
       year TEXT,
       image TEXT,
+      image_id INTEGER,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+
+    CREATE TABLE project_images (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      filename TEXT NOT NULL,
+      original_name TEXT,
+      size_bytes INTEGER DEFAULT 0,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
   `);
 
