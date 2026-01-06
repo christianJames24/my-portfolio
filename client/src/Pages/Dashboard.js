@@ -1010,60 +1010,6 @@ export default function Dashboard() {
                   style={{ display: "none" }}
                 />
               </label>
-              <form
-                onSubmit={async (e) => {
-                  e.preventDefault();
-                  const filename = e.target.filename.value.trim();
-                  if (!filename) return;
-                  try {
-                    const token = await getAccessTokenSilently();
-                    const res = await fetch("/api/uploads/register", {
-                      method: "POST",
-                      headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`,
-                      },
-                      body: JSON.stringify({ filename }),
-                    });
-                    if (res.ok) {
-                      e.target.filename.value = "";
-                      fetchData();
-                    } else {
-                      const err = await res.json();
-                      alert(err.error || "Failed to register");
-                    }
-                  } catch (err) {
-                    console.error(err);
-                  }
-                }}
-                style={{ display: "flex", gap: "8px", alignItems: "center" }}
-              >
-                <input
-                  name="filename"
-                  placeholder="filename.webp"
-                  style={{
-                    padding: "8px 12px",
-                    background: "var(--color-black)",
-                    border: "2px solid var(--color-cyan)",
-                    color: "var(--color-white)",
-                    fontSize: "12px",
-                  }}
-                />
-                <button
-                  type="submit"
-                  style={{
-                    padding: "8px 16px",
-                    background: "var(--color-cyan)",
-                    color: "var(--color-black)",
-                    fontWeight: "900",
-                    fontSize: "12px",
-                    border: "2px solid var(--color-black)",
-                    cursor: "pointer",
-                  }}
-                >
-                  REGISTER OLD
-                </button>
-              </form>
             </div>
           )}
 
@@ -1114,11 +1060,16 @@ export default function Dashboard() {
                       if (!window.confirm(t.confirmDeleteImage)) return;
                       try {
                         const token = await getAccessTokenSilently();
-                        await fetch(`/api/uploads/${img.id}`, {
+                        const res = await fetch(`/api/uploads/${img.id}`, {
                           method: "DELETE",
                           headers: { Authorization: `Bearer ${token}` },
                         });
-                        fetchData();
+                        if (res.ok) {
+                          fetchData();
+                        } else {
+                          console.error("Failed to delete image");
+                          alert("Failed to delete image");
+                        }
                       } catch (err) {
                         console.error("Error deleting image:", err);
                       }
@@ -1138,7 +1089,8 @@ export default function Dashboard() {
             </div>
           )}
         </div>
-      )}
+      )
+      }
 
       <style>{`
         .btn-small {

@@ -336,11 +336,15 @@ router.delete("/:id", checkJwt, requirePermission("admin:dashboard"), async (req
         }
 
         const image = selectResult.rows[0];
+        console.log(`Deleting image ID ${id}: ${image.filename}`);
 
         // Delete file from disk
         const filePath = path.join(UPLOADS_DIR, image.filename);
         if (fs.existsSync(filePath)) {
             fs.unlinkSync(filePath);
+            console.log("Deleted file from disk:", filePath);
+        } else {
+            console.warn("File not found on disk:", filePath);
         }
 
         // Delete from database
@@ -349,6 +353,7 @@ router.delete("/:id", checkJwt, requirePermission("admin:dashboard"), async (req
             : "DELETE FROM project_images WHERE id = ?";
 
         await db.query(deleteQuery, [id]);
+        console.log("Deleted from database");
 
         res.json({ message: "Image deleted" });
     } catch (err) {
