@@ -1055,7 +1055,7 @@ export default function Dashboard() {
                   }}>
                     {img.usedBy ? `${t.inUse}: ${img.usedBy.projectName}` : t.unused}
                   </p>
-                  <button
+                  {/* <button
                     onClick={async () => {
                       if (!window.confirm(t.confirmDeleteImage)) return;
                       try {
@@ -1083,7 +1083,7 @@ export default function Dashboard() {
                     }}
                   >
                     {t.delete}
-                  </button>
+                  </button> */}
                 </div>
               ))}
             </div>
