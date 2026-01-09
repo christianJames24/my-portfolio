@@ -1055,35 +1055,7 @@ export default function Dashboard() {
                   }}>
                     {img.usedBy ? `${t.inUse}: ${img.usedBy.projectName}` : t.unused}
                   </p>
-                  {/* <button
-                    onClick={async () => {
-                      if (!window.confirm(t.confirmDeleteImage)) return;
-                      try {
-                        const token = await getAccessTokenSilently();
-                        const res = await fetch(`/api/uploads/${img.id}`, {
-                          method: "DELETE",
-                          headers: { Authorization: `Bearer ${token}` },
-                        });
-                        if (res.ok) {
-                          fetchData();
-                        } else {
-                          console.error("Failed to delete image");
-                          alert("Failed to delete image");
-                        }
-                      } catch (err) {
-                        console.error("Error deleting image:", err);
-                      }
-                    }}
-                    className="btn-small"
-                    style={{
-                      background: "var(--color-red-pink)",
-                      color: "var(--color-white)",
-                      width: "100%",
-                      marginTop: "8px",
-                    }}
-                  >
-                    {t.delete}
-                  </button> */}
+                  {/* Image deletion intentionally disabled - images are permanent */}
                 </div>
               ))}
             </div>

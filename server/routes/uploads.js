@@ -1,11 +1,9 @@
 // server/routes/uploads.js
+// Base64 image storage - no filesystem dependencies
 const express = require("express");
 const router = express.Router();
 const multer = require("multer");
 const sharp = require("sharp");
-const path = require("path");
-const fs = require("fs");
-const crypto = require("crypto");
 const { db, isProduction } = require("../config/database");
 const { checkJwt } = require("../config/auth");
 const { requirePermission } = require("../middleware/permissions");
@@ -13,13 +11,6 @@ const { requirePermission } = require("../middleware/permissions");
 // Constants
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB per file
 const MAX_TOTAL_STORAGE = 500 * 1024 * 1024; // 500MB total
-
-const UPLOADS_DIR = path.join(__dirname, "..", "uploads");
-
-// Ensure uploads directory exists
-if (!fs.existsSync(UPLOADS_DIR)) {
-    fs.mkdirSync(UPLOADS_DIR, { recursive: true });
-}
 
 // Multer config - store in memory for processing
 const upload = multer({
@@ -50,7 +41,8 @@ const getProjectCount = async () => {
 // Debug endpoint to check database contents (public for debugging)
 router.get("/debug/db", async (req, res) => {
     try {
-        const imagesResult = await db.query("SELECT * FROM project_images");
+        // Don't return image_data in debug (too large)
+        const imagesResult = await db.query("SELECT id, original_name, size_bytes, created_at FROM project_images");
         const projectsResult = await db.query("SELECT id, name_en, image_id FROM projects");
         res.json({
             imagesCount: imagesResult.rows.length,
@@ -64,13 +56,19 @@ router.get("/debug/db", async (req, res) => {
 
 // ============ PUBLIC: Serve images ============
 
-// Get image by ID (public - no auth required)
+// Get image by ID (public - no auth required) - serves base64 as image
 router.get("/:id", async (req, res) => {
     try {
         const { id } = req.params;
+
+        // Skip non-numeric IDs (like "stats", "list", "debug")
+        if (isNaN(parseInt(id))) {
+            return res.status(404).json({ error: "Invalid image ID" });
+        }
+
         const query = isProduction
-            ? "SELECT * FROM project_images WHERE id = $1"
-            : "SELECT * FROM project_images WHERE id = ?";
+            ? "SELECT image_data, original_name FROM project_images WHERE id = $1"
+            : "SELECT image_data, original_name FROM project_images WHERE id = ?";
 
         const result = await db.query(query, [id]);
 
@@ -79,34 +77,17 @@ router.get("/:id", async (req, res) => {
         }
 
         const image = result.rows[0];
-        const filePath = path.join(UPLOADS_DIR, image.filename);
 
-        if (!fs.existsSync(filePath)) {
-            return res.status(404).json({ error: "Image file not found" });
+        if (!image.image_data) {
+            return res.status(404).json({ error: "Image data not found" });
         }
+
+        // image_data is stored as base64 string, convert to buffer
+        const imageBuffer = Buffer.from(image.image_data, "base64");
 
         res.setHeader("Content-Type", "image/webp");
         res.setHeader("Cache-Control", "public, max-age=31536000"); // 1 year cache
-        res.sendFile(filePath);
-    } catch (err) {
-        console.error("Error serving image:", err);
-        res.status(500).json({ error: err.message });
-    }
-});
-
-// Get image by filename directly (public - no auth required)
-router.get("/file/:filename", (req, res) => {
-    try {
-        const { filename } = req.params;
-        const filePath = path.join(UPLOADS_DIR, filename);
-
-        if (!fs.existsSync(filePath)) {
-            return res.status(404).json({ error: "Image file not found" });
-        }
-
-        res.setHeader("Content-Type", "image/webp");
-        res.setHeader("Cache-Control", "public, max-age=31536000");
-        res.sendFile(filePath);
+        res.send(imageBuffer);
     } catch (err) {
         console.error("Error serving image:", err);
         res.status(500).json({ error: err.message });
@@ -138,9 +119,9 @@ router.get("/stats/usage", checkJwt, requirePermission("admin:dashboard"), async
 // List all images (admin only) - queries database
 router.get("/list/all", checkJwt, requirePermission("admin:dashboard"), async (req, res) => {
     try {
-        // Get all images from database
+        // Get all images from database (exclude image_data for list view)
         const imagesResult = await db.query(
-            "SELECT * FROM project_images ORDER BY created_at DESC"
+            "SELECT id, original_name, size_bytes, created_at FROM project_images ORDER BY created_at DESC"
         );
         console.log("Images from database:", imagesResult.rows.length);
 
@@ -158,7 +139,6 @@ router.get("/list/all", checkJwt, requirePermission("admin:dashboard"), async (r
         // Build response with usage info
         const images = imagesResult.rows.map(img => ({
             id: img.id,
-            filename: img.filename,
             originalName: img.original_name,
             sizeBytes: img.size_bytes,
             createdAt: img.created_at,
@@ -173,90 +153,7 @@ router.get("/list/all", checkJwt, requirePermission("admin:dashboard"), async (r
     }
 });
 
-// Register an old image by filename (admin only)
-router.post("/register", checkJwt, requirePermission("admin:dashboard"), async (req, res) => {
-    try {
-        const { filename } = req.body;
-        if (!filename) {
-            return res.status(400).json({ error: "Filename is required" });
-        }
-
-        // Check if already registered
-        const checkQuery = isProduction
-            ? "SELECT id FROM project_images WHERE filename = $1"
-            : "SELECT id FROM project_images WHERE filename = ?";
-        const existing = await db.query(checkQuery, [filename]);
-
-        if (existing.rows.length > 0) {
-            return res.json({ message: "Already registered", id: existing.rows[0].id });
-        }
-
-        // Add to database
-        const insertQuery = isProduction
-            ? "INSERT INTO project_images (filename, original_name, size_bytes) VALUES ($1, $2, $3) RETURNING *"
-            : "INSERT INTO project_images (filename, original_name, size_bytes) VALUES (?, ?, ?) RETURNING *";
-
-        const result = await db.query(insertQuery, [filename, filename, 0]);
-        res.json({ message: "Registered", image: result.rows[0] });
-    } catch (err) {
-        console.error("Error registering image:", err);
-        res.status(500).json({ error: err.message });
-    }
-});
-
-// Sync images: scan directory and reconcile with database (admin only)
-router.post("/sync", checkJwt, requirePermission("admin:dashboard"), async (req, res) => {
-    try {
-        console.log("Starting image sync...");
-        console.log("Uploads dir:", UPLOADS_DIR);
-
-        // Ensure uploads directory exists
-        if (!fs.existsSync(UPLOADS_DIR)) {
-            fs.mkdirSync(UPLOADS_DIR, { recursive: true });
-            console.log("Created uploads directory");
-        }
-
-        // Get all image files in uploads directory
-        const allFiles = fs.readdirSync(UPLOADS_DIR);
-        const files = allFiles.filter(f =>
-            f.endsWith('.webp') || f.endsWith('.jpg') || f.endsWith('.jpeg') ||
-            f.endsWith('.png') || f.endsWith('.gif')
-        );
-        console.log("Files on disk:", files.length, files);
-
-        // Get all images from database
-        const dbResult = await db.query("SELECT * FROM project_images");
-        console.log("Files in database:", dbResult.rows.length);
-        const dbFiles = new Set(dbResult.rows.map(r => r.filename));
-
-        let added = 0;
-        let removed = 0;
-
-        // Add files that exist on disk but not in database
-        for (const filename of files) {
-            if (!dbFiles.has(filename)) {
-                const filePath = path.join(UPLOADS_DIR, filename);
-                const stats = fs.statSync(filePath);
-                console.log("Adding to DB:", filename, stats.size);
-
-                const query = isProduction
-                    ? `INSERT INTO project_images (filename, original_name, size_bytes) VALUES ($1, $2, $3)`
-                    : `INSERT INTO project_images (filename, original_name, size_bytes) VALUES (?, ?, ?)`;
-
-                await db.query(query, [filename, filename, stats.size]);
-                added++;
-            }
-        }
-
-        console.log(`Sync complete: ${added} added`);
-        res.json({ message: `Synced: ${added} added`, filesOnDisk: files.length });
-    } catch (err) {
-        console.error("Error syncing images:", err);
-        res.status(500).json({ error: err.message });
-    }
-});
-
-// Upload image (admin only)
+// Upload image (admin only) - stores as base64 in database
 router.post("/", checkJwt, requirePermission("admin:dashboard"), upload.single("image"), async (req, res) => {
     try {
         if (!req.file) {
@@ -269,30 +166,26 @@ router.post("/", checkJwt, requirePermission("admin:dashboard"), upload.single("
             return res.status(400).json({ error: "Storage limit reached (500MB)" });
         }
 
-        // Generate unique filename
-        const filename = `${crypto.randomUUID()}.webp`;
-        const filePath = path.join(UPLOADS_DIR, filename);
-
         // Optimize and convert to WebP
         const optimizedBuffer = await sharp(req.file.buffer)
             .resize(1200, 1200, { fit: "inside", withoutEnlargement: true })
             .webp({ quality: 80 })
             .toBuffer();
 
-        // Save file
-        fs.writeFileSync(filePath, optimizedBuffer);
+        // Convert to base64 for storage
+        const base64Data = optimizedBuffer.toString("base64");
 
         // Save to database
         const query = isProduction
-            ? `INSERT INTO project_images (filename, original_name, size_bytes) 
+            ? `INSERT INTO project_images (original_name, size_bytes, image_data) 
          VALUES ($1, $2, $3) RETURNING *`
-            : `INSERT INTO project_images (filename, original_name, size_bytes) 
+            : `INSERT INTO project_images (original_name, size_bytes, image_data) 
          VALUES (?, ?, ?)`;
 
         const result = await db.query(query, [
-            filename,
             req.file.originalname,
             optimizedBuffer.length,
+            base64Data,
         ]);
 
         // For SQLite, we need to get the inserted row
@@ -301,7 +194,7 @@ router.post("/", checkJwt, requirePermission("admin:dashboard"), upload.single("
             insertedImage = result.rows[0];
         } else {
             const selectResult = await db.query(
-                "SELECT * FROM project_images ORDER BY id DESC LIMIT 1"
+                "SELECT id, original_name, size_bytes, created_at FROM project_images ORDER BY id DESC LIMIT 1"
             );
             insertedImage = selectResult.rows[0];
         }
@@ -309,7 +202,6 @@ router.post("/", checkJwt, requirePermission("admin:dashboard"), upload.single("
         res.json({
             id: insertedImage.id,
             url: `/api/uploads/${insertedImage.id}`,
-            filename: insertedImage.filename,
             originalName: insertedImage.original_name,
             sizeBytes: insertedImage.size_bytes,
         });
@@ -319,47 +211,6 @@ router.post("/", checkJwt, requirePermission("admin:dashboard"), upload.single("
     }
 });
 
-// Delete image (admin only)
-router.delete("/:id", checkJwt, requirePermission("admin:dashboard"), async (req, res) => {
-    try {
-        const { id } = req.params;
-
-        // Get image info first
-        const selectQuery = isProduction
-            ? "SELECT * FROM project_images WHERE id = $1"
-            : "SELECT * FROM project_images WHERE id = ?";
-
-        const selectResult = await db.query(selectQuery, [id]);
-
-        if (selectResult.rows.length === 0) {
-            return res.status(404).json({ error: "Image not found" });
-        }
-
-        const image = selectResult.rows[0];
-        console.log(`Deleting image ID ${id}: ${image.filename}`);
-
-        // Delete file from disk
-        const filePath = path.join(UPLOADS_DIR, image.filename);
-        if (fs.existsSync(filePath)) {
-            fs.unlinkSync(filePath);
-            console.log("Deleted file from disk:", filePath);
-        } else {
-            console.warn("File not found on disk:", filePath);
-        }
-
-        // Delete from database
-        const deleteQuery = isProduction
-            ? "DELETE FROM project_images WHERE id = $1"
-            : "DELETE FROM project_images WHERE id = ?";
-
-        await db.query(deleteQuery, [id]);
-        console.log("Deleted from database");
-
-        res.json({ message: "Image deleted" });
-    } catch (err) {
-        console.error("Error deleting image:", err);
-        res.status(500).json({ error: err.message });
-    }
-});
+// NOTE: Image deletion intentionally disabled - images are permanent
 
 module.exports = router;

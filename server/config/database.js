@@ -54,11 +54,17 @@ if (isProduction) {
       await db.query(`
         CREATE TABLE IF NOT EXISTS project_images (
           id SERIAL PRIMARY KEY,
-          filename VARCHAR(255) NOT NULL,
+          filename VARCHAR(255),
           original_name VARCHAR(255),
           size_bytes INTEGER DEFAULT 0,
+          image_data TEXT,
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
+      `);
+
+      // Add image_data column if it doesn't exist (migration for existing databases)
+      await db.query(`
+        ALTER TABLE project_images ADD COLUMN IF NOT EXISTS image_data TEXT
       `);
 
       console.log("Database migrations completed successfully");
@@ -100,9 +106,10 @@ if (isProduction) {
 
     CREATE TABLE IF NOT EXISTS project_images (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      filename TEXT NOT NULL,
+      filename TEXT,
       original_name TEXT,
       size_bytes INTEGER DEFAULT 0,
+      image_data TEXT,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
   `);
@@ -150,28 +157,8 @@ if (isProduction) {
     },
   };
 
-  // Auto-sync uploads directory for local development (SQLite is in-memory)
-  const path = require("path");
-  const fs = require("fs");
-  const UPLOADS_DIR = path.join(__dirname, "..", "uploads");
-
-  if (fs.existsSync(UPLOADS_DIR)) {
-    const files = fs.readdirSync(UPLOADS_DIR).filter(f => f.endsWith('.webp'));
-    for (const filename of files) {
-      const filePath = path.join(UPLOADS_DIR, filename);
-      const stats = fs.statSync(filePath);
-      try {
-        sqliteDb.prepare(
-          "INSERT INTO project_images (filename, original_name, size_bytes) VALUES (?, ?, ?)"
-        ).run(filename, filename, stats.size);
-      } catch (e) {
-        // Ignore duplicates
-      }
-    }
-    if (files.length > 0) {
-      console.log(`Auto-synced ${files.length} images for local development`);
-    }
-  }
+  // No more auto-sync from filesystem - images are stored in database as base64
+  console.log("SQLite in-memory database initialized (base64 image storage)");
 }
 
 module.exports = { db, isProduction };
