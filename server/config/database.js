@@ -46,25 +46,21 @@ if (isProduction) {
         )
       `);
 
-      // Add image_id column if it doesn't exist
       await db.query(`
         ALTER TABLE projects ADD COLUMN IF NOT EXISTS image_id INTEGER
       `);
 
+      // Drop old project_images table and create new images table
+      await db.query(`DROP TABLE IF EXISTS project_images`);
+
       await db.query(`
-        CREATE TABLE IF NOT EXISTS project_images (
+        CREATE TABLE IF NOT EXISTS images (
           id SERIAL PRIMARY KEY,
-          filename VARCHAR(255),
           original_name VARCHAR(255),
           size_bytes INTEGER DEFAULT 0,
-          image_data TEXT,
+          image_data TEXT NOT NULL,
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
-      `);
-
-      // Add image_data column if it doesn't exist (migration for existing databases)
-      await db.query(`
-        ALTER TABLE project_images ADD COLUMN IF NOT EXISTS image_data TEXT
       `);
 
       console.log("Database migrations completed successfully");
@@ -104,12 +100,11 @@ if (isProduction) {
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
 
-    CREATE TABLE IF NOT EXISTS project_images (
+    CREATE TABLE IF NOT EXISTS images (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      filename TEXT,
       original_name TEXT,
       size_bytes INTEGER DEFAULT 0,
-      image_data TEXT,
+      image_data TEXT NOT NULL,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
   `);
@@ -157,7 +152,6 @@ if (isProduction) {
     },
   };
 
-  // No more auto-sync from filesystem - images are stored in database as base64
   console.log("SQLite in-memory database initialized (base64 image storage)");
 }
 

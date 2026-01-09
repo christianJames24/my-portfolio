@@ -28,7 +28,7 @@ const upload = multer({
 
 // Helper: Get total storage used
 const getTotalStorageUsed = async () => {
-    const result = await db.query("SELECT COALESCE(SUM(size_bytes), 0) as total FROM project_images");
+    const result = await db.query("SELECT COALESCE(SUM(size_bytes), 0) as total FROM images");
     return parseInt(result.rows[0].total) || 0;
 };
 
@@ -42,7 +42,7 @@ const getProjectCount = async () => {
 router.get("/debug/db", async (req, res) => {
     try {
         // Don't return image_data in debug (too large)
-        const imagesResult = await db.query("SELECT id, original_name, size_bytes, created_at FROM project_images");
+        const imagesResult = await db.query("SELECT id, original_name, size_bytes, created_at FROM images");
         const projectsResult = await db.query("SELECT id, name_en, image_id FROM projects");
         res.json({
             imagesCount: imagesResult.rows.length,
@@ -67,8 +67,8 @@ router.get("/:id", async (req, res) => {
         }
 
         const query = isProduction
-            ? "SELECT image_data, original_name FROM project_images WHERE id = $1"
-            : "SELECT image_data, original_name FROM project_images WHERE id = ?";
+            ? "SELECT image_data, original_name FROM images WHERE id = $1"
+            : "SELECT image_data, original_name FROM images WHERE id = ?";
 
         const result = await db.query(query, [id]);
 
@@ -121,7 +121,7 @@ router.get("/list/all", checkJwt, requirePermission("admin:dashboard"), async (r
     try {
         // Get all images from database (exclude image_data for list view)
         const imagesResult = await db.query(
-            "SELECT id, original_name, size_bytes, created_at FROM project_images ORDER BY created_at DESC"
+            "SELECT id, original_name, size_bytes, created_at FROM images ORDER BY created_at DESC"
         );
         console.log("Images from database:", imagesResult.rows.length);
 
@@ -177,9 +177,9 @@ router.post("/", checkJwt, requirePermission("admin:dashboard"), upload.single("
 
         // Save to database
         const query = isProduction
-            ? `INSERT INTO project_images (original_name, size_bytes, image_data) 
+            ? `INSERT INTO images (original_name, size_bytes, image_data) 
          VALUES ($1, $2, $3) RETURNING *`
-            : `INSERT INTO project_images (original_name, size_bytes, image_data) 
+            : `INSERT INTO images (original_name, size_bytes, image_data) 
          VALUES (?, ?, ?)`;
 
         const result = await db.query(query, [
@@ -194,7 +194,7 @@ router.post("/", checkJwt, requirePermission("admin:dashboard"), upload.single("
             insertedImage = result.rows[0];
         } else {
             const selectResult = await db.query(
-                "SELECT id, original_name, size_bytes, created_at FROM project_images ORDER BY id DESC LIMIT 1"
+                "SELECT id, original_name, size_bytes, created_at FROM images ORDER BY id DESC LIMIT 1"
             );
             insertedImage = selectResult.rows[0];
         }
