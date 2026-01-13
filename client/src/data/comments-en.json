@@ -1,10 +1,10 @@
 {
-  "title": "Comments",
-  "placeholder": "Leave a comment...",
+  "title": "Testimonials",
+  "placeholder": "Leave a testimonial...",
   "submit": "Submit",
-  "login": "Login to Comment",
-  "loginMessage": "You must be logged in to comment",
+  "login": "Login to Leave Testimonial",
+  "loginMessage": "You must be logged in to leave a testimonial",
   "delete": "Delete",
-  "noComments": "No comments yet. Be the first!",
+  "noComments": "No testimonials yet. Be the first!",
   "posting": "Posting..."
 }

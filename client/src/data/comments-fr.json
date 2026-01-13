@@ -1,10 +1,10 @@
 {
-  "title": "Commentaires",
-  "placeholder": "Laisser un commentaire...",
+  "title": "Témoignages",
+  "placeholder": "Laisser un témoignage...",
   "submit": "Soumettre",
-  "login": "Connexion pour commenter",
-  "loginMessage": "Vous devez être connecté pour commenter",
+  "login": "Connexion pour témoigner",
+  "loginMessage": "Vous devez être connecté pour laisser un témoignage",
   "delete": "Supprimer",
-  "noComments": "Pas encore de commentaires.",
+  "noComments": "Pas encore de témoignages.",
   "posting": "Publication..."
 }

@@ -21,8 +21,8 @@ export default function Comments() {
   const location = useLocation();
 
   const pendingMessage = {
-    en: "Comment submitted! It will appear after admin approval.",
-    fr: "Commentaire soumis! Il apparaîtra après approbation de l'administrateur.",
+    en: "Testimonial submitted! It will appear after admin approval.",
+    fr: "Témoignage soumis! Il apparaîtra après approbation de l'administrateur.",
   };
 
   useEffect(() => {
@@ -87,13 +87,13 @@ export default function Comments() {
       }
     } catch (err) {
       console.error("Error posting comment:", err);
-      alert("Error posting comment");
+      alert("Error posting testimonial");
     }
     setLoading(false);
   };
 
   const handleDelete = async (commentId) => {
-    if (!window.confirm("Delete this comment?")) return;
+    if (!window.confirm("Delete this testimonial?")) return;
 
     try {
       const token = await getAccessTokenSilently();

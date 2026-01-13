@@ -101,7 +101,7 @@ export default function BackgroundGradient() {
       number: 5,
       color1: "var(--color-cyan)",
       color2: "var(--color-neon-green)",
-      title: "COMMENTS",
+      title: "TESTIMONIALS",
     },
     "/dashboard": {
       number: 6,

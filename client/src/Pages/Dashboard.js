@@ -36,7 +36,7 @@ export default function Dashboard() {
   const t = {
     en: {
       title: "Dashboard",
-      comments: "Comments",
+      comments: "Testimonials",
       projects: "Projects",
       pending: "Pending",
       approved: "Approved",
@@ -50,7 +50,7 @@ export default function Dashboard() {
       cancel: "Cancel",
       exportEn: "Export EN",
       exportFr: "Export FR",
-      noComments: "No comments to review",
+      noComments: "No testimonials to review",
       noProjects: "No projects yet",
       english: "English",
       french: "French",
@@ -72,7 +72,7 @@ export default function Dashboard() {
     },
     fr: {
       title: "Tableau de Bord",
-      comments: "Commentaires",
+      comments: "Témoignages",
       projects: "Projets",
       pending: "En attente",
       approved: "Approuvé",
@@ -86,7 +86,7 @@ export default function Dashboard() {
       cancel: "Annuler",
       exportEn: "Exporter EN",
       exportFr: "Exporter FR",
-      noComments: "Aucun commentaire à examiner",
+      noComments: "Aucun témoignage à examiner",
       noProjects: "Aucun projet pour le moment",
       english: "Anglais",
       french: "Français",
