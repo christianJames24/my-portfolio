@@ -30,6 +30,11 @@ export default function Projects() {
     fetchProjects();
   }, [language]);
 
+  useEffect(() => {
+    const pageTitle = projectsData?.title || (language === 'en' ? 'Projects' : 'Projets');
+    document.title = `Christian James Lee - ${pageTitle}`;
+  }, [language, projectsData]);
+
   const t = projectsData || (language === "en" ? contentEn : contentFr);
 
   const getProjectColors = (index) => {

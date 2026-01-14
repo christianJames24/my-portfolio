@@ -1,5 +1,5 @@
 // Home.js
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { LanguageContext } from '../App';
 import contentEn from '../data/home-en.json';
 import contentFr from '../data/home-fr.json';
@@ -7,6 +7,11 @@ import contentFr from '../data/home-fr.json';
 export default function Home({ backendData }) {
   const { language } = useContext(LanguageContext);
   const t = language === 'en' ? contentEn : contentFr;
+
+  useEffect(() => {
+    const pageTitle = t.title || (language === 'en' ? 'Home' : 'Accueil');
+    document.title = `Christian James Lee - ${pageTitle}`;
+  }, [language, t.title]);
 
   return (
     <div className="home-container" style={{

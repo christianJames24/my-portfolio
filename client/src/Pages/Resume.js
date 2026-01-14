@@ -1,5 +1,5 @@
 // Resume.js
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { LanguageContext } from '../App';
 import contentEn from '../data/resume-en.json';
 import contentFr from '../data/resume-fr.json';
@@ -7,6 +7,11 @@ import contentFr from '../data/resume-fr.json';
 export default function Resume() {
   const { language } = useContext(LanguageContext);
   const t = language === 'en' ? contentEn : contentFr;
+
+  useEffect(() => {
+    const pageTitle = t.title || (language === 'en' ? 'Resume' : 'CV');
+    document.title = `Christian James Lee - ${pageTitle}`;
+  }, [language, t.title]);
 
   return (
     <div className="page-container resume-page">

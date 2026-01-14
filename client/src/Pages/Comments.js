@@ -30,6 +30,11 @@ export default function Comments() {
   }, []);
 
   useEffect(() => {
+    const pageTitle = t.title || (language === 'en' ? 'Testimonials' : 'Témoignages');
+    document.title = `Christian James Lee - ${pageTitle}`;
+  }, [language, t.title]);
+
+  useEffect(() => {
     if (isAuthenticated) {
       fetchPermissions();
     }

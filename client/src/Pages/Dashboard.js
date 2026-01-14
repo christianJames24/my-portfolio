@@ -21,6 +21,11 @@ export default function Dashboard() {
   const [imagePreview, setImagePreview] = useState(null);
   const [storageStats, setStorageStats] = useState(null);
 
+  useEffect(() => {
+    const pageTitle = language === 'en' ? 'Dashboard' : 'Tableau de bord';
+    document.title = `Christian James Lee - ${pageTitle}`;
+  }, [language]);
+
   const [projectForm, setProjectForm] = useState({
     name_en: "",
     name_fr: "",
