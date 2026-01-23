@@ -167,4 +167,41 @@ router.get("/:page/export", checkJwt, requirePermission("admin:dashboard"), asyn
     }
 });
 
+// POST - Import content from JSON (admin only)
+router.post("/:page/import", checkJwt, requirePermission("admin:dashboard"), async (req, res) => {
+    try {
+        const { page } = req.params;
+        const { content, language } = req.body;
+        const lang = language || "en";
+
+        const validPages = ["about", "resume", "home"];
+        if (!validPages.includes(page)) {
+            return res.status(400).json({ error: "Invalid page name" });
+        }
+
+        if (!content || typeof content !== "object") {
+            return res.status(400).json({ error: "Invalid content format" });
+        }
+
+        // Upsert: insert or update
+        const query = isProduction
+            ? `INSERT INTO page_content (page_name, language, content, updated_at) 
+         VALUES ($1, $2, $3, CURRENT_TIMESTAMP) 
+         ON CONFLICT (page_name, language) 
+         DO UPDATE SET content = $3, updated_at = CURRENT_TIMESTAMP`
+            : `INSERT INTO page_content (page_name, language, content, updated_at) 
+         VALUES (?, ?, ?, CURRENT_TIMESTAMP) 
+         ON CONFLICT (page_name, language) 
+         DO UPDATE SET content = excluded.content, updated_at = CURRENT_TIMESTAMP`;
+
+        const contentStr = isProduction ? content : JSON.stringify(content);
+        await db.query(query, [page, lang, contentStr]);
+
+        res.json({ success: true, message: "Content imported successfully" });
+    } catch (err) {
+        console.error("Error importing content:", err);
+        res.status(500).json({ error: err.message });
+    }
+});
+
 module.exports = router;

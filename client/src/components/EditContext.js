@@ -94,6 +94,31 @@ export function EditProvider({ children, isAdmin }) {
         }
     }, [getAccessTokenSilently]);
 
+    // Import content from JSON object
+    const importContent = useCallback(async (page, content, language = "en") => {
+        try {
+            const token = await getAccessTokenSilently();
+            const response = await fetch(`/api/content/${page}/import`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({ content, language }),
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || "Failed to import content");
+            }
+
+            return await response.json();
+        } catch (err) {
+            console.error("Error importing content:", err);
+            throw err;
+        }
+    }, [getAccessTokenSilently]);
+
     return (
         <EditContext.Provider
             value={{
@@ -103,6 +128,7 @@ export function EditProvider({ children, isAdmin }) {
                 saveField,
                 saveContent,
                 exportContent,
+                importContent,
             }}
         >
             {children}

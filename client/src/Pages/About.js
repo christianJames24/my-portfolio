@@ -6,6 +6,7 @@ import contentFr from "../data/about-fr.json";
 import EditableText from "../components/EditableText";
 import EditableImage from "../components/EditableImage";
 import ExportButton from "../components/ExportButton";
+import ImportButton from "../components/ImportButton";
 import { useEdit } from "../components/EditContext";
 
 export default function About() {
@@ -59,14 +60,7 @@ export default function About() {
     ]);
   };
 
-  // For nested fields like skillsImages array (if needed later)
-  const handleArrayFieldSave = async (field, index, value) => {
-    const newArray = [...content[field]];
-    newArray[index] = value;
-    const newContent = { ...content, [field]: newArray };
-    setContent(newContent);
-    await saveContent("about", newContent, language);
-  };
+
 
   // For image arrays - save to both languages
   const handleImageArraySave = async (field, index, value) => {
@@ -102,6 +96,7 @@ export default function About() {
       {canEdit && (
         <div style={{ marginBottom: "20px", display: "flex", gap: "12px", flexWrap: "wrap" }}>
           <ExportButton page="about" language={language} />
+          <ImportButton page="about" language={language} />
         </div>
       )}
 
