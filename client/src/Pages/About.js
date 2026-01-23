@@ -10,7 +10,7 @@ import { useEdit } from "../components/EditContext";
 
 export default function About() {
   const { language } = useContext(LanguageContext);
-  const { canEdit, saveContent } = useEdit();
+  const { canEdit, saveContent, saveField } = useEdit();
   const [content, setContent] = useState(language === "en" ? contentEn : contentFr);
 
   // Fetch content from API with fallback to JSON
@@ -48,16 +48,18 @@ export default function About() {
 
   // Save images to BOTH languages so they stay in sync
   const handleImageSave = async (field, value) => {
+    // Update local state immediately
     const newContent = { ...content, [field]: value };
     setContent(newContent);
-    // Save to both en and fr
+    // Save partial update to both en and fr using PATCH
+    // This avoids overwriting text content in the other language
     await Promise.all([
-      saveContent("about", { ...newContent }, "en"),
-      saveContent("about", { ...newContent }, "fr"),
+      saveField("about", field, value, "en"),
+      saveField("about", field, value, "fr"),
     ]);
   };
 
-  // For nested fields like skillsImages array
+  // For nested fields like skillsImages array (if needed later)
   const handleArrayFieldSave = async (field, index, value) => {
     const newArray = [...content[field]];
     newArray[index] = value;
@@ -68,13 +70,18 @@ export default function About() {
 
   // For image arrays - save to both languages
   const handleImageArraySave = async (field, index, value) => {
+    // field is "skillsImages", index is the index
     const newArray = [...content[field]];
     newArray[index] = value;
     const newContent = { ...content, [field]: newArray };
     setContent(newContent);
+
+    // Construct the path for PATCH (e.g. "skillsImages[0]")
+    const path = `${field}[${index}]`;
+
     await Promise.all([
-      saveContent("about", { ...newContent }, "en"),
-      saveContent("about", { ...newContent }, "fr"),
+      saveField("about", path, value, "en"),
+      saveField("about", path, value, "fr"),
     ]);
   };
 
