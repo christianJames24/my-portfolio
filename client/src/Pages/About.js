@@ -46,6 +46,17 @@ export default function About() {
     await saveContent("about", newContent, language);
   };
 
+  // Save images to BOTH languages so they stay in sync
+  const handleImageSave = async (field, value) => {
+    const newContent = { ...content, [field]: value };
+    setContent(newContent);
+    // Save to both en and fr
+    await Promise.all([
+      saveContent("about", { ...newContent }, "en"),
+      saveContent("about", { ...newContent }, "fr"),
+    ]);
+  };
+
   // For nested fields like skillsImages array
   const handleArrayFieldSave = async (field, index, value) => {
     const newArray = [...content[field]];
@@ -53,6 +64,18 @@ export default function About() {
     const newContent = { ...content, [field]: newArray };
     setContent(newContent);
     await saveContent("about", newContent, language);
+  };
+
+  // For image arrays - save to both languages
+  const handleImageArraySave = async (field, index, value) => {
+    const newArray = [...content[field]];
+    newArray[index] = value;
+    const newContent = { ...content, [field]: newArray };
+    setContent(newContent);
+    await Promise.all([
+      saveContent("about", { ...newContent }, "en"),
+      saveContent("about", { ...newContent }, "fr"),
+    ]);
   };
 
   const t = content;
@@ -102,7 +125,7 @@ export default function About() {
             field="profileImage"
             page="about"
             language={language}
-            onSave={(v) => handleFieldSave("profileImage", v)}
+            onSave={(v) => handleImageSave("profileImage", v)}
             className="profile-image"
             style={{
               width: "100%",
@@ -146,7 +169,7 @@ export default function About() {
             field="journeyImage"
             page="about"
             language={language}
-            onSave={(v) => handleFieldSave("journeyImage", v)}
+            onSave={(v) => handleImageSave("journeyImage", v)}
             className="section-image"
             style={{
               width: "100%",
@@ -218,7 +241,7 @@ export default function About() {
               field={`skillsImages[${index}]`}
               page="about"
               language={language}
-              onSave={(v) => handleArrayFieldSave("skillsImages", index, v)}
+              onSave={(v) => handleImageArraySave("skillsImages", index, v)}
               style={{
                 width: "100%",
                 height: "auto",
@@ -273,7 +296,7 @@ export default function About() {
             field="outsideImage"
             page="about"
             language={language}
-            onSave={(v) => handleFieldSave("outsideImage", v)}
+            onSave={(v) => handleImageSave("outsideImage", v)}
             className="section-image"
             style={{
               width: "100%",
