@@ -110,7 +110,7 @@
 /* LIGHT THEME (Default) */
 :root {
   --font-display: 'TheNeue-Black', 'Arial Black', sans-serif;
-  --font-body: 'Comfortaa','Arial', sans-serif;
+  --font-body: 'Comfortaa', 'Arial', sans-serif;
   --font-bold: 'Chintzy', sans-serif;
   --font-special: 'Chintzy', sans-serif;
   --font-countdown: 'Gothica', sans-serif;
@@ -152,7 +152,7 @@
 
   --color-stripe-1: rgba(87, 87, 87, 0.08);
   --color-stripe-2: rgba(184, 184, 184, 0.08);
-  
+
   --color-neon-green: #f7f7f7;
   --color-magenta: #d8d8d881;
   --color-cyan: #505050;
@@ -203,114 +203,114 @@
   --color-blue-3: #FFFDF8;
 } */
 
- 
+
 
 @font-face {
-    font-family: Comfortaa;
-    src: url("../public/assets/Fonts/fonts/Comfortaa-Regular.ttf");
+  font-family: Comfortaa;
+  src: url("../public/assets/Fonts/fonts/Comfortaa-Regular.ttf");
 }
 
 @font-face {
-    font-family: Comfortaa;
-    src: url("../public/assets/Fonts/fonts/Comfortaa-Light.ttf");
-    font-weight: light;
+  font-family: Comfortaa;
+  src: url("../public/assets/Fonts/fonts/Comfortaa-Light.ttf");
+  font-weight: light;
 }
 
 @font-face {
-    font-family: Comfortaa;
-    src: url("../public/assets/Fonts/fonts/Comfortaa-Bold.ttf");
-    font-weight: bold;
+  font-family: Comfortaa;
+  src: url("../public/assets/Fonts/fonts/Comfortaa-Bold.ttf");
+  font-weight: bold;
 }
 
 @font-face {
-    font-family: Lollipoptron;
-    src: url("../public/assets/Fonts/fonts/Lollipoptron-7GPD.ttf");
+  font-family: Lollipoptron;
+  src: url("../public/assets/Fonts/fonts/Lollipoptron-7GPD.ttf");
 }
 
 @font-face {
-    font-family: Emoji Font;
-    src: url("../public/assets/Fonts/dingbatFonts/EmojiFont.ttf");
+  font-family: Emoji Font;
+  src: url("../public/assets/Fonts/dingbatFonts/EmojiFont.ttf");
 }
 
 @font-face {
-    font-family: SimpleDirectionArrows;
-    src: url("../public/assets/Fonts/dingbatFonts/SimpleDirectionArrows.ttf");
+  font-family: SimpleDirectionArrows;
+  src: url("../public/assets/Fonts/dingbatFonts/SimpleDirectionArrows.ttf");
 }
 
 @font-face {
-    font-family: Star Things;
-    src: url("../public/assets/Fonts/dingbatFonts/starthings.ttf");
+  font-family: Star Things;
+  src: url("../public/assets/Fonts/dingbatFonts/starthings.ttf");
 }
 
 @font-face {
-    font-family: Burnstown Dam Back;
-    src: url("../public/assets/Fonts/fonts/Burnstown\ Dam\ Back.otf");
+  font-family: Burnstown Dam Back;
+  src: url("../public/assets/Fonts/fonts/Burnstown\ Dam\ Back.otf");
 }
 
 @font-face {
-    font-family: Burnstown Dam;
-    src: url("../public/assets/Fonts/fonts/Burnstown\ Dam.otf");
+  font-family: Burnstown Dam;
+  src: url("../public/assets/Fonts/fonts/Burnstown\ Dam.otf");
 }
 
 @font-face {
-    font-family: Chintzy;
-    src: url("../public/assets/Fonts/fonts/chintzy.ttf");
+  font-family: Chintzy;
+  src: url("../public/assets/Fonts/fonts/chintzy.ttf");
 }
 
 @font-face {
-    font-family: EHSMB;
-    src: url("../public/assets/Fonts/fonts/EHSMB.TTF");
+  font-family: EHSMB;
+  src: url("../public/assets/Fonts/fonts/EHSMB.TTF");
 }
 
 @font-face {
-    font-family: Gothica;
-    src: url("../public/assets/Fonts/fonts/Gothica-Bold.ttf");
+  font-family: Gothica;
+  src: url("../public/assets/Fonts/fonts/Gothica-Bold.ttf");
 }
 
 @font-face {
-    font-family: Hypik;
-    src: url("../public/assets/Fonts/fonts/hypik.otf");
+  font-family: Hypik;
+  src: url("../public/assets/Fonts/fonts/hypik.otf");
 }
 
 @font-face {
-    font-family: Metal Lord;
-    src: url("../public/assets/Fonts/fonts/Metal\ Lord.otf");
+  font-family: Metal Lord;
+  src: url("../public/assets/Fonts/fonts/Metal\ Lord.otf");
 }
 
 @font-face {
-    font-family: RobloxFont;
-    src: url("../public/assets/Fonts/fonts/RobloxFont-Regular.ttf");
+  font-family: RobloxFont;
+  src: url("../public/assets/Fonts/fonts/RobloxFont-Regular.ttf");
 }
 
 @font-face {
-    font-family: TheNeue-Black;
-    src: url("../public/assets/Fonts/fonts/TheNeue-Black.ttf");
+  font-family: TheNeue-Black;
+  src: url("../public/assets/Fonts/fonts/TheNeue-Black.ttf");
 }
 
 
 @font-face {
-    font-family: TimesNewArial;
-    src: url("../public/assets/Fonts/fonts/timesnewarial.ttf");
+  font-family: TimesNewArial;
+  src: url("../public/assets/Fonts/fonts/timesnewarial.ttf");
 }
 
 @font-face {
-    font-family: Transit;
-    src: url("../public/assets/Fonts/fonts/Transit\ CAT.ttf");
+  font-family: Transit;
+  src: url("../public/assets/Fonts/fonts/Transit\ CAT.ttf");
 }
 
 @font-face {
-    font-family: Ubuntu Title;
-    src: url("../public/assets/Fonts/fonts/Ubuntu-Title.ttf");
+  font-family: Ubuntu Title;
+  src: url("../public/assets/Fonts/fonts/Ubuntu-Title.ttf");
 }
 
 @font-face {
-    font-family: Ubuntu Title Fr;
-    src: url("../public/assets/Fonts/fonts/ubuntu-title-fr-1.1.ttf");
+  font-family: Ubuntu Title Fr;
+  src: url("../public/assets/Fonts/fonts/ubuntu-title-fr-1.1.ttf");
 }
 
 @font-face {
-    font-family: ZeroAnd;
-    src: url("../public/assets/Fonts/fonts/zero&.ttf");
+  font-family: ZeroAnd;
+  src: url("../public/assets/Fonts/fonts/zero&.ttf");
 }
 
 body {
@@ -330,21 +330,17 @@ body::before {
   left: 0;
   width: 100%;
   height: 100%;
-  background: 
-    repeating-linear-gradient(
-      45deg,
+  background:
+    repeating-linear-gradient(45deg,
       transparent,
       transparent 15px,
       var(--color-stripe-1) 15px,
-      var(--color-stripe-1) 30px
-    ),
-    repeating-linear-gradient(
-      -45deg,
+      var(--color-stripe-1) 30px),
+    repeating-linear-gradient(-45deg,
       transparent,
       transparent 15px,
       var(--color-stripe-2) 15px,
-      var(--color-stripe-2) 30px
-    );
+      var(--color-stripe-2) 30px);
   pointer-events: none;
   z-index: 1;
 }
@@ -401,6 +397,7 @@ body::before {
     width: 120px;
     height: 15px;
   }
+
   .page-container::after {
     left: 50px;
     width: 100px;
@@ -423,7 +420,7 @@ h1 {
   hyphens: none;
   position: relative;
   /* Hard shadow stack - responsive */
-  text-shadow: 
+  text-shadow:
     clamp(3px, 0.8vw, 8px) clamp(3px, 0.8vw, 8px) 0 var(--color-dark-magenta),
     clamp(4px, 1.2vw, 12px) clamp(4px, 1.2vw, 12px) 0 var(--color-cyan),
     clamp(-1px, -0.2vw, -2px) clamp(-1px, -0.2vw, -2px) 0 var(--color-neon-green);
@@ -442,7 +439,7 @@ h2 {
   transform: skewX(-3deg);
   word-break: keep-all;
   /* Hard shadows only */
-  text-shadow: 
+  text-shadow:
     3px 3px 0 var(--color-dark-magenta),
     -2px -2px 0 var(--color-cyan);
   border-bottom: 6px solid var(--color-magenta);
@@ -457,26 +454,24 @@ h2 {
   margin-bottom: 75px;
   position: relative;
   overflow: visible;
-  box-shadow: 
+  box-shadow:
     10px 10px 0 var(--color-magenta),
     -5px -5px 0 var(--color-cyan);
   transform: skewY(-1deg);
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  clip-path: polygon(
-    0 0,
-    calc(100% - 15px) 0,
-    100% 15px,
-    100% 100%,
-    15px 100%,
-    0 calc(100% - 15px)
-  );
+  clip-path: polygon(0 0,
+      calc(100% - 15px) 0,
+      100% 15px,
+      100% 100%,
+      15px 100%,
+      0 calc(100% - 15px));
 }
 
 @media (max-width: 768px) {
   .content-card {
     padding: 40px;
     margin-bottom: 30px;
-    box-shadow: 
+    box-shadow:
       15px 15px 0 var(--color-magenta),
       -8px -8px 0 var(--color-cyan);
   }
@@ -510,22 +505,20 @@ h2 {
 .content-card:nth-child(even) {
   transform: skewY(1deg);
   border-color: var(--color-magenta);
-  box-shadow: 
+  box-shadow:
     -10px 10px 0 var(--color-neon-green),
     5px -5px 0 var(--color-cyan);
-  clip-path: polygon(
-    15px 0,
-    100% 0,
-    100% calc(100% - 15px),
-    calc(100% - 15px) 100%,
-    0 100%,
-    0 15px
-  );
+  clip-path: polygon(15px 0,
+      100% 0,
+      100% calc(100% - 15px),
+      calc(100% - 15px) 100%,
+      0 100%,
+      0 15px);
 }
 
 @media (min-width: 768px) {
   .content-card:nth-child(even) {
-    box-shadow: 
+    box-shadow:
       -15px 15px 0 var(--color-neon-green),
       8px -8px 0 var(--color-cyan);
   }
@@ -533,14 +526,14 @@ h2 {
 
 .content-card:hover {
   transform: skewY(0deg) translateY(-5px);
-  box-shadow: 
+  box-shadow:
     20px 20px 0 var(--color-magenta),
     -10px -10px 0 var(--color-neon-green);
   border-color: var(--color-cyan);
 }
 
 .content-card:nth-child(even):hover {
-  box-shadow: 
+  box-shadow:
     -20px 20px 0 var(--color-cyan),
     10px -10px 0 var(--color-magenta);
   border-color: var(--color-neon-green);
@@ -567,26 +560,24 @@ h2 {
   letter-spacing: 0.1em;
   transition: all 0.15s;
   /* Hard shadow stack */
-  box-shadow: 
+  box-shadow:
     6px 6px 0 var(--color-black),
     6px 6px 0 var(--color-cyan);
   transform: skewX(-5deg);
   white-space: nowrap;
   position: relative;
   font-family: var(--font-bold);
-  clip-path: polygon(
-    8px 0,
-    100% 0,
-    100% calc(100% - 8px),
-    calc(100% - 8px) 100%,
-    0 100%,
-    0 8px
-  );
+  clip-path: polygon(8px 0,
+      100% 0,
+      100% calc(100% - 8px),
+      calc(100% - 8px) 100%,
+      0 100%,
+      0 8px);
 }
 
 .btn-primary:hover {
   transform: skewX(-5deg) translate(-3px, -3px);
-  box-shadow: 
+  box-shadow:
     9px 9px 0 var(--color-black),
     9px 9px 0 var(--color-neon-green);
   background: var(--color-neon-green);
@@ -594,7 +585,110 @@ h2 {
 
 .btn-primary:active {
   transform: skewX(-5deg) translate(2px, 2px);
-  box-shadow: 
+  box-shadow:
     3px 3px 0 var(--color-black),
     3px 3px 0 var(--color-cyan);
+}
+
+/* ===================== */
+/* INLINE EDITING STYLES */
+/* ===================== */
+
+.editable-field {
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.editable-field--can-edit {
+  cursor: pointer;
+  outline: 2px dashed transparent;
+  outline-offset: 4px;
+  transition: outline 0.2s ease, background 0.2s ease;
+}
+
+.editable-field--can-edit:hover {
+  outline: 2px dashed var(--color-magenta);
+  background: rgba(255, 0, 255, 0.05);
+}
+
+.editable-field--can-edit::after {
+  content: '✎';
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  font-size: 12px;
+  background: var(--color-magenta);
+  color: var(--color-white);
+  padding: 2px 4px;
+  border-radius: 3px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+.editable-field--can-edit:hover::after {
+  opacity: 1;
+}
+
+.editable-field--editing {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--color-magenta);
+}
+
+.editable-saving {
+  margin-left: 8px;
+  color: var(--color-cyan);
+  font-size: 12px;
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Edit mode indicator */
+.edit-mode-active {
+  position: relative;
+}
+
+.edit-mode-active::before {
+  content: 'EDIT MODE';
+  position: fixed;
+  top: 80px;
+  right: 24px;
+  background: var(--color-magenta);
+  color: var(--color-white);
+  padding: 8px 16px;
+  font-size: 12px;
+  font-weight: bold;
+  text-transform: uppercase;
+  z-index: 1000;
+  border: 2px solid var(--color-black);
+  box-shadow: 3px 3px 0 var(--color-black);
+}
+
+/* Editable list styles */
+.editable-list-item {
+  position: relative;
+  border-radius: 4px;
+}
+
+.editable-list-saving {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: var(--color-cyan);
+  color: var(--color-black);
+  padding: 4px 8px;
+  font-size: 11px;
+  font-weight: bold;
+  z-index: 10;
 }

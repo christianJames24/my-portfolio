@@ -14,6 +14,8 @@ import Projects from "./Pages/Projects";
 import Resume from "./Pages/Resume";
 import Comments from "./Pages/Comments";
 import Dashboard from "./Pages/Dashboard";
+import { EditProvider } from "./components/EditContext";
+import EditModeToggle from "./components/EditModeToggle";
 import "./styles/animations.css";
 import "./styles/pageTransitions.css";
 
@@ -307,53 +309,57 @@ function App() {
 
   return (
     <LanguageContext.Provider value={{ language, t, toggleLanguage, theme, toggleTheme }}>
-      <div
-        style={{
-          minHeight: "100vh",
-          position: "relative",
-          paddingBottom: "0",
-        }}
-      >
-        <BackgroundGradient scrollY={scrollY} />
+      <EditProvider isAdmin={isAdmin}>
+        <div
+          style={{
+            minHeight: "100vh",
+            position: "relative",
+            paddingBottom: "0",
+          }}
+        >
+          <BackgroundGradient scrollY={scrollY} />
 
-        <TopNav />
+          <TopNav />
 
-        <BubbleMenu
-          items={menuItems}
-          menuAriaLabel="Toggle navigation"
-          menuBg="var(--color-menu-bg)"
-          menuContentColor="var(--color-menu-content)"
-          useFixedPosition={true}
-          animationEase="back.out(1.5)"
-          animationDuration={0.5}
-          staggerDelay={0.12}
-          onItemClick={handleMenuItemClick}
-        />
+          <BubbleMenu
+            items={menuItems}
+            menuAriaLabel="Toggle navigation"
+            menuBg="var(--color-menu-bg)"
+            menuContentColor="var(--color-menu-content)"
+            useFixedPosition={true}
+            animationEase="back.out(1.5)"
+            animationDuration={0.5}
+            staggerDelay={0.12}
+            onItemClick={handleMenuItemClick}
+          />
 
-        <PageNavigation
-          isTransitioning={transitionStage !== "idle"}
-          pages={pages}
-        />
+          <PageNavigation
+            isTransitioning={transitionStage !== "idle"}
+            pages={pages}
+          />
 
-        <div style={cowStyles}>
-          <ThreeD />
-        </div>
-
-        <div className="page-transition-wrapper">
-          <div
-            className={`page-transition-content ${transitionStage !== "idle" ? "transitioning" : ""
-              } ${getTransitionClass()}`}
-            onAnimationEnd={handleTransitionEnd}
-          >
-            {displayLocation && renderPage(displayLocation.pathname)}
+          <div style={cowStyles}>
+            <ThreeD />
           </div>
-        </div>
 
-        {/* <BottomBar show={showFooter} /> */}
-        {transitionStage === "idle" && (
-          <BottomBar show={showFooter} instantHide={instantHide} />
-        )}
-      </div>
+          <div className="page-transition-wrapper">
+            <div
+              className={`page-transition-content ${transitionStage !== "idle" ? "transitioning" : ""
+                } ${getTransitionClass()}`}
+              onAnimationEnd={handleTransitionEnd}
+            >
+              {displayLocation && renderPage(displayLocation.pathname)}
+            </div>
+          </div>
+
+          {/* <BottomBar show={showFooter} /> */}
+          {transitionStage === "idle" && (
+            <BottomBar show={showFooter} instantHide={instantHide} />
+          )}
+
+          <EditModeToggle />
+        </div>
+      </EditProvider>
     </LanguageContext.Provider>
   );
 }

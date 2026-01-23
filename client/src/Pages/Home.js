@@ -1,17 +1,51 @@
 // Home.js
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { LanguageContext } from '../App';
 import contentEn from '../data/home-en.json';
 import contentFr from '../data/home-fr.json';
+import EditableText from '../components/EditableText';
+import ExportButton from '../components/ExportButton';
+import { useEdit } from '../components/EditContext';
 
 export default function Home({ backendData }) {
   const { language } = useContext(LanguageContext);
-  const t = language === 'en' ? contentEn : contentFr;
+  const { canEdit, saveContent } = useEdit();
+  const [content, setContent] = useState(language === 'en' ? contentEn : contentFr);
+
+  // Fetch content from API with fallback to JSON
+  useEffect(() => {
+    const fetchContent = async () => {
+      try {
+        const res = await fetch(`/api/content/home?lang=${language}`);
+        const data = await res.json();
+
+        if (data.useClientFallback) {
+          setContent(language === 'en' ? contentEn : contentFr);
+        } else {
+          setContent(data);
+        }
+      } catch (err) {
+        console.error('Error fetching home content:', err);
+        setContent(language === 'en' ? contentEn : contentFr);
+      }
+    };
+
+    fetchContent();
+  }, [language]);
 
   useEffect(() => {
-    const pageTitle = t.title || (language === 'en' ? 'Home' : 'Accueil');
+    const pageTitle = content.title || (language === 'en' ? 'Home' : 'Accueil');
     document.title = `Christian James Lee - ${pageTitle}`;
-  }, [language, t.title]);
+  }, [language, content.title]);
+
+  // Update local state and save to backend
+  const handleFieldSave = async (field, value) => {
+    const newContent = { ...content, [field]: value };
+    setContent(newContent);
+    await saveContent('home', newContent, language);
+  };
+
+  const t = content;
 
   return (
     <div className="home-container" style={{
@@ -26,11 +60,23 @@ export default function Home({ backendData }) {
       flexDirection: 'column',
       justifyContent: 'center',
     }}>
-      
+
+      {canEdit && (
+        <div style={{ marginBottom: '20px' }}>
+          <ExportButton page="home" language={language} />
+        </div>
+      )}
+
       <h1>
-        {t.title}
+        <EditableText
+          value={t.title}
+          field="title"
+          page="home"
+          language={language}
+          onSave={(v) => handleFieldSave('title', v)}
+        />
       </h1>
-      
+
       <p style={{
         fontSize: 'clamp(16px, 3vw, 32px)',
         color: 'var(--color-black)',
@@ -49,7 +95,13 @@ export default function Home({ backendData }) {
         overflowWrap: 'break-word',
         fontFamily: 'var(--font-body)'
       }}>
-        {t.subtitle}
+        <EditableText
+          value={t.subtitle}
+          field="subtitle"
+          page="home"
+          language={language}
+          onSave={(v) => handleFieldSave('subtitle', v)}
+        />
       </p>
 
       <style>{`

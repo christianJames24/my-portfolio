@@ -63,6 +63,17 @@ if (isProduction) {
         )
       `);
 
+      await db.query(`
+        CREATE TABLE IF NOT EXISTS page_content (
+          id SERIAL PRIMARY KEY,
+          page_name VARCHAR(50) NOT NULL,
+          language VARCHAR(5) NOT NULL,
+          content JSONB NOT NULL,
+          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          UNIQUE(page_name, language)
+        )
+      `);
+
       console.log("Database migrations completed successfully");
     } catch (err) {
       console.error("Error running migrations:", err);
@@ -106,6 +117,15 @@ if (isProduction) {
       size_bytes INTEGER DEFAULT 0,
       image_data TEXT NOT NULL,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+
+    CREATE TABLE IF NOT EXISTS page_content (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      page_name TEXT NOT NULL,
+      language TEXT NOT NULL,
+      content TEXT NOT NULL,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE(page_name, language)
     );
   `);
 
