@@ -62,4 +62,20 @@ router.delete("/:id", checkJwt, requirePermission("admin:dashboard"), async (req
     }
 });
 
+// PATCH - Mark message as read (admin only)
+router.patch("/:id/read", checkJwt, requirePermission("admin:dashboard"), async (req, res) => {
+    try {
+        const { id } = req.params;
+        const query = isProduction
+            ? "UPDATE messages SET read = TRUE WHERE id = $1 RETURNING *"
+            : "UPDATE messages SET read = 1 WHERE id = ?";
+
+        await db.query(query, [id]);
+        res.json({ message: "Message marked as read" });
+    } catch (err) {
+        console.error("Error marking message as read:", err);
+        res.status(500).json({ error: err.message });
+    }
+});
+
 module.exports = router;

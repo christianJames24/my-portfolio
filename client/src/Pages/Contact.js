@@ -234,7 +234,7 @@ export default function Contact() {
 
                 {/* Contact Info */}
                 <div className="content-card">
-                    <h2 style={{ marginBottom: "24px", color: "var(--color-magenta)" }}>
+                    <h2 style={{ marginBottom: "24px", color: "var(--color-magenta)", wordBreak: "break-word", overflowWrap: "break-word" }}>
                         {t.infoTitle}
                     </h2>
 

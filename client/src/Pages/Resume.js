@@ -12,7 +12,6 @@ export default function Resume() {
   const { language } = useContext(LanguageContext);
   const { canEdit, saveContent } = useEdit();
   const [content, setContent] = useState(language === 'en' ? contentEn : contentFr);
-  const [resumePdfUrl, setResumePdfUrl] = useState(null);
 
   // Fetch content from API with fallback to JSON
   useEffect(() => {
@@ -33,22 +32,6 @@ export default function Resume() {
     };
 
     fetchContent();
-  }, [language]);
-
-  // Fetch resume PDF URL from contact_info
-  useEffect(() => {
-    const fetchContactInfo = async () => {
-      try {
-        const res = await fetch(`/api/content/contact_info?lang=${language}`);
-        const data = await res.json();
-        if (!data.useClientFallback && data.resumePdf) {
-          setResumePdfUrl(data.resumePdf);
-        }
-      } catch (err) {
-        console.error('Error fetching contact info:', err);
-      }
-    };
-    fetchContactInfo();
   }, [language]);
 
   useEffect(() => {
@@ -80,11 +63,33 @@ export default function Resume() {
     { key: 'description', label: 'Description', multiline: true, default: '' },
   ];
 
-  const handleDownload = () => {
-    if (resumePdfUrl) {
-      window.open(resumePdfUrl, '_blank');
-    } else {
-      alert(language === 'en' ? 'Resume PDF not yet configured.' : 'Le PDF du CV n\'est pas encore configuré.');
+  const handleDownload = async () => {
+    try {
+      const res = await fetch(`/api/resumes/${language}`);
+
+      if (!res.ok) {
+        if (res.status === 404) {
+          alert(language === 'en'
+            ? 'No resume available for download yet. Please upload one in the Dashboard.'
+            : 'Aucun CV disponible au téléchargement. Veuillez en télécharger un dans le tableau de bord.');
+        } else {
+          alert(language === 'en' ? 'Error downloading resume' : 'Erreur lors du téléchargement du CV');
+        }
+        return;
+      }
+
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Resume_${language.toUpperCase()}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (err) {
+      console.error('Download error:', err);
+      alert(language === 'en' ? 'Error downloading resume' : 'Erreur lors du téléchargement du CV');
     }
   };
 

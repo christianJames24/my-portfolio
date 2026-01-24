@@ -17,6 +17,7 @@ const dashboardRoutes = require("./routes/dashboard");
 const uploadsRoutes = require("./routes/uploads");
 const contentRoutes = require("./routes/content");
 const messagesRoutes = require("./routes/messages");
+const resumesRoutes = require("./routes/resumes");
 
 app.get("/api", (req, res) => {
   res.json({ status: "API is running" });
@@ -36,6 +37,7 @@ app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/uploads", uploadsRoutes);
 app.use("/api/content", contentRoutes);
 app.use("/api/messages", messagesRoutes);
+app.use("/api/resumes", resumesRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, "0.0.0.0", () => {

@@ -50,14 +50,10 @@ export default function BottomBar({ show, instantHide }) {
           {contactInfo?.socials?.linkedin && (
             <a href={contactInfo.socials.linkedin} className="social-link" aria-label="LinkedIn" target="_blank" rel="noopener noreferrer">LinkedIn</a>
           )}
-          {contactInfo?.socials?.twitter && (
-            <a href={contactInfo.socials.twitter} className="social-link" aria-label="Twitter" target="_blank" rel="noopener noreferrer">Twitter</a>
-          )}
           {!contactInfo?.socials && (
             <>
               <a href="#" className="social-link" aria-label="GitHub">GitHub</a>
               <a href="#" className="social-link" aria-label="LinkedIn">LinkedIn</a>
-              <a href="#" className="social-link" aria-label="Twitter">Twitter</a>
             </>
           )}
         </div>

@@ -85,6 +85,16 @@ if (isProduction) {
         )
       `);
 
+      await db.query(`
+        CREATE TABLE IF NOT EXISTS resumes (
+          language VARCHAR(5) PRIMARY KEY,
+          file_name VARCHAR(255) NOT NULL,
+          file_data TEXT NOT NULL,
+          mime_type VARCHAR(50) NOT NULL,
+          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+      `);
+
       console.log("Database migrations completed successfully");
     } catch (err) {
       console.error("Error running migrations:", err);
@@ -147,6 +157,14 @@ if (isProduction) {
       read INTEGER DEFAULT 0,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
+
+    CREATE TABLE IF NOT EXISTS resumes (
+      language TEXT PRIMARY KEY,
+      file_name TEXT NOT NULL,
+      file_data TEXT NOT NULL,
+      mime_type TEXT NOT NULL,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
   `);
 
   db = {
@@ -160,14 +178,20 @@ if (isProduction) {
             const info = stmt.run(...params);
             resolve({ rowCount: info.changes });
           } else if (text.trim().toUpperCase().startsWith("INSERT")) {
-            const cleanText = normalizedText.replace(" RETURNING *", "");
+            const cleanText = normalizedText.replace(/ RETURNING .*/i, "");
             const stmt = sqliteDb.prepare(cleanText);
             const info = stmt.run(...params);
             const tableName = text.match(/INTO\s+(\w+)/i)?.[1] || "comments";
-            const row = sqliteDb
-              .prepare(`SELECT * FROM ${tableName} WHERE id = ?`)
-              .get(info.lastInsertRowid);
-            resolve({ rows: [row] });
+
+            // Skip row retrieval for tables without id column (like resumes)
+            if (tableName === "resumes") {
+              resolve({ rows: [{ language: params[0], file_name: params[1] }] });
+            } else {
+              const row = sqliteDb
+                .prepare(`SELECT * FROM ${tableName} WHERE id = ?`)
+                .get(info.lastInsertRowid);
+              resolve({ rows: [row] });
+            }
           } else if (text.trim().toUpperCase().startsWith("UPDATE")) {
             const cleanText = normalizedText.replace(" RETURNING *", "");
             const stmt = sqliteDb.prepare(cleanText);

@@ -25,9 +25,11 @@ export default function Dashboard() {
     email: "",
     phone: "",
     location: "",
-    socials: { github: "", linkedin: "", twitter: "" }
+    socials: { github: "", linkedin: "" }
   });
   const [savingContact, setSavingContact] = useState(false);
+  const [resumes, setResumes] = useState({ en: null, fr: null });
+  const [uploadingResume, setUploadingResume] = useState(null);
 
   useEffect(() => {
     const pageTitle = language === 'en' ? 'Dashboard' : 'Tableau de bord';
@@ -95,7 +97,13 @@ export default function Dashboard() {
       socialLinks: "Social Links",
       saving: "Saving...",
       saved: "Saved!",
-      resumePdf: "Resume PDF URL",
+      resumeUpload: "Resume Upload",
+      uploadEn: "Upload English Resume (PDF)",
+      uploadFr: "Upload French Resume (PDF)",
+      currentFile: "Current file:",
+      uploadSuccess: "Resume uploaded successfully!",
+      markRead: "Mark as Read",
+      unread: "Unread",
     },
     fr: {
       title: "Tableau de Bord",
@@ -146,6 +154,8 @@ export default function Dashboard() {
       saving: "Enregistrement...",
       saved: "Enregistré!",
       resumePdf: "URL du CV PDF",
+      markRead: "Marquer comme lu",
+      unread: "Non lu",
     },
   }[language];
 
@@ -183,8 +193,30 @@ export default function Dashboard() {
       if (contactRes.ok) {
         const contactData = await contactRes.json();
         if (!contactData.useClientFallback) {
-          setContactInfo(contactData);
+          // Filter out twitter if present in old data
+          const { twitter, ...otherSocials } = contactData.socials || {};
+          setContactInfo({
+            ...contactData,
+            socials: otherSocials
+          });
         }
+      }
+
+      // Fetch resume info
+      try {
+        const resumesRes = await fetch("/api/resumes/info/all", { headers });
+        if (resumesRes.ok) {
+          const resumesData = await resumesRes.json();
+          const newResumes = { en: null, fr: null };
+          resumesData.forEach(r => {
+            if (newResumes[r.language] !== undefined) {
+              newResumes[r.language] = r;
+            }
+          });
+          setResumes(newResumes);
+        }
+      } catch (e) {
+        console.error("Error fetching resumes:", e);
       }
 
       // Fetch images list (don't sync on every load - it might remove valid entries)
@@ -1224,28 +1256,58 @@ export default function Dashboard() {
                 <p style={{ margin: "16px 0", color: "var(--color-white)" }}>
                   {msg.message}
                 </p>
-                <button
-                  onClick={async () => {
-                    if (!window.confirm("Delete this message?")) return;
-                    try {
-                      const token = await getAccessTokenSilently();
-                      await fetch(`/api/messages/${msg.id}`, {
-                        method: "DELETE",
-                        headers: { Authorization: `Bearer ${token}` },
-                      });
-                      fetchData();
-                    } catch (err) {
-                      console.error("Error deleting message:", err);
-                    }
-                  }}
-                  className="btn-small"
-                  style={{
-                    background: "var(--color-red-pink)",
-                    color: "var(--color-white)",
-                  }}
-                >
-                  {t.delete}
-                </button>
+                <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+                  {!msg.read && (
+                    <span style={{ color: "var(--color-yellow)", fontSize: "12px", fontWeight: "700", marginRight: "8px" }}>
+                      ({t.unread})
+                    </span>
+                  )}
+                  {!msg.read && (
+                    <button
+                      onClick={async () => {
+                        try {
+                          const token = await getAccessTokenSilently();
+                          await fetch(`/api/messages/${msg.id}/read`, {
+                            method: "PATCH",
+                            headers: { Authorization: `Bearer ${token}` },
+                          });
+                          fetchData();
+                        } catch (err) {
+                          console.error("Error marking message as read:", err);
+                        }
+                      }}
+                      className="btn-small"
+                      style={{
+                        background: "var(--color-neon-green)",
+                        color: "var(--color-black)",
+                      }}
+                    >
+                      {t.markRead}
+                    </button>
+                  )}
+                  <button
+                    onClick={async () => {
+                      if (!window.confirm("Delete this message?")) return;
+                      try {
+                        const token = await getAccessTokenSilently();
+                        await fetch(`/api/messages/${msg.id}`, {
+                          method: "DELETE",
+                          headers: { Authorization: `Bearer ${token}` },
+                        });
+                        fetchData();
+                      } catch (err) {
+                        console.error("Error deleting message:", err);
+                      }
+                    }}
+                    className="btn-small"
+                    style={{
+                      background: "var(--color-red-pink)",
+                      color: "var(--color-white)",
+                    }}
+                  >
+                    {t.delete}
+                  </button>
+                </div>
               </div>
             ))
           )}
@@ -1325,67 +1387,97 @@ export default function Dashboard() {
                 }
               />
             </div>
-            <div>
-              <label className="form-label">{t.twitter}</label>
-              <input
-                type="url"
-                className="form-input"
-                value={contactInfo.socials?.twitter || ""}
-                onChange={(e) =>
-                  setContactInfo({
-                    ...contactInfo,
-                    socials: { ...contactInfo.socials, twitter: e.target.value },
-                  })
-                }
-              />
-            </div>
-
-            <h3 style={{ color: "var(--color-yellow)", marginTop: "24px" }}>
-              Resume
-            </h3>
-
-            <div>
-              <label className="form-label">{t.resumePdf}</label>
-              <input
-                type="url"
-                className="form-input"
-                placeholder="https://drive.google.com/..."
-                value={contactInfo.resumePdf || ""}
-                onChange={(e) =>
-                  setContactInfo({ ...contactInfo, resumePdf: e.target.value })
-                }
-              />
-            </div>
-
-            <button
-              className="btn-primary"
-              disabled={savingContact}
-              onClick={async () => {
-                setSavingContact(true);
-                try {
-                  const token = await getAccessTokenSilently();
-                  await fetch("/api/content/contact_info", {
-                    method: "PUT",
-                    headers: {
-                      "Content-Type": "application/json",
-                      Authorization: `Bearer ${token}`,
-                    },
-                    body: JSON.stringify({
-                      content: contactInfo,
-                      language: "en",
-                    }),
-                  });
-                  alert(t.saved);
-                } catch (err) {
-                  console.error("Error saving contact info:", err);
-                }
-                setSavingContact(false);
-              }}
-              style={{ marginTop: "16px" }}
-            >
-              {savingContact ? t.saving : t.save}
-            </button>
           </div>
+
+          <h3 style={{ color: "var(--color-yellow)", marginTop: "24px" }}>
+            {t.resumeUpload}
+          </h3>
+
+          <div style={{ display: "grid", gap: "16px" }}>
+            {["en", "fr"].map((lang) => (
+              <div key={lang} style={{ padding: "12px", border: "2px solid var(--color-black)", background: "var(--color-black)" }}>
+                <label className="form-label" style={{ marginTop: 0 }}>
+                  {lang === "en" ? t.uploadEn : t.uploadFr}
+                </label>
+
+                {resumes[lang] && (
+                  <p style={{ color: "var(--color-neon-green)", fontSize: "12px", marginBottom: "8px" }}>
+                    {t.currentFile} {resumes[lang].file_name} <br />
+                    <span style={{ color: "var(--color-cyan)" }}>
+                      ({new Date(resumes[lang].updated_at).toLocaleDateString()})
+                    </span>
+                  </p>
+                )}
+
+                <input
+                  type="file"
+                  accept="application/pdf"
+                  disabled={uploadingResume === lang}
+                  onChange={async (e) => {
+                    if (!e.target.files[0]) return;
+                    const file = e.target.files[0];
+                    setUploadingResume(lang);
+
+                    try {
+                      const formData = new FormData();
+                      formData.append("resume", file);
+
+                      const token = await getAccessTokenSilently();
+                      const res = await fetch(`/api/resumes/${lang}`, {
+                        method: "POST",
+                        headers: { Authorization: `Bearer ${token}` },
+                        body: formData
+                      });
+
+                      if (res.ok) {
+                        alert(t.uploadSuccess);
+                        // Refresh data
+                        fetchData();
+                      } else {
+                        const err = await res.json();
+                        alert("Error: " + err.error);
+                      }
+                    } catch (err) {
+                      console.error("Upload error:", err);
+                      alert("Upload failed");
+                    }
+                    setUploadingResume(null);
+                  }}
+                  style={{ color: "var(--color-white)" }}
+                />
+                {uploadingResume === lang && <span style={{ color: "var(--color-yellow)", marginLeft: "8px" }}>{t.uploading}</span>}
+              </div>
+            ))}
+          </div>
+
+          <button
+            className="btn-primary"
+            disabled={savingContact}
+            onClick={async () => {
+              setSavingContact(true);
+              try {
+                const token = await getAccessTokenSilently();
+                await fetch("/api/content/contact_info", {
+                  method: "PUT",
+                  headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                  },
+                  body: JSON.stringify({
+                    content: contactInfo,
+                    language: "en",
+                  }),
+                });
+                alert(t.saved);
+              } catch (err) {
+                console.error("Error saving contact info:", err);
+              }
+              setSavingContact(false);
+            }}
+            style={{ marginTop: "16px" }}
+          >
+            {savingContact ? t.saving : t.save}
+          </button>
         </div>
       )}
 
@@ -1437,6 +1529,6 @@ export default function Dashboard() {
           }
         }
       `}</style>
-    </div>
+    </div >
   );
 }
