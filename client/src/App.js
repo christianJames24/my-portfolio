@@ -13,6 +13,7 @@ import About from "./Pages/About";
 import Projects from "./Pages/Projects";
 import Resume from "./Pages/Resume";
 import Comments from "./Pages/Comments";
+import Contact from "./Pages/Contact";
 import Dashboard from "./Pages/Dashboard";
 import { EditProvider } from "./components/EditContext";
 import EditModeToggle from "./components/EditModeToggle";
@@ -33,6 +34,7 @@ const translations = {
       projects: "projects",
       resume: "resume",
       comments: "testimonials",
+      contact: "contact",
       dashboard: "dashboard",
       login: "login",
       logout: "logout",
@@ -45,6 +47,7 @@ const translations = {
       projects: "projets",
       resume: "cv",
       comments: "témoignages",
+      contact: "contact",
       dashboard: "tableau",
       login: "connexion",
       logout: "déconnexion",
@@ -91,6 +94,7 @@ function App() {
     { path: "/projects", name: "projects" },
     { path: "/resume", name: "resume" },
     { path: "/comments", name: "comments" },
+    { path: "/contact", name: "contact" },
     ...(isAdmin ? [{ path: "/dashboard", name: "dashboard" }] : []),
   ];
 
@@ -144,6 +148,16 @@ function App() {
         textColor: "var(--color-white)",
       },
       path: "/comments",
+    },
+    {
+      label: t.nav.contact,
+      ariaLabel: t.nav.contact,
+      rotation: 8,
+      hoverStyles: {
+        bgColor: "var(--color-pink-1)",
+        textColor: "var(--color-white)",
+      },
+      path: "/contact",
     },
     ...(isAdmin
       ? [
@@ -285,6 +299,8 @@ function App() {
         return <Resume backendData={backendData} />;
       case "/comments":
         return <Comments backendData={backendData} />;
+      case "/contact":
+        return <Contact />;
       case "/dashboard":
         return isAdmin ? <Dashboard /> : <Home backendData={backendData} />;
       default:

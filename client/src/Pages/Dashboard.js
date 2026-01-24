@@ -12,6 +12,7 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("comments");
   const [comments, setComments] = useState([]);
   const [projects, setProjects] = useState([]);
+  const [messages, setMessages] = useState([]);
   const [uploadedImages, setUploadedImages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editingProject, setEditingProject] = useState(null);
@@ -20,6 +21,13 @@ export default function Dashboard() {
   const [uploading, setUploading] = useState(false);
   const [imagePreview, setImagePreview] = useState(null);
   const [storageStats, setStorageStats] = useState(null);
+  const [contactInfo, setContactInfo] = useState({
+    email: "",
+    phone: "",
+    location: "",
+    socials: { github: "", linkedin: "", twitter: "" }
+  });
+  const [savingContact, setSavingContact] = useState(false);
 
   useEffect(() => {
     const pageTitle = language === 'en' ? 'Dashboard' : 'Tableau de bord';
@@ -74,6 +82,20 @@ export default function Dashboard() {
       unused: "Unused",
       confirmDeleteImage: "Delete this image?",
       order: "Sort Order",
+      messages: "Messages",
+      settings: "Settings",
+      noMessages: "No messages yet",
+      email: "Email",
+      phone: "Phone",
+      location: "Location",
+      github: "GitHub URL",
+      linkedin: "LinkedIn URL",
+      twitter: "Twitter URL",
+      contactInfo: "Contact Information",
+      socialLinks: "Social Links",
+      saving: "Saving...",
+      saved: "Saved!",
+      resumePdf: "Resume PDF URL",
     },
     fr: {
       title: "Tableau de Bord",
@@ -110,6 +132,20 @@ export default function Dashboard() {
       unused: "Inutilisé",
       confirmDeleteImage: "Supprimer cette image ?",
       order: "Ordre",
+      messages: "Messages",
+      settings: "Paramètres",
+      noMessages: "Aucun message pour le moment",
+      email: "Courriel",
+      phone: "Téléphone",
+      location: "Lieu",
+      github: "URL GitHub",
+      linkedin: "URL LinkedIn",
+      twitter: "URL Twitter",
+      contactInfo: "Coordonnées",
+      socialLinks: "Liens sociaux",
+      saving: "Enregistrement...",
+      saved: "Enregistré!",
+      resumePdf: "URL du CV PDF",
     },
   }[language];
 
@@ -123,10 +159,12 @@ export default function Dashboard() {
       const token = await getAccessTokenSilently();
       const headers = { Authorization: `Bearer ${token}` };
 
-      const [commentsRes, projectsRes, statsRes] = await Promise.all([
+      const [commentsRes, projectsRes, statsRes, messagesRes, contactRes] = await Promise.all([
         fetch("/api/dashboard/comments", { headers }),
         fetch("/api/dashboard/projects", { headers }),
         fetch("/api/uploads/stats/usage", { headers }),
+        fetch("/api/messages", { headers }),
+        fetch("/api/content/contact_info?lang=en"),
       ]);
 
       if (commentsRes.status === 403 || projectsRes.status === 403) {
@@ -138,6 +176,15 @@ export default function Dashboard() {
       setProjects(await projectsRes.json());
       if (statsRes.ok) {
         setStorageStats(await statsRes.json());
+      }
+      if (messagesRes.ok) {
+        setMessages(await messagesRes.json());
+      }
+      if (contactRes.ok) {
+        const contactData = await contactRes.json();
+        if (!contactData.useClientFallback) {
+          setContactInfo(contactData);
+        }
       }
 
       // Fetch images list (don't sync on every load - it might remove valid entries)
@@ -470,6 +517,71 @@ export default function Dashboard() {
           }}
         >
           {t.images}
+        </button>
+        <button
+          onClick={() => setActiveTab("messages")}
+          className={`btn-tab ${activeTab === "messages" ? "active" : ""}`}
+          style={{
+            padding: "12px 24px",
+            border: "4px solid var(--color-black)",
+            background:
+              activeTab === "messages"
+                ? "var(--color-yellow)"
+                : "var(--color-white)",
+            color: "var(--color-black)",
+            fontWeight: "900",
+            fontSize: "16px",
+            cursor: "pointer",
+            boxShadow: "4px 4px 0 var(--color-black)",
+            textTransform: "uppercase",
+            position: "relative",
+          }}
+        >
+          {t.messages}
+          {messages.length > 0 && (
+            <span
+              style={{
+                position: "absolute",
+                top: "-8px",
+                right: "-8px",
+                background: "var(--color-red-pink)",
+                color: "var(--color-white)",
+                borderRadius: "50%",
+                width: "24px",
+                height: "24px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: "12px",
+                border: "2px solid var(--color-black)",
+              }}
+            >
+              {messages.length}
+            </span>
+          )}
+        </button>
+        <button
+          onClick={() => setActiveTab("settings")}
+          className={`btn-tab ${activeTab === "settings" ? "active" : ""}`}
+          style={{
+            padding: "12px 24px",
+            border: "4px solid var(--color-black)",
+            background:
+              activeTab === "settings"
+                ? "var(--color-cyan)"
+                : "var(--color-white)",
+            color:
+              activeTab === "settings"
+                ? "var(--color-white)"
+                : "var(--color-black)",
+            fontWeight: "900",
+            fontSize: "16px",
+            cursor: "pointer",
+            boxShadow: "4px 4px 0 var(--color-black)",
+            textTransform: "uppercase",
+          }}
+        >
+          {t.settings}
         </button>
       </div>
 
@@ -1068,6 +1180,214 @@ export default function Dashboard() {
         </div>
       )
       }
+
+      {activeTab === "messages" && (
+        <div>
+          {messages.length === 0 ? (
+            <div className="content-card">
+              <p>{t.noMessages}</p>
+            </div>
+          ) : (
+            messages.map((msg) => (
+              <div
+                key={msg.id}
+                className="content-card"
+                style={{ marginBottom: "16px" }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "flex-start",
+                    flexWrap: "wrap",
+                    gap: "12px",
+                  }}
+                >
+                  <div>
+                    <strong style={{ color: "var(--color-neon-green)", fontFamily: "var(--font-body)" }}>
+                      {msg.name}
+                    </strong>
+                    <span
+                      style={{
+                        marginLeft: "12px",
+                        color: "var(--color-cyan)",
+                        fontSize: "14px",
+                      }}
+                    >
+                      {msg.email}
+                    </span>
+                  </div>
+                  <span style={{ color: "var(--color-cyan)", fontSize: "14px" }}>
+                    {new Date(msg.created_at).toLocaleDateString()}
+                  </span>
+                </div>
+                <p style={{ margin: "16px 0", color: "var(--color-white)" }}>
+                  {msg.message}
+                </p>
+                <button
+                  onClick={async () => {
+                    if (!window.confirm("Delete this message?")) return;
+                    try {
+                      const token = await getAccessTokenSilently();
+                      await fetch(`/api/messages/${msg.id}`, {
+                        method: "DELETE",
+                        headers: { Authorization: `Bearer ${token}` },
+                      });
+                      fetchData();
+                    } catch (err) {
+                      console.error("Error deleting message:", err);
+                    }
+                  }}
+                  className="btn-small"
+                  style={{
+                    background: "var(--color-red-pink)",
+                    color: "var(--color-white)",
+                  }}
+                >
+                  {t.delete}
+                </button>
+              </div>
+            ))
+          )}
+        </div>
+      )}
+
+      {activeTab === "settings" && (
+        <div className="content-card">
+          <h2 style={{ color: "var(--color-neon-green)", marginBottom: "24px" }}>
+            {t.contactInfo}
+          </h2>
+
+          <div style={{ display: "grid", gap: "16px", maxWidth: "500px" }}>
+            <div>
+              <label className="form-label">{t.email}</label>
+              <input
+                type="email"
+                className="form-input"
+                value={contactInfo.email || ""}
+                onChange={(e) =>
+                  setContactInfo({ ...contactInfo, email: e.target.value })
+                }
+              />
+            </div>
+            <div>
+              <label className="form-label">{t.phone}</label>
+              <input
+                type="tel"
+                className="form-input"
+                value={contactInfo.phone || ""}
+                onChange={(e) =>
+                  setContactInfo({ ...contactInfo, phone: e.target.value })
+                }
+              />
+            </div>
+            <div>
+              <label className="form-label">{t.location}</label>
+              <input
+                type="text"
+                className="form-input"
+                value={contactInfo.location || ""}
+                onChange={(e) =>
+                  setContactInfo({ ...contactInfo, location: e.target.value })
+                }
+              />
+            </div>
+
+            <h3 style={{ color: "var(--color-magenta)", marginTop: "16px" }}>
+              {t.socialLinks}
+            </h3>
+
+            <div>
+              <label className="form-label">{t.github}</label>
+              <input
+                type="url"
+                className="form-input"
+                value={contactInfo.socials?.github || ""}
+                onChange={(e) =>
+                  setContactInfo({
+                    ...contactInfo,
+                    socials: { ...contactInfo.socials, github: e.target.value },
+                  })
+                }
+              />
+            </div>
+            <div>
+              <label className="form-label">{t.linkedin}</label>
+              <input
+                type="url"
+                className="form-input"
+                value={contactInfo.socials?.linkedin || ""}
+                onChange={(e) =>
+                  setContactInfo({
+                    ...contactInfo,
+                    socials: { ...contactInfo.socials, linkedin: e.target.value },
+                  })
+                }
+              />
+            </div>
+            <div>
+              <label className="form-label">{t.twitter}</label>
+              <input
+                type="url"
+                className="form-input"
+                value={contactInfo.socials?.twitter || ""}
+                onChange={(e) =>
+                  setContactInfo({
+                    ...contactInfo,
+                    socials: { ...contactInfo.socials, twitter: e.target.value },
+                  })
+                }
+              />
+            </div>
+
+            <h3 style={{ color: "var(--color-yellow)", marginTop: "24px" }}>
+              Resume
+            </h3>
+
+            <div>
+              <label className="form-label">{t.resumePdf}</label>
+              <input
+                type="url"
+                className="form-input"
+                placeholder="https://drive.google.com/..."
+                value={contactInfo.resumePdf || ""}
+                onChange={(e) =>
+                  setContactInfo({ ...contactInfo, resumePdf: e.target.value })
+                }
+              />
+            </div>
+
+            <button
+              className="btn-primary"
+              disabled={savingContact}
+              onClick={async () => {
+                setSavingContact(true);
+                try {
+                  const token = await getAccessTokenSilently();
+                  await fetch("/api/content/contact_info", {
+                    method: "PUT",
+                    headers: {
+                      "Content-Type": "application/json",
+                      Authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({
+                      content: contactInfo,
+                      language: "en",
+                    }),
+                  });
+                  alert(t.saved);
+                } catch (err) {
+                  console.error("Error saving contact info:", err);
+                }
+                setSavingContact(false);
+              }}
+              style={{ marginTop: "16px" }}
+            >
+              {savingContact ? t.saving : t.save}
+            </button>
+          </div>
+        </div>
+      )}
 
       <style>{`
         .btn-small {

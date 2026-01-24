@@ -11,7 +11,7 @@ router.get("/:page", async (req, res) => {
         const { page } = req.params;
         const lang = req.query.lang || "en";
 
-        const validPages = ["about", "resume", "home"];
+        const validPages = ["about", "resume", "home", "contact_info"];
         if (!validPages.includes(page)) {
             return res.status(400).json({ error: "Invalid page name" });
         }
@@ -46,7 +46,7 @@ router.put("/:page", checkJwt, requirePermission("admin:dashboard"), async (req,
         const { content, language } = req.body;
         const lang = language || "en";
 
-        const validPages = ["about", "resume", "home"];
+        const validPages = ["about", "resume", "home", "contact_info"];
         if (!validPages.includes(page)) {
             return res.status(400).json({ error: "Invalid page name" });
         }
@@ -80,7 +80,7 @@ router.patch("/:page/field", checkJwt, requirePermission("admin:dashboard"), asy
         const { field, value, language } = req.body;
         const lang = language || "en";
 
-        const validPages = ["about", "resume", "home"];
+        const validPages = ["about", "resume", "home", "contact_info"];
         if (!validPages.includes(page)) {
             return res.status(400).json({ error: "Invalid page name" });
         }
@@ -138,7 +138,7 @@ router.get("/:page/export", checkJwt, requirePermission("admin:dashboard"), asyn
         const { page } = req.params;
         const lang = req.query.lang || "en";
 
-        const validPages = ["about", "resume", "home"];
+        const validPages = ["about", "resume", "home", "contact_info"];
         if (!validPages.includes(page)) {
             return res.status(400).json({ error: "Invalid page name" });
         }
@@ -174,7 +174,7 @@ router.post("/:page/import", checkJwt, requirePermission("admin:dashboard"), asy
         const { content, language } = req.body;
         const lang = language || "en";
 
-        const validPages = ["about", "resume", "home"];
+        const validPages = ["about", "resume", "home", "contact_info"];
         if (!validPages.includes(page)) {
             return res.status(400).json({ error: "Invalid page name" });
         }

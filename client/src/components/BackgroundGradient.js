@@ -103,8 +103,14 @@ export default function BackgroundGradient() {
       color2: "var(--color-neon-green)",
       title: "TESTIMONIALS",
     },
-    "/dashboard": {
+    "/contact": {
       number: 6,
+      color1: "var(--color-magenta)",
+      color2: "var(--color-cyan)",
+      title: "CONTACT",
+    },
+    "/dashboard": {
+      number: 7,
       color1: "var(--color-neon-green)",
       color2: "var(--color-magenta)",
       title: "DASHBOARD",

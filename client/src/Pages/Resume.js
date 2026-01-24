@@ -12,6 +12,7 @@ export default function Resume() {
   const { language } = useContext(LanguageContext);
   const { canEdit, saveContent } = useEdit();
   const [content, setContent] = useState(language === 'en' ? contentEn : contentFr);
+  const [resumePdfUrl, setResumePdfUrl] = useState(null);
 
   // Fetch content from API with fallback to JSON
   useEffect(() => {
@@ -32,6 +33,22 @@ export default function Resume() {
     };
 
     fetchContent();
+  }, [language]);
+
+  // Fetch resume PDF URL from contact_info
+  useEffect(() => {
+    const fetchContactInfo = async () => {
+      try {
+        const res = await fetch(`/api/content/contact_info?lang=${language}`);
+        const data = await res.json();
+        if (!data.useClientFallback && data.resumePdf) {
+          setResumePdfUrl(data.resumePdf);
+        }
+      } catch (err) {
+        console.error('Error fetching contact info:', err);
+      }
+    };
+    fetchContactInfo();
   }, [language]);
 
   useEffect(() => {
@@ -63,6 +80,14 @@ export default function Resume() {
     { key: 'description', label: 'Description', multiline: true, default: '' },
   ];
 
+  const handleDownload = () => {
+    if (resumePdfUrl) {
+      window.open(resumePdfUrl, '_blank');
+    } else {
+      alert(language === 'en' ? 'Resume PDF not yet configured.' : 'Le PDF du CV n\'est pas encore configuré.');
+    }
+  };
+
   return (
     <div className="page-container resume-page">
       <h1>
@@ -82,7 +107,7 @@ export default function Resume() {
       )}
 
       <div className="content-card">
-        <button className="btn-primary" onClick={() => alert('PDF download would go here!')}>
+        <button className="btn-primary" onClick={handleDownload}>
           <EditableText
             value={t.download}
             field="download"

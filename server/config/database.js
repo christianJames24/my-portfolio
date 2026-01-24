@@ -74,6 +74,17 @@ if (isProduction) {
         )
       `);
 
+      await db.query(`
+        CREATE TABLE IF NOT EXISTS messages (
+          id SERIAL PRIMARY KEY,
+          name VARCHAR(255) NOT NULL,
+          email VARCHAR(255) NOT NULL,
+          message TEXT NOT NULL,
+          read BOOLEAN DEFAULT FALSE,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+      `);
+
       console.log("Database migrations completed successfully");
     } catch (err) {
       console.error("Error running migrations:", err);
@@ -126,6 +137,15 @@ if (isProduction) {
       content TEXT NOT NULL,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       UNIQUE(page_name, language)
+    );
+
+    CREATE TABLE IF NOT EXISTS messages (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      email TEXT NOT NULL,
+      message TEXT NOT NULL,
+      read INTEGER DEFAULT 0,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
   `);
 
