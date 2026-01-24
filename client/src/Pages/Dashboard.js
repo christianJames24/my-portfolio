@@ -103,6 +103,7 @@ export default function Dashboard() {
       currentFile: "Current file:",
       uploadSuccess: "Resume uploaded successfully!",
       markRead: "Mark as Read",
+      markUnread: "Mark as Unread",
       unread: "Unread",
     },
     fr: {
@@ -155,6 +156,7 @@ export default function Dashboard() {
       saved: "Enregistré!",
       resumePdf: "URL du CV PDF",
       markRead: "Marquer comme lu",
+      markUnread: "Marquer comme non lu",
       unread: "Non lu",
     },
   }[language];
@@ -570,7 +572,7 @@ export default function Dashboard() {
           }}
         >
           {t.messages}
-          {messages.length > 0 && (
+          {messages.filter(m => !m.read).length > 0 && (
             <span
               style={{
                 position: "absolute",
@@ -588,7 +590,7 @@ export default function Dashboard() {
                 border: "2px solid var(--color-black)",
               }}
             >
-              {messages.length}
+              {messages.filter(m => !m.read).length}
             </span>
           )}
         </button>
@@ -1262,7 +1264,7 @@ export default function Dashboard() {
                       ({t.unread})
                     </span>
                   )}
-                  {!msg.read && (
+                  {!msg.read ? (
                     <button
                       onClick={async () => {
                         try {
@@ -1283,6 +1285,28 @@ export default function Dashboard() {
                       }}
                     >
                       {t.markRead}
+                    </button>
+                  ) : (
+                    <button
+                      onClick={async () => {
+                        try {
+                          const token = await getAccessTokenSilently();
+                          await fetch(`/api/messages/${msg.id}/unread`, {
+                            method: "PATCH",
+                            headers: { Authorization: `Bearer ${token}` },
+                          });
+                          fetchData();
+                        } catch (err) {
+                          console.error("Error marking message as unread:", err);
+                        }
+                      }}
+                      className="btn-small"
+                      style={{
+                        background: "var(--color-yellow)",
+                        color: "var(--color-black)",
+                      }}
+                    >
+                      {t.markUnread}
                     </button>
                   )}
                   <button

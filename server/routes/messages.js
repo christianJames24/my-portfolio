@@ -78,4 +78,20 @@ router.patch("/:id/read", checkJwt, requirePermission("admin:dashboard"), async 
     }
 });
 
+// PATCH - Mark message as unread (admin only)
+router.patch("/:id/unread", checkJwt, requirePermission("admin:dashboard"), async (req, res) => {
+    try {
+        const { id } = req.params;
+        const query = isProduction
+            ? "UPDATE messages SET read = FALSE WHERE id = $1 RETURNING *"
+            : "UPDATE messages SET read = 0 WHERE id = ?";
+
+        await db.query(query, [id]);
+        res.json({ message: "Message marked as unread" });
+    } catch (err) {
+        console.error("Error marking message as unread:", err);
+        res.status(500).json({ error: err.message });
+    }
+});
+
 module.exports = router;
