@@ -4,6 +4,7 @@ const router = express.Router();
 const { db, isProduction } = require("../config/database");
 const { checkJwt } = require("../config/auth");
 const { requirePermission } = require("../middleware/permissions");
+const { validateComment, validateId } = require("../utils/validators");
 
 // Get approved comments only (public)
 router.get("/", async (req, res) => {
@@ -27,7 +28,7 @@ router.get("/me", checkJwt, (req, res) => {
 });
 
 // Post a comment (protected) - now goes to pending
-router.post("/", checkJwt, requirePermission("write:comments"), async (req, res) => {
+router.post("/", checkJwt, requirePermission("write:comments"), validateComment, async (req, res) => {
   try {
     const { text, user_name, user_picture } = req.body;
     const user_id = req.auth.sub || req.auth.payload.sub;
@@ -47,12 +48,12 @@ router.post("/", checkJwt, requirePermission("write:comments"), async (req, res)
     res.json({ ...result.rows[0], message: "Comment submitted for approval" });
   } catch (err) {
     console.error("Error posting comment:", err);
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: "Failed to submit comment" });
   }
 });
 
 // Delete a comment (admin only)
-router.delete("/:id", checkJwt, requirePermission("delete:comments"), async (req, res) => {
+router.delete("/:id", checkJwt, requirePermission("delete:comments"), validateId, async (req, res) => {
   try {
     const { id } = req.params;
     const query = isProduction
@@ -63,7 +64,7 @@ router.delete("/:id", checkJwt, requirePermission("delete:comments"), async (req
     res.json({ message: "Comment deleted" });
   } catch (err) {
     console.error("Error deleting comment:", err);
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: "Failed to delete comment" });
   }
 });
 

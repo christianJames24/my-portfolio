@@ -4,6 +4,7 @@ const router = express.Router();
 const { db, isProduction } = require("../config/database");
 const { checkJwt } = require("../config/auth");
 const { requirePermission } = require("../middleware/permissions");
+const { validateProject, validateProjectReorder, validateId } = require("../utils/validators");
 
 // Middleware: All dashboard routes require admin
 router.use(checkJwt);
@@ -25,7 +26,7 @@ router.get("/projects", async (req, res) => {
 });
 
 // Reorder projects (swap sort_order between two projects)
-router.put("/projects/reorder", async (req, res) => {
+router.put("/projects/reorder", validateProjectReorder, async (req, res) => {
   try {
     const { projectId, direction } = req.body;
 
@@ -65,12 +66,12 @@ router.put("/projects/reorder", async (req, res) => {
     res.json({ message: "Projects reordered" });
   } catch (err) {
     console.error("Error reordering projects:", err);
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: "Failed to reorder projects" });
   }
 });
 
 // Create project
-router.post("/projects", async (req, res) => {
+router.post("/projects", validateProject, async (req, res) => {
   try {
     const { name_en, name_fr, description_en, description_fr, tech, year, image, image_id, sort_order } = req.body;
 
@@ -92,7 +93,7 @@ router.post("/projects", async (req, res) => {
 });
 
 // Update project
-router.put("/projects/:id", async (req, res) => {
+router.put("/projects/:id", validateId, validateProject, async (req, res) => {
   try {
     const { id } = req.params;
     const { name_en, name_fr, description_en, description_fr, tech, year, image, image_id, sort_order } = req.body;
@@ -120,7 +121,7 @@ router.put("/projects/:id", async (req, res) => {
 
 
 // Delete project
-router.delete("/projects/:id", async (req, res) => {
+router.delete("/projects/:id", validateId, async (req, res) => {
   try {
     const { id } = req.params;
     const query = isProduction
@@ -199,7 +200,7 @@ router.get("/comments/pending/count", async (req, res) => {
 });
 
 // Approve comment
-router.put("/comments/:id/approve", async (req, res) => {
+router.put("/comments/:id/approve", validateId, async (req, res) => {
   try {
     const { id } = req.params;
     const query = isProduction
@@ -215,7 +216,7 @@ router.put("/comments/:id/approve", async (req, res) => {
 });
 
 // Reject comment
-router.put("/comments/:id/reject", async (req, res) => {
+router.put("/comments/:id/reject", validateId, async (req, res) => {
   try {
     const { id } = req.params;
     const query = isProduction

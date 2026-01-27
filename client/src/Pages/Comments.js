@@ -5,6 +5,7 @@ import { useLocation } from "react-router-dom";
 import { LanguageContext } from "../App";
 import contentEn from "../data/comments-en.json";
 import contentFr from "../data/comments-fr.json";
+import { sanitizeInput, validateComment } from "../utils/inputValidation";
 
 export default function Comments() {
   const { language } = useContext(LanguageContext);
@@ -15,6 +16,7 @@ export default function Comments() {
   const [loading, setLoading] = useState(false);
   const [permissions, setPermissions] = useState([]);
   const [submitMessage, setSubmitMessage] = useState("");
+  const [validationError, setValidationError] = useState("");
 
   const t = language === "en" ? contentEn : contentFr;
   const isAdmin = permissions.includes("delete:comments");
@@ -65,10 +67,21 @@ export default function Comments() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!newComment.trim()) return;
+    
+    // Sanitize input
+    const sanitizedComment = sanitizeInput(newComment);
+    
+    // Validate input
+    const validation = validateComment(sanitizedComment);
+    if (!validation.isValid) {
+      setValidationError(validation.error);
+      return;
+    }
 
     setLoading(true);
     setSubmitMessage("");
+    setValidationError("");
+    
     try {
       const token = await getAccessTokenSilently();
 
@@ -79,7 +92,7 @@ export default function Comments() {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          text: newComment,
+          text: sanitizedComment,
           user_name: user.name,
           user_picture: user.picture,
         }),
@@ -89,10 +102,13 @@ export default function Comments() {
         setNewComment("");
         setSubmitMessage(pendingMessage[language]);
         fetchComments();
+      } else {
+        const data = await response.json();
+        setValidationError(data.error || "Error posting testimonial");
       }
     } catch (err) {
       console.error("Error posting comment:", err);
-      alert("Error posting testimonial");
+      setValidationError("Error posting testimonial. Please try again.");
     }
     setLoading(false);
   };
@@ -134,26 +150,45 @@ export default function Comments() {
           <form onSubmit={handleSubmit}>
             <textarea
               value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
+              onChange={(e) => {
+                setNewComment(e.target.value);
+                if (validationError) setValidationError("");
+              }}
               placeholder={t.placeholder}
               className="comment-input"
               disabled={loading}
+              maxLength="1000"
               style={{
                 width: "100%",
                 minHeight: "120px",
                 padding: "16px",
-                border: "4px solid var(--color-neon-green)",
+                border: validationError ? "4px solid var(--color-magenta)" : "4px solid var(--color-neon-green)",
                 background: "var(--color-black)",
                 color: "var(--color-white)",
                 fontSize: "16px",
                 fontFamily: "var(--font-body)",
                 resize: "vertical",
-                marginBottom: "20px",
-                boxShadow: "6px 6px 0 var(--color-magenta)",
+                marginBottom: "8px",
+                boxShadow: validationError ? "6px 6px 0 var(--color-magenta)" : "6px 6px 0 var(--color-magenta)",
                 outline: "none",
                 boxSizing: "border-box",
               }}
+              aria-invalid={!!validationError}
+              aria-describedby={validationError ? "comment-error" : undefined}
             />
+            {validationError && (
+              <div 
+                id="comment-error"
+                style={{
+                  color: "var(--color-magenta)",
+                  fontSize: "14px",
+                  marginBottom: "12px",
+                  fontWeight: "600",
+                }}
+              >
+                {validationError}
+              </div>
+            )}
             <button type="submit" className="btn-primary" disabled={loading}>
               {loading ? t.posting : t.submit}
             </button>

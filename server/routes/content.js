@@ -4,17 +4,13 @@ const router = express.Router();
 const { db, isProduction } = require("../config/database");
 const { checkJwt } = require("../config/auth");
 const { requirePermission } = require("../middleware/permissions");
+const { validatePageContent, validateContentUpdate, validateFieldUpdate } = require("../utils/validators");
 
 // GET content for a page (public)
-router.get("/:page", async (req, res) => {
+router.get("/:page", validatePageContent, async (req, res) => {
     try {
         const { page } = req.params;
         const lang = req.query.lang || "en";
-
-        const validPages = ["about", "resume", "home", "contact_info"];
-        if (!validPages.includes(page)) {
-            return res.status(400).json({ error: "Invalid page name" });
-        }
 
         const query = isProduction
             ? "SELECT content FROM page_content WHERE page_name = $1 AND language = $2"
@@ -40,16 +36,11 @@ router.get("/:page", async (req, res) => {
 });
 
 // PUT - Update full page content (admin only)
-router.put("/:page", checkJwt, requirePermission("admin:dashboard"), async (req, res) => {
+router.put("/:page", checkJwt, requirePermission("admin:dashboard"), validateContentUpdate, async (req, res) => {
     try {
         const { page } = req.params;
         const { content, language } = req.body;
         const lang = language || "en";
-
-        const validPages = ["about", "resume", "home", "contact_info"];
-        if (!validPages.includes(page)) {
-            return res.status(400).json({ error: "Invalid page name" });
-        }
 
         // Upsert: insert or update
         const query = isProduction
@@ -69,21 +60,16 @@ router.put("/:page", checkJwt, requirePermission("admin:dashboard"), async (req,
         res.json({ success: true, page, language: lang });
     } catch (err) {
         console.error("Error updating content:", err);
-        res.status(500).json({ error: err.message });
+        res.status(500).json({ error: "Failed to update content" });
     }
 });
 
 // PATCH - Update single field (admin only)
-router.patch("/:page/field", checkJwt, requirePermission("admin:dashboard"), async (req, res) => {
+router.patch("/:page/field", checkJwt, requirePermission("admin:dashboard"), validateFieldUpdate, async (req, res) => {
     try {
         const { page } = req.params;
         const { field, value, language } = req.body;
         const lang = language || "en";
-
-        const validPages = ["about", "resume", "home", "contact_info"];
-        if (!validPages.includes(page)) {
-            return res.status(400).json({ error: "Invalid page name" });
-        }
 
         // First, get current content
         const selectQuery = isProduction
@@ -128,7 +114,7 @@ router.patch("/:page/field", checkJwt, requirePermission("admin:dashboard"), asy
         res.json({ success: true, field, value });
     } catch (err) {
         console.error("Error updating field:", err);
-        res.status(500).json({ error: err.message });
+        res.status(500).json({ error: "Failed to update field" });
     }
 });
 
@@ -163,7 +149,7 @@ router.get("/:page/export", checkJwt, requirePermission("admin:dashboard"), asyn
         res.send(JSON.stringify(content, null, 2));
     } catch (err) {
         console.error("Error exporting content:", err);
-        res.status(500).json({ error: err.message });
+        res.status(500).json({ error: "Failed to export content" });
     }
 });
 
@@ -200,7 +186,7 @@ router.post("/:page/import", checkJwt, requirePermission("admin:dashboard"), asy
         res.json({ success: true, message: "Content imported successfully" });
     } catch (err) {
         console.error("Error importing content:", err);
-        res.status(500).json({ error: err.message });
+        res.status(500).json({ error: "Failed to import content" });
     }
 });
 

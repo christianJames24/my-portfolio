@@ -1,6 +1,7 @@
 // Contact.js
 import React, { useContext, useState, useEffect } from "react";
 import { LanguageContext } from "../App";
+import { sanitizeInput, validateContactForm } from "../utils/inputValidation";
 
 export default function Contact() {
     const { language } = useContext(LanguageContext);
@@ -8,6 +9,7 @@ export default function Contact() {
     const [loading, setLoading] = useState(false);
     const [submitStatus, setSubmitStatus] = useState(null);
     const [contactInfo, setContactInfo] = useState(null);
+    const [validationErrors, setValidationErrors] = useState({});
 
     const t = {
         en: {
@@ -64,13 +66,30 @@ export default function Contact() {
     }, [language]);
 
     const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+        const sanitizedValue = sanitizeInput(value);
+        setFormData({ ...formData, [name]: sanitizedValue });
+        
+        // Clear validation error for this field when user starts typing
+        if (validationErrors[name]) {
+            setValidationErrors({ ...validationErrors, [name]: "" });
+        }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        
+        // Client-side validation
+        const validation = validateContactForm(formData);
+        if (!validation.isValid) {
+            setValidationErrors(validation.errors);
+            setSubmitStatus("validation-error");
+            return;
+        }
+        
         setLoading(true);
         setSubmitStatus(null);
+        setValidationErrors({});
 
         try {
             const res = await fetch("/api/messages", {
@@ -85,6 +104,15 @@ export default function Contact() {
             } else {
                 const data = await res.json();
                 setSubmitStatus("error");
+                
+                // Handle server-side validation errors
+                if (data.details) {
+                    const serverErrors = {};
+                    data.details.forEach(err => {
+                        serverErrors[err.field] = err.message;
+                    });
+                    setValidationErrors(serverErrors);
+                }
                 console.error("Error:", data.error);
             }
         } catch (err) {
@@ -94,18 +122,25 @@ export default function Contact() {
         setLoading(false);
     };
 
-    const inputStyle = {
+    const inputStyle = (hasError) => ({
         width: "100%",
         padding: "16px",
-        border: "4px solid var(--color-black)",
+        border: hasError ? "4px solid var(--color-magenta)" : "4px solid var(--color-black)",
         background: "var(--color-white)",
         color: "var(--color-black)",
         fontSize: "16px",
         fontFamily: "var(--font-body)",
-        marginBottom: "16px",
-        boxShadow: "4px 4px 0 var(--color-black)",
+        marginBottom: "4px",
+        boxShadow: hasError ? "4px 4px 0 var(--color-magenta)" : "4px 4px 0 var(--color-black)",
         boxSizing: "border-box",
         outline: "none",
+    });
+    
+    const errorStyle = {
+        color: "var(--color-magenta)",
+        fontSize: "14px",
+        marginBottom: "12px",
+        fontWeight: "600",
     };
 
     return (
@@ -140,8 +175,14 @@ export default function Contact() {
                             value={formData.name}
                             onChange={handleChange}
                             required
-                            style={inputStyle}
+                            maxLength="100"
+                            style={inputStyle(validationErrors.name)}
+                            aria-invalid={!!validationErrors.name}
+                            aria-describedby={validationErrors.name ? "name-error" : undefined}
                         />
+                        {validationErrors.name && (
+                            <div id="name-error" style={errorStyle}>{validationErrors.name}</div>
+                        )}
 
                         <label
                             htmlFor="email"
@@ -163,8 +204,14 @@ export default function Contact() {
                             value={formData.email}
                             onChange={handleChange}
                             required
-                            style={inputStyle}
+                            maxLength="255"
+                            style={inputStyle(validationErrors.email)}
+                            aria-invalid={!!validationErrors.email}
+                            aria-describedby={validationErrors.email ? "email-error" : undefined}
                         />
+                        {validationErrors.email && (
+                            <div id="email-error" style={errorStyle}>{validationErrors.email}</div>
+                        )}
 
                         <label
                             htmlFor="message"
@@ -186,8 +233,14 @@ export default function Contact() {
                             onChange={handleChange}
                             required
                             rows={6}
-                            style={{ ...inputStyle, resize: "vertical", minHeight: "150px" }}
+                            maxLength="5000"
+                            style={{ ...inputStyle(validationErrors.message), resize: "vertical", minHeight: "150px" }}
+                            aria-invalid={!!validationErrors.message}
+                            aria-describedby={validationErrors.message ? "message-error" : undefined}
                         />
+                        {validationErrors.message && (
+                            <div id="message-error" style={errorStyle}>{validationErrors.message}</div>
+                        )}
 
                         <button
                             type="submit"

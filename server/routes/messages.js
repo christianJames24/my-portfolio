@@ -4,32 +4,23 @@ const router = express.Router();
 const { db, isProduction } = require("../config/database");
 const { checkJwt } = require("../config/auth");
 const { requirePermission } = require("../middleware/permissions");
+const { validateMessage, validateId } = require("../utils/validators");
 
 // POST - Submit a message (public, no auth required)
-router.post("/", async (req, res) => {
+router.post("/", validateMessage, async (req, res) => {
     try {
         const { name, email, message } = req.body;
-
-        if (!name || !email || !message) {
-            return res.status(400).json({ error: "Name, email, and message are required" });
-        }
-
-        // Basic email validation
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
-            return res.status(400).json({ error: "Invalid email format" });
-        }
 
         const query = isProduction
             ? `INSERT INTO messages (name, email, message) VALUES ($1, $2, $3) RETURNING *`
             : `INSERT INTO messages (name, email, message) VALUES (?, ?, ?)`;
 
-        const result = await db.query(query, [name.trim(), email.trim(), message.trim()]);
+        const result = await db.query(query, [name, email, message]);
 
         res.status(201).json({ success: true, message: "Message sent successfully" });
     } catch (err) {
         console.error("Error saving message:", err);
-        res.status(500).json({ error: err.message });
+        res.status(500).json({ error: "Failed to send message. Please try again later." });
     }
 });
 
@@ -47,7 +38,7 @@ router.get("/", checkJwt, requirePermission("admin:dashboard"), async (req, res)
 });
 
 // DELETE - Delete a message (admin only)
-router.delete("/:id", checkJwt, requirePermission("admin:dashboard"), async (req, res) => {
+router.delete("/:id", checkJwt, requirePermission("admin:dashboard"), validateId, async (req, res) => {
     try {
         const { id } = req.params;
         const query = isProduction
@@ -58,12 +49,12 @@ router.delete("/:id", checkJwt, requirePermission("admin:dashboard"), async (req
         res.json({ message: "Message deleted" });
     } catch (err) {
         console.error("Error deleting message:", err);
-        res.status(500).json({ error: err.message });
+        res.status(500).json({ error: "Failed to delete message" });
     }
 });
 
 // PATCH - Mark message as read (admin only)
-router.patch("/:id/read", checkJwt, requirePermission("admin:dashboard"), async (req, res) => {
+router.patch("/:id/read", checkJwt, requirePermission("admin:dashboard"), validateId, async (req, res) => {
     try {
         const { id } = req.params;
         const query = isProduction
@@ -74,12 +65,12 @@ router.patch("/:id/read", checkJwt, requirePermission("admin:dashboard"), async 
         res.json({ message: "Message marked as read" });
     } catch (err) {
         console.error("Error marking message as read:", err);
-        res.status(500).json({ error: err.message });
+        res.status(500).json({ error: "Failed to update message" });
     }
 });
 
 // PATCH - Mark message as unread (admin only)
-router.patch("/:id/unread", checkJwt, requirePermission("admin:dashboard"), async (req, res) => {
+router.patch("/:id/unread", checkJwt, requirePermission("admin:dashboard"), validateId, async (req, res) => {
     try {
         const { id } = req.params;
         const query = isProduction
@@ -90,7 +81,7 @@ router.patch("/:id/unread", checkJwt, requirePermission("admin:dashboard"), asyn
         res.json({ message: "Message marked as unread" });
     } catch (err) {
         console.error("Error marking message as unread:", err);
-        res.status(500).json({ error: err.message });
+        res.status(500).json({ error: "Failed to update message" });
     }
 });
 

@@ -7,6 +7,7 @@ const sharp = require("sharp");
 const { db, isProduction } = require("../config/database");
 const { checkJwt } = require("../config/auth");
 const { requirePermission } = require("../middleware/permissions");
+const { validateId } = require("../utils/validators");
 
 // Constants
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB per file
@@ -57,14 +58,9 @@ router.get("/debug/db", async (req, res) => {
 // ============ PUBLIC: Serve images ============
 
 // Get image by ID (public - no auth required) - serves base64 as image
-router.get("/:id", async (req, res) => {
+router.get("/:id", validateId, async (req, res) => {
     try {
         const { id } = req.params;
-
-        // Skip non-numeric IDs (like "stats", "list", "debug")
-        if (isNaN(parseInt(id))) {
-            return res.status(404).json({ error: "Invalid image ID" });
-        }
 
         const query = isProduction
             ? "SELECT image_data, original_name FROM images WHERE id = $1"
@@ -90,7 +86,7 @@ router.get("/:id", async (req, res) => {
         res.send(imageBuffer);
     } catch (err) {
         console.error("Error serving image:", err);
-        res.status(500).json({ error: err.message });
+        res.status(500).json({ error: "Failed to serve image" });
     }
 });
 
@@ -112,7 +108,7 @@ router.get("/stats/usage", checkJwt, requirePermission("admin:dashboard"), async
         });
     } catch (err) {
         console.error("Error getting stats:", err);
-        res.status(500).json({ error: err.message });
+        res.status(500).json({ error: "Failed to retrieve storage stats" });
     }
 });
 
@@ -149,7 +145,7 @@ router.get("/list/all", checkJwt, requirePermission("admin:dashboard"), async (r
         res.json(images);
     } catch (err) {
         console.error("Error listing images:", err);
-        res.status(500).json({ error: err.message });
+        res.status(500).json({ error: "Failed to list images" });
     }
 });
 
@@ -158,6 +154,11 @@ router.post("/", checkJwt, requirePermission("admin:dashboard"), upload.single("
     try {
         if (!req.file) {
             return res.status(400).json({ error: "No image file provided" });
+        }
+        
+        // Additional validation for file name
+        if (req.file.originalname.length > 255) {
+            return res.status(400).json({ error: "Filename is too long" });
         }
 
         // Check storage limit
@@ -207,7 +208,16 @@ router.post("/", checkJwt, requirePermission("admin:dashboard"), upload.single("
         });
     } catch (err) {
         console.error("Error uploading image:", err);
-        res.status(500).json({ error: err.message });
+        
+        // Handle specific multer errors
+        if (err instanceof multer.MulterError) {
+            if (err.code === 'LIMIT_FILE_SIZE') {
+                return res.status(400).json({ error: "File size exceeds 5MB limit" });
+            }
+            return res.status(400).json({ error: `Upload error: ${err.message}` });
+        }
+        
+        res.status(500).json({ error: "Failed to upload image" });
     }
 });
 
