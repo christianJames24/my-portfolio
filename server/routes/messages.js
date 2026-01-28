@@ -20,10 +20,13 @@ router.post("/", checkJwt, validateMessage, async (req, res) => {
         // Send email via SMTP
         if (process.env.SMTP_USER && process.env.SMTP_PASS) {
             try {
+                // Default to port 2525 (common alternative) or 587 if not specified
+                const port = process.env.SMTP_PORT ? parseInt(process.env.SMTP_PORT) : 2525;
+
                 const transporter = require("nodemailer").createTransport({
                     host: process.env.SMTP_HOST || "smtp.mailgun.org",
-                    port: parseInt(process.env.SMTP_PORT) || 2525,
-                    secure: false, // true for 465, false for other ports
+                    port: port,
+                    secure: port === 465, // true for 465, false for other ports
                     auth: {
                         user: process.env.SMTP_USER,
                         pass: process.env.SMTP_PASS,
