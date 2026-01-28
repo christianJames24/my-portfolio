@@ -21,19 +21,24 @@ router.post("/", validateMessage, async (req, res) => {
         if (process.env.GOOGLE_USER && process.env.GOOGLE_PASS) {
             try {
                 const transporter = require("nodemailer").createTransport({
-                    service: "gmail",
+                    host: "smtp.gmail.com",
+                    port: parseInt(process.env.SMTP_PORT) || 465,
+                    secure: true, // use SSL
                     auth: {
                         user: process.env.GOOGLE_USER,
                         pass: process.env.GOOGLE_PASS,
+                    },
+                    tls: {
+                        rejectUnauthorized: false,
                     },
                 });
 
                 const mailOptions = {
                     from: process.env.GOOGLE_USER,
-                    to: process.env.GOOGLE_USER, // Send to self
+                    to: process.env.CONTACT_RECEIVER || process.env.GOOGLE_USER, // Send to configured receiver or self
                     subject: `New Contact Form Message from ${name}`,
                     text: `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`,
-                    replyTo: email,
+                    replyTo: email, // Reply goes to the person who submitted the form
                 };
 
                 await transporter.sendMail(mailOptions);
