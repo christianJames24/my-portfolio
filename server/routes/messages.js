@@ -6,8 +6,8 @@ const { checkJwt } = require("../config/auth");
 const { requirePermission } = require("../middleware/permissions");
 const { validateMessage, validateId } = require("../utils/validators");
 
-// POST - Submit a message (public, no auth required)
-router.post("/", validateMessage, async (req, res) => {
+// POST - Submit a message (requires authentication)
+router.post("/", checkJwt, validateMessage, async (req, res) => {
     try {
         const { name, email, message } = req.body;
 

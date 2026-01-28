@@ -7,7 +7,7 @@ import { useNotification } from "../contexts/NotificationContext";
 
 export default function Contact() {
     const { language } = useContext(LanguageContext);
-    const { user, isAuthenticated } = useAuth0();
+    const { user, isAuthenticated, loginWithRedirect, getAccessTokenSilently } = useAuth0();
     const { notify, removeNotification } = useNotification();
     const [formData, setFormData] = useState({ name: "", email: "", message: "" });
     const [loading, setLoading] = useState(false);
@@ -37,6 +37,8 @@ export default function Contact() {
             email: "Email",
             phone: "Phone",
             location: "Location",
+            loginMessage: "Please log in to send a message.",
+            login: "Log In",
         },
         fr: {
             title: "Contact",
@@ -52,6 +54,8 @@ export default function Contact() {
             email: "Courriel",
             phone: "Téléphone",
             location: "Lieu",
+            loginMessage: "Veuillez vous connecter pour envoyer un message.",
+            login: "Se Connecter",
         },
     }[language];
 
@@ -116,9 +120,13 @@ export default function Contact() {
                 email: sanitizeInput(formData.email),
                 message: sanitizeInput(formData.message),
             };
+            const token = await getAccessTokenSilently();
             const res = await fetch("/api/messages", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
                 body: JSON.stringify(sanitizedData),
             });
 
@@ -202,139 +210,153 @@ export default function Contact() {
                         {t.subtitle}
                     </h2>
 
-                    <form onSubmit={handleSubmit}>
-                        <label
-                            htmlFor="name"
-                            style={{
-                                display: "block",
-                                marginBottom: "8px",
-                                fontWeight: "700",
-                                textTransform: "uppercase",
-                                fontSize: "14px",
-                                color: "var(--color-cyan)",
-                            }}
-                        >
-                            {t.nameLabel}
-                        </label>
-                        <input
-                            type="text"
-                            id="name"
-                            name="name"
-                            value={formData.name}
-                            onChange={handleChange}
-                            required
-                            maxLength="100"
-                            style={inputStyle(validationErrors.name)}
-                            aria-invalid={!!validationErrors.name}
-                            aria-describedby={validationErrors.name ? "name-error" : undefined}
-                        />
-                        {validationErrors.name && (
-                            <div id="name-error" style={errorStyle}>{validationErrors.name}</div>
-                        )}
-
-                        <label
-                            htmlFor="email"
-                            style={{
-                                display: "block",
-                                marginBottom: "8px",
-                                fontWeight: "700",
-                                textTransform: "uppercase",
-                                fontSize: "14px",
-                                color: "var(--color-cyan)",
-                            }}
-                        >
-                            {t.emailLabel}
-                        </label>
-                        <input
-                            type="email"
-                            id="email"
-                            name="email"
-                            value={formData.email}
-                            onChange={handleChange}
-                            required
-                            maxLength="255"
-                            readOnly={isAuthenticated}
-                            style={{
-                                ...inputStyle(validationErrors.email),
-                                ...(isAuthenticated ? { opacity: 0.7, cursor: "not-allowed" } : {})
-                            }}
-                            aria-invalid={!!validationErrors.email}
-                            aria-describedby={validationErrors.email ? "email-error" : undefined}
-                        />
-                        {validationErrors.email && (
-                            <div id="email-error" style={errorStyle}>{validationErrors.email}</div>
-                        )}
-
-                        <label
-                            htmlFor="message"
-                            style={{
-                                display: "block",
-                                marginBottom: "8px",
-                                fontWeight: "700",
-                                textTransform: "uppercase",
-                                fontSize: "14px",
-                                color: "var(--color-cyan)",
-                            }}
-                        >
-                            {t.messageLabel}
-                        </label>
-                        <textarea
-                            id="message"
-                            name="message"
-                            value={formData.message}
-                            onChange={handleChange}
-                            required
-                            rows={6}
-                            maxLength="5000"
-                            style={{ ...inputStyle(validationErrors.message), resize: "vertical", minHeight: "150px" }}
-                            aria-invalid={!!validationErrors.message}
-                            aria-describedby={validationErrors.message ? "message-error" : undefined}
-                        />
-                        {validationErrors.message && (
-                            <div id="message-error" style={errorStyle}>{validationErrors.message}</div>
-                        )}
-
-                        <button
-                            type="submit"
-                            className="btn-primary"
-                            disabled={loading}
-                            style={{ width: "100%" }}
-                        >
-                            {loading ? t.sending : t.send}
-                        </button>
-
-                        {submitStatus === "success" && (
-                            <p
+                    {isAuthenticated ? (
+                        <form onSubmit={handleSubmit}>
+                            <label
+                                htmlFor="name"
                                 style={{
-                                    marginTop: "16px",
-                                    padding: "12px 16px",
-                                    background: "var(--color-neon-green)",
-                                    color: "var(--color-black)",
+                                    display: "block",
+                                    marginBottom: "8px",
                                     fontWeight: "700",
-                                    border: "3px solid var(--color-black)",
-                                    boxShadow: "4px 4px 0 var(--color-black)",
+                                    textTransform: "uppercase",
+                                    fontSize: "14px",
+                                    color: "var(--color-cyan)",
                                 }}
                             >
-                                {t.success}
-                            </p>
-                        )}
+                                {t.nameLabel}
+                            </label>
+                            <input
+                                type="text"
+                                id="name"
+                                name="name"
+                                value={formData.name}
+                                onChange={handleChange}
+                                required
+                                maxLength="100"
+                                style={inputStyle(validationErrors.name)}
+                                aria-invalid={!!validationErrors.name}
+                                aria-describedby={validationErrors.name ? "name-error" : undefined}
+                            />
+                            {validationErrors.name && (
+                                <div id="name-error" style={errorStyle}>{validationErrors.name}</div>
+                            )}
 
-                        {submitStatus === "error" && (
-                            <p
+                            <label
+                                htmlFor="email"
                                 style={{
-                                    marginTop: "16px",
-                                    padding: "12px 16px",
-                                    background: "var(--color-red-pink)",
-                                    color: "var(--color-white)",
+                                    display: "block",
+                                    marginBottom: "8px",
                                     fontWeight: "700",
-                                    border: "3px solid var(--color-black)",
-                                    boxShadow: "4px 4px 0 var(--color-black)",
+                                    textTransform: "uppercase",
+                                    fontSize: "14px",
+                                    color: "var(--color-cyan)",
                                 }}
                             >
-                                {t.error}
+                                {t.emailLabel}
+                            </label>
+                            <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                value={formData.email}
+                                onChange={handleChange}
+                                required
+                                maxLength="255"
+                                readOnly={isAuthenticated}
+                                style={{
+                                    ...inputStyle(validationErrors.email),
+                                    ...(isAuthenticated ? { opacity: 0.7, cursor: "not-allowed" } : {})
+                                }}
+                                aria-invalid={!!validationErrors.email}
+                                aria-describedby={validationErrors.email ? "email-error" : undefined}
+                            />
+                            {validationErrors.email && (
+                                <div id="email-error" style={errorStyle}>{validationErrors.email}</div>
+                            )}
+
+                            <label
+                                htmlFor="message"
+                                style={{
+                                    display: "block",
+                                    marginBottom: "8px",
+                                    fontWeight: "700",
+                                    textTransform: "uppercase",
+                                    fontSize: "14px",
+                                    color: "var(--color-cyan)",
+                                }}
+                            >
+                                {t.messageLabel}
+                            </label>
+                            <textarea
+                                id="message"
+                                name="message"
+                                value={formData.message}
+                                onChange={handleChange}
+                                required
+                                rows={6}
+                                maxLength="5000"
+                                style={{ ...inputStyle(validationErrors.message), resize: "vertical", minHeight: "150px" }}
+                                aria-invalid={!!validationErrors.message}
+                                aria-describedby={validationErrors.message ? "message-error" : undefined}
+                            />
+                            {validationErrors.message && (
+                                <div id="message-error" style={errorStyle}>{validationErrors.message}</div>
+                            )}
+
+                            <button
+                                type="submit"
+                                className="btn-primary"
+                                disabled={loading}
+                                style={{ width: "100%" }}
+                            >
+                                {loading ? t.sending : t.send}
+                            </button>
+
+                            {submitStatus === "success" && (
+                                <p
+                                    style={{
+                                        marginTop: "16px",
+                                        padding: "12px 16px",
+                                        background: "var(--color-neon-green)",
+                                        color: "var(--color-black)",
+                                        fontWeight: "700",
+                                        border: "3px solid var(--color-black)",
+                                        boxShadow: "4px 4px 0 var(--color-black)",
+                                    }}
+                                >
+                                    {t.success}
+                                </p>
+                            )}
+
+                            {submitStatus === "error" && (
+                                <p
+                                    style={{
+                                        marginTop: "16px",
+                                        padding: "12px 16px",
+                                        background: "var(--color-red-pink)",
+                                        color: "var(--color-white)",
+                                        fontWeight: "700",
+                                        border: "3px solid var(--color-black)",
+                                        boxShadow: "4px 4px 0 var(--color-black)",
+                                    }}
+                                >
+                                    {t.error}
+                                </p>
+                            )}
+                        </form>
+                    ) : (
+                        <div>
+                            <p style={{ fontSize: "clamp(16px, 2.5vw, 19px)", marginBottom: "20px" }}>
+                                {t.loginMessage}
                             </p>
-                        )}
-                    </form>
+                            <button
+                                onClick={() => loginWithRedirect({ appState: { returnTo: "/contact" } })}
+                                className="btn-primary"
+                            >
+                                {t.login}
+                            </button>
+                        </div>
+                    )}
                 </div>
 
                 {/* Contact Info */}
@@ -477,7 +499,7 @@ export default function Contact() {
                         )}
                     </div>
                 </div>
-            </div>
+            </div >
 
             <style>{`
         @media (max-width: 900px) {
@@ -486,6 +508,6 @@ export default function Contact() {
           }
         }
       `}</style>
-        </div>
+        </div >
     );
 }
