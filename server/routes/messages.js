@@ -18,15 +18,15 @@ router.post("/", checkJwt, validateMessage, async (req, res) => {
         await db.query(query, [name, email, message]);
 
         // Send email via SMTP
-        if (process.env.GOOGLE_USER && process.env.GOOGLE_PASS) {
+        if (process.env.SMTP_USER && process.env.SMTP_PASS) {
             try {
                 const transporter = require("nodemailer").createTransport({
-                    host: "smtp.gmail.com",
-                    port: parseInt(process.env.SMTP_PORT) || 465,
-                    secure: true, // use SSL
+                    host: process.env.SMTP_HOST || "smtp.mailgun.org",
+                    port: parseInt(process.env.SMTP_PORT) || 2525,
+                    secure: false, // true for 465, false for other ports
                     auth: {
-                        user: process.env.GOOGLE_USER,
-                        pass: process.env.GOOGLE_PASS,
+                        user: process.env.SMTP_USER,
+                        pass: process.env.SMTP_PASS,
                     },
                     tls: {
                         rejectUnauthorized: false,
@@ -34,8 +34,8 @@ router.post("/", checkJwt, validateMessage, async (req, res) => {
                 });
 
                 const mailOptions = {
-                    from: process.env.GOOGLE_USER,
-                    to: process.env.CONTACT_RECEIVER || process.env.GOOGLE_USER, // Send to configured receiver or self
+                    from: process.env.SMTP_FROM || process.env.SMTP_USER,
+                    to: process.env.CONTACT_RECEIVER || process.env.SMTP_USER, // Send to configured receiver or self
                     subject: `New Contact Form Message from ${name}`,
                     text: `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`,
                     replyTo: email, // Reply goes to the person who submitted the form
@@ -47,7 +47,7 @@ router.post("/", checkJwt, validateMessage, async (req, res) => {
                 // Don't fail the request if email fails, but log it
             }
         } else {
-            console.warn("Google SMTP credentials not found in environment variables");
+            console.warn("SMTP credentials not found in environment variables");
         }
 
         res.status(201).json({ success: true, message: "Message sent successfully" });
