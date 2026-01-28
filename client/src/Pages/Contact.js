@@ -1,15 +1,26 @@
 // Contact.js
 import React, { useContext, useState, useEffect } from "react";
+import { useAuth0 } from "@auth0/auth0-react";
 import { LanguageContext } from "../App";
 import { sanitizeInput, validateContactForm } from "../utils/inputValidation";
+import { useNotification } from "../contexts/NotificationContext";
 
 export default function Contact() {
     const { language } = useContext(LanguageContext);
+    const { user, isAuthenticated } = useAuth0();
+    const { notify, removeNotification } = useNotification();
     const [formData, setFormData] = useState({ name: "", email: "", message: "" });
     const [loading, setLoading] = useState(false);
     const [submitStatus, setSubmitStatus] = useState(null);
     const [contactInfo, setContactInfo] = useState(null);
     const [validationErrors, setValidationErrors] = useState({});
+
+    // Pre-fill email from Auth0 if logged in
+    useEffect(() => {
+        if (isAuthenticated && user?.email && !formData.email) {
+            setFormData(prev => ({ ...prev, email: user.email }));
+        }
+    }, [isAuthenticated, user, formData.email]);
 
     const t = {
         en: {
@@ -67,9 +78,9 @@ export default function Contact() {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        const sanitizedValue = sanitizeInput(value);
-        setFormData({ ...formData, [name]: sanitizedValue });
-        
+        // Don't sanitize on every keystroke - only on submit
+        setFormData({ ...formData, [name]: value });
+
         // Clear validation error for this field when user starts typing
         if (validationErrors[name]) {
             setValidationErrors({ ...validationErrors, [name]: "" });
@@ -78,7 +89,7 @@ export default function Contact() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
+
         // Client-side validation
         const validation = validateContactForm(formData);
         if (!validation.isValid) {
@@ -86,25 +97,50 @@ export default function Contact() {
             setSubmitStatus("validation-error");
             return;
         }
-        
+
         setLoading(true);
         setSubmitStatus(null);
         setValidationErrors({});
 
+        // Show "Sending" notification
+        const sendingNotificationId = notify(
+            language === "en" ? "Sending your message..." : "Envoi de votre message...",
+            "info",
+            null // persistent until manually removed
+        );
+
         try {
+            // Sanitize the data before sending
+            const sanitizedData = {
+                name: sanitizeInput(formData.name),
+                email: sanitizeInput(formData.email),
+                message: sanitizeInput(formData.message),
+            };
             const res = await fetch("/api/messages", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(formData),
+                body: JSON.stringify(sanitizedData),
             });
+
+            // Remove "Sending" notification
+            removeNotification(sendingNotificationId);
 
             if (res.ok) {
                 setSubmitStatus("success");
-                setFormData({ name: "", email: "", message: "" });
+                setFormData(prev => ({ ...prev, name: "", message: "" }));
+                // If authenticated, keep the email
+                if (!isAuthenticated) {
+                    setFormData(prev => ({ ...prev, email: "" }));
+                }
+                notify(
+                    language === "en" ? "Message sent successfully!" : "Message envoyé avec succès!",
+                    "success",
+                    5000
+                );
             } else {
                 const data = await res.json();
                 setSubmitStatus("error");
-                
+
                 // Handle server-side validation errors
                 if (data.details) {
                     const serverErrors = {};
@@ -114,10 +150,22 @@ export default function Contact() {
                     setValidationErrors(serverErrors);
                 }
                 console.error("Error:", data.error);
+                notify(
+                    language === "en" ? "Failed to send message." : "Échec de l'envoi du message.",
+                    "error",
+                    5000
+                );
             }
         } catch (err) {
+            // Remove "Sending" notification on error too
+            removeNotification(sendingNotificationId);
             setSubmitStatus("error");
             console.error("Error sending message:", err);
+            notify(
+                language === "en" ? "Failed to send message." : "Échec de l'envoi du message.",
+                "error",
+                5000
+            );
         }
         setLoading(false);
     };
@@ -135,7 +183,7 @@ export default function Contact() {
         boxSizing: "border-box",
         outline: "none",
     });
-    
+
     const errorStyle = {
         color: "var(--color-magenta)",
         fontSize: "14px",
@@ -205,7 +253,11 @@ export default function Contact() {
                             onChange={handleChange}
                             required
                             maxLength="255"
-                            style={inputStyle(validationErrors.email)}
+                            readOnly={isAuthenticated}
+                            style={{
+                                ...inputStyle(validationErrors.email),
+                                ...(isAuthenticated ? { opacity: 0.7, cursor: "not-allowed" } : {})
+                            }}
                             aria-invalid={!!validationErrors.email}
                             aria-describedby={validationErrors.email ? "email-error" : undefined}
                         />

@@ -15,7 +15,35 @@ router.post("/", validateMessage, async (req, res) => {
             ? `INSERT INTO messages (name, email, message) VALUES ($1, $2, $3) RETURNING *`
             : `INSERT INTO messages (name, email, message) VALUES (?, ?, ?)`;
 
-        const result = await db.query(query, [name, email, message]);
+        await db.query(query, [name, email, message]);
+
+        // Send email via SMTP
+        if (process.env.GOOGLE_USER && process.env.GOOGLE_PASS) {
+            try {
+                const transporter = require("nodemailer").createTransport({
+                    service: "gmail",
+                    auth: {
+                        user: process.env.GOOGLE_USER,
+                        pass: process.env.GOOGLE_PASS,
+                    },
+                });
+
+                const mailOptions = {
+                    from: process.env.GOOGLE_USER,
+                    to: process.env.GOOGLE_USER, // Send to self
+                    subject: `New Contact Form Message from ${name}`,
+                    text: `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`,
+                    replyTo: email,
+                };
+
+                await transporter.sendMail(mailOptions);
+            } catch (emailErr) {
+                console.error("Failed to send email via SMTP:", emailErr);
+                // Don't fail the request if email fails, but log it
+            }
+        } else {
+            console.warn("Google SMTP credentials not found in environment variables");
+        }
 
         res.status(201).json({ success: true, message: "Message sent successfully" });
     } catch (err) {
