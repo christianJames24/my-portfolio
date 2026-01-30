@@ -185,7 +185,7 @@ export default function About() {
         </div>
       </div>
 
-      <div className="content-card">
+      {/* <div className="content-card">
         <h2>
           <EditableText
             value={t.whatIDo}
@@ -205,7 +205,7 @@ export default function About() {
             onSave={(v) => handleFieldSave("whatIDoText", v)}
           />
         </p>
-      </div>
+      </div> */}
 
       <div className="content-card">
         <h2>
@@ -259,7 +259,7 @@ export default function About() {
         </div>
       </div>
 
-      <div className="content-card">
+      {/* <div className="content-card">
         <h2>
           <EditableText
             value={t.philosophy}
@@ -279,7 +279,7 @@ export default function About() {
             onSave={(v) => handleFieldSave("philosophyText", v)}
           />
         </p>
-      </div>
+      </div> */}
 
       <div className="content-card">
         <h2 style={{ marginBottom: "20px" }}>

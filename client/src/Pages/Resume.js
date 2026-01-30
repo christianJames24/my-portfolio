@@ -160,10 +160,10 @@ export default function Resume() {
                   {job.title}
                 </h3>
                 <span style={{
-                  color: 'var(--color-cyan)',
+                  color: 'var(--color-magenta)',
                   fontSize: 'clamp(14px, 2vw, 16px)',
                   fontWeight: '900',
-                  fontFamily: 'var(--font-bold)'
+                  // fontFamily: 'var(--font-bold)'
                 }}>
                   {job.period}
                 </span>
@@ -219,10 +219,10 @@ export default function Resume() {
                   {school.degree}
                 </h3>
                 <span style={{
-                  color: 'var(--color-cyan)',
+                  color: 'var(--color-magenta)',
                   fontSize: 'clamp(14px, 2vw, 16px)',
                   fontWeight: '900',
-                  fontFamily: 'var(--font-bold)'
+                  // fontFamily: 'var(--font-bold)'
                 }}>
                   {school.period}
                 </span>
@@ -263,7 +263,7 @@ export default function Resume() {
         </p>
       </div>
 
-      <div className="content-card">
+      {/* <div className="content-card">
         <h2>
           <EditableText
             value={t.certifications}
@@ -293,7 +293,7 @@ export default function Resume() {
             />
           </p>
         ))}
-      </div>
+      </div> */}
     </div>
   );
 }
