@@ -46,6 +46,7 @@ export default function Dashboard() {
     image: "",
     image_id: null,
     sort_order: 0,
+    link: "",
   });
 
   const t = {
@@ -84,6 +85,12 @@ export default function Dashboard() {
       unused: "Unused",
       confirmDeleteImage: "Delete this image?",
       order: "Sort Order",
+      link: "Link (Optional - e.g. https://...)",
+      importEn: "Import EN",
+      importEn: "Import EN",
+      importFr: "Import FR",
+      importing: "Importing...",
+      importSuccess: "Projects imported successfully!",
       messages: "Messages",
       settings: "Settings",
       noMessages: "No messages yet",
@@ -295,6 +302,7 @@ export default function Dashboard() {
         image: "",
         image_id: null,
         sort_order: 0,
+        link: "",
       });
       setImagePreview(null);
       setImageMode("url");
@@ -316,6 +324,7 @@ export default function Dashboard() {
       image: project.image || "",
       image_id: project.image_id || null,
       sort_order: project.sort_order || 0,
+      link: project.link || "",
     });
     setImageMode(project.image_id ? "upload" : "url");
     setImagePreview(project.image_id ? `/api/uploads/${project.image_id}` : null);
@@ -397,6 +406,56 @@ export default function Dashboard() {
     } finally {
       setUploading(false);
       // Reset file input
+      e.target.value = "";
+    }
+  };
+
+  const handleImport = async (e, lang) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (!window.confirm(`Importing ${lang.toUpperCase()} projects will merge with existing projects by order. Continue?`)) {
+      e.target.value = "";
+      return;
+    }
+
+    try {
+      const text = await file.text();
+      const json = JSON.parse(text);
+
+      // Extract projects array (handle both { projects: [] } and [] formats)
+      const projectsList = Array.isArray(json) ? json : (json.projects || []);
+
+      if (!projectsList.length) {
+        alert("No projects found in file");
+        return;
+      }
+
+      const token = await getAccessTokenSilently();
+      const res = await fetch("/api/dashboard/projects/import", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          projects: projectsList,
+          language: lang
+        })
+      });
+
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.error || "Import failed");
+      }
+
+      const result = await res.json();
+      alert(`${t.importSuccess} (${result.count} processed)`);
+      fetchData();
+    } catch (err) {
+      console.error("Import error:", err);
+      alert("Import failed: " + err.message);
+    } finally {
       e.target.value = "";
     }
   };
@@ -730,6 +789,7 @@ export default function Dashboard() {
                     image: "",
                     image_id: null,
                     sort_order: 0,
+                    link: "",
                   });
                   setImageMode("url");
                   setImagePreview(null);
@@ -752,6 +812,44 @@ export default function Dashboard() {
                 style={{ background: "var(--color-magenta)" }}
               >
                 {t.exportFr}
+              </button>
+
+              {/* Secret Import Inputs */}
+              <input
+                type="file"
+                accept=".json"
+                id="import-projects-en"
+                style={{ display: "none" }}
+                onChange={(e) => handleImport(e, "en")}
+              />
+              <input
+                type="file"
+                accept=".json"
+                id="import-projects-fr"
+                style={{ display: "none" }}
+                onChange={(e) => handleImport(e, "fr")}
+              />
+
+              <button
+                onClick={() => document.getElementById("import-projects-en").click()}
+                className="btn-primary"
+                style={{
+                  background: "var(--color-yellow)",
+                  color: "var(--color-black)",
+                  marginLeft: "12px"
+                }}
+              >
+                {t.importEn}
+              </button>
+              <button
+                onClick={() => document.getElementById("import-projects-fr").click()}
+                className="btn-primary"
+                style={{
+                  background: "var(--color-yellow)",
+                  color: "var(--color-black)"
+                }}
+              >
+                {t.importFr}
               </button>
             </div>
 

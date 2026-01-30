@@ -73,16 +73,16 @@ router.put("/projects/reorder", validateProjectReorder, async (req, res) => {
 // Create project
 router.post("/projects", validateProject, async (req, res) => {
   try {
-    const { name_en, name_fr, description_en, description_fr, tech, year, image, image_id, sort_order } = req.body;
+    const { name_en, name_fr, description_en, description_fr, tech, year, image, image_id, sort_order, link } = req.body;
 
     const query = isProduction
-      ? `INSERT INTO projects (name_en, name_fr, description_en, description_fr, tech, year, image, image_id, sort_order) 
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *`
-      : `INSERT INTO projects (name_en, name_fr, description_en, description_fr, tech, year, image, image_id, sort_order) 
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING *`;
+      ? `INSERT INTO projects (name_en, name_fr, description_en, description_fr, tech, year, image, image_id, sort_order, link) 
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *`
+      : `INSERT INTO projects (name_en, name_fr, description_en, description_fr, tech, year, image, image_id, sort_order, link) 
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING *`;
 
     const result = await db.query(query, [
-      name_en, name_fr, description_en, description_fr, tech, year, image || null, image_id || null, sort_order || 0
+      name_en, name_fr, description_en, description_fr, tech, year, image || null, image_id || null, sort_order || 0, link || null
     ]);
 
     res.json(result.rows[0]);
@@ -96,20 +96,20 @@ router.post("/projects", validateProject, async (req, res) => {
 router.put("/projects/:id", validateId, validateProject, async (req, res) => {
   try {
     const { id } = req.params;
-    const { name_en, name_fr, description_en, description_fr, tech, year, image, image_id, sort_order } = req.body;
+    const { name_en, name_fr, description_en, description_fr, tech, year, image, image_id, sort_order, link } = req.body;
 
     const query = isProduction
       ? `UPDATE projects SET 
            name_en = $1, name_fr = $2, description_en = $3, description_fr = $4, 
-           tech = $5, year = $6, image = $7, image_id = $8, sort_order = $9, updated_at = CURRENT_TIMESTAMP
-         WHERE id = $10 RETURNING *`
+           tech = $5, year = $6, image = $7, image_id = $8, sort_order = $9, link = $10, updated_at = CURRENT_TIMESTAMP
+         WHERE id = $11 RETURNING *`
       : `UPDATE projects SET 
            name_en = ?, name_fr = ?, description_en = ?, description_fr = ?, 
-           tech = ?, year = ?, image = ?, image_id = ?, sort_order = ?, updated_at = CURRENT_TIMESTAMP
+           tech = ?, year = ?, image = ?, image_id = ?, sort_order = ?, link = ?, updated_at = CURRENT_TIMESTAMP
          WHERE id = ? RETURNING *`;
 
     const result = await db.query(query, [
-      name_en, name_fr, description_en, description_fr, tech, year, image || null, image_id || null, sort_order || 0, id
+      name_en, name_fr, description_en, description_fr, tech, year, image || null, image_id || null, sort_order || 0, link || null, id
     ]);
 
     res.json(result.rows[0]);
@@ -148,7 +148,9 @@ router.get("/projects/export", async (req, res) => {
         description: p.description_en,
         tech: p.tech,
         year: p.year,
-        image: p.image
+        year: p.year,
+        image: p.image,
+        link: p.link
       }))
     };
 
@@ -159,7 +161,9 @@ router.get("/projects/export", async (req, res) => {
         description: p.description_fr,
         tech: p.tech,
         year: p.year,
-        image: p.image
+        year: p.year,
+        image: p.image,
+        link: p.link
       }))
     };
 
@@ -168,67 +172,178 @@ router.get("/projects/export", async (req, res) => {
     console.error("Error exporting projects:", err);
     res.status(500).json({ error: err.message });
   }
-});
+  // Import projects from JSON (Smart Merge)
+  router.post("/projects/import", async (req, res) => {
+    try {
+      const { projects, language } = req.body;
+      const lang = language || "en";
 
-// ============ COMMENTS ============
+      if (!Array.isArray(projects)) {
+        return res.status(400).json({ error: "Invalid projects data (must be an array)" });
+      }
 
-// Get all comments (including pending)
-router.get("/comments", async (req, res) => {
-  try {
-    const result = await db.query(
-      "SELECT * FROM comments ORDER BY created_at DESC"
-    );
-    res.json(result.rows);
-  } catch (err) {
-    console.error("Error fetching comments:", err);
-    res.status(500).json({ error: err.message });
-  }
-});
+      // 1. Get current projects ordered by sort_order
+      const currentResult = await db.query(
+        "SELECT * FROM projects ORDER BY sort_order ASC, created_at DESC"
+      );
+      const existingProjects = currentResult.rows;
 
-// Get pending comments count
-router.get("/comments/pending/count", async (req, res) => {
-  try {
-    const query = isProduction
-      ? "SELECT COUNT(*) as count FROM comments WHERE status = $1"
-      : "SELECT COUNT(*) as count FROM comments WHERE status = ?";
-    const result = await db.query(query, ["pending"]);
-    res.json({ count: parseInt(result.rows[0].count) });
-  } catch (err) {
-    console.error("Error fetching pending count:", err);
-    res.status(500).json({ error: err.message });
-  }
-});
+      const results = [];
 
-// Approve comment
-router.put("/comments/:id/approve", validateId, async (req, res) => {
-  try {
-    const { id } = req.params;
-    const query = isProduction
-      ? "UPDATE comments SET status = $1 WHERE id = $2 RETURNING *"
-      : "UPDATE comments SET status = ? WHERE id = ? RETURNING *";
+      // 2. Iterate through import list and Merge or Insert
+      for (let i = 0; i < projects.length; i++) {
+        const p = projects[i];
+        const existing = existingProjects[i];
 
-    const result = await db.query(query, ["approved", id]);
-    res.json(result.rows[0]);
-  } catch (err) {
-    console.error("Error approving comment:", err);
-    res.status(500).json({ error: err.message });
-  }
-});
+        if (existing) {
+          // UPDATE existing row at this index
+          // Only update fields for the current language
+          const updateQuery = isProduction
+            ? `UPDATE projects SET 
+               name_${lang} = $1, 
+               description_${lang} = $2, 
+               tech = COALESCE($3, tech), 
+               year = COALESCE($4, year), 
+               image = COALESCE($5, image),
+               link = COALESCE($6, link),
+               updated_at = CURRENT_TIMESTAMP
+             WHERE id = $7 RETURNING *`
+            : `UPDATE projects SET 
+               name_${lang} = ?, 
+               description_${lang} = ?, 
+               tech = COALESCE(?, tech), 
+               year = COALESCE(?, year), 
+               image = COALESCE(?, image),
+               link = COALESCE(?, link),
+               updated_at = CURRENT_TIMESTAMP
+             WHERE id = ? RETURNING *`;
 
-// Reject comment
-router.put("/comments/:id/reject", validateId, async (req, res) => {
-  try {
-    const { id } = req.params;
-    const query = isProduction
-      ? "UPDATE comments SET status = $1 WHERE id = $2 RETURNING *"
-      : "UPDATE comments SET status = ? WHERE id = ? RETURNING *";
+          const values = [
+            p.name,
+            p.description,
+            p.tech || null, // tech/year/image/link are shared
+            p.year || null,
+            p.image || null,
+            p.link || null,
+            existing.id
+          ];
 
-    const result = await db.query(query, ["rejected", id]);
-    res.json(result.rows[0]);
-  } catch (err) {
-    console.error("Error rejecting comment:", err);
-    res.status(500).json({ error: err.message });
-  }
-});
+          const updated = await db.query(updateQuery, values);
+          results.push(updated.rows[0]);
 
-module.exports = router;
+        } else {
+          // INSERT new row
+          // We need to handle the fact that we only have 1 language
+          const insertQuery = isProduction
+            ? `INSERT INTO projects (
+               name_${lang}, description_${lang}, tech, year, image, sort_order, link
+             ) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`
+            : `INSERT INTO projects (
+               name_${lang}, description_${lang}, tech, year, image, sort_order, link
+             ) VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING *`;
+
+          const values = [
+            p.name,
+            p.description,
+            p.tech || "",
+            p.year || "",
+            p.image || "",
+            i, // Set sort order to current index
+            p.link || null
+          ];
+
+          const inserted = await db.query(insertQuery, values);
+          results.push(inserted.rows[0]);
+        }
+      }
+
+      // 3. Optional: Delete extra rows if the import list is shorter?
+      // User strategy: "Import" usually implies "Make it look like this". 
+      // If I import a list of 3 items, and I had 5, the last 2 should probably be removed 
+      // to match the imported state. 
+      // HOWEVER, for safety in a "merge" context (importing EN then FR), 
+      // we should only delete if we are sure. 
+      // Let's assume the user wants the list to match the import size.
+      if (existingProjects.length > projects.length) {
+        const idsToDelete = existingProjects.slice(projects.length).map(p => p.id);
+
+        // Delete loop (simplest for cross-db compatibility)
+        for (const id of idsToDelete) {
+          const deleteQuery = isProduction
+            ? "DELETE FROM projects WHERE id = $1"
+            : "DELETE FROM projects WHERE id = ?";
+          await db.query(deleteQuery, [id]);
+        }
+      }
+
+      res.json({ success: true, count: results.length });
+
+    } catch (err) {
+      console.error("Error importing projects:", err);
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+
+  // ============ COMMENTS ============
+
+  // Get all comments (including pending)
+  router.get("/comments", async (req, res) => {
+    try {
+      const result = await db.query(
+        "SELECT * FROM comments ORDER BY created_at DESC"
+      );
+      res.json(result.rows);
+    } catch (err) {
+      console.error("Error fetching comments:", err);
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  // Get pending comments count
+  router.get("/comments/pending/count", async (req, res) => {
+    try {
+      const query = isProduction
+        ? "SELECT COUNT(*) as count FROM comments WHERE status = $1"
+        : "SELECT COUNT(*) as count FROM comments WHERE status = ?";
+      const result = await db.query(query, ["pending"]);
+      res.json({ count: parseInt(result.rows[0].count) });
+    } catch (err) {
+      console.error("Error fetching pending count:", err);
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  // Approve comment
+  router.put("/comments/:id/approve", validateId, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const query = isProduction
+        ? "UPDATE comments SET status = $1 WHERE id = $2 RETURNING *"
+        : "UPDATE comments SET status = ? WHERE id = ? RETURNING *";
+
+      const result = await db.query(query, ["approved", id]);
+      res.json(result.rows[0]);
+    } catch (err) {
+      console.error("Error approving comment:", err);
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  // Reject comment
+  router.put("/comments/:id/reject", validateId, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const query = isProduction
+        ? "UPDATE comments SET status = $1 WHERE id = $2 RETURNING *"
+        : "UPDATE comments SET status = ? WHERE id = ? RETURNING *";
+
+      const result = await db.query(query, ["rejected", id]);
+      res.json(result.rows[0]);
+    } catch (err) {
+      console.error("Error rejecting comment:", err);
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  module.exports = router;

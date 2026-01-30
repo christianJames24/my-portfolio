@@ -54,33 +54,64 @@ export default function Projects() {
         const colors = getProjectColors(index);
         return (
           <div key={index} className="content-card">
-            <img
-              src={project.image}
-              alt={project.name}
-              className={`project-image ${
-                index % 2 === 0 ? "float-right" : "float-left"
-              }`}
-              style={{
-                width: "100%",
-                height: "auto",
-                marginBottom: "20px",
-                border: `5px solid ${colors.border}`,
-                boxShadow: `10px 10px 0 ${colors.shadow}`,
-                clipPath:
-                  index % 2 === 0
-                    ? "polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 0 100%)"
-                    : "polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px)",
-                transition: "all 0.3s",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = "translateY(-5px)";
-                e.currentTarget.style.boxShadow = `15px 15px 0 ${colors.shadow}`;
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = "translateY(0)";
-                e.currentTarget.style.boxShadow = `10px 10px 0 ${colors.shadow}`;
-              }}
-            />
+            {project.link ? (
+              <a href={project.link} target="_blank" rel="noopener noreferrer" style={{ display: 'block', textDecoration: 'none', color: 'inherit' }}>
+                <img
+                  src={project.image}
+                  alt={project.name}
+                  className={`project-image ${index % 2 === 0 ? "float-right" : "float-left"
+                    }`}
+                  style={{
+                    width: "100%",
+                    height: "auto",
+                    marginBottom: "20px",
+                    border: `5px solid ${colors.border}`,
+                    boxShadow: `10px 10px 0 ${colors.shadow}`,
+                    clipPath:
+                      index % 2 === 0
+                        ? "polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 0 100%)"
+                        : "polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px)",
+                    transition: "all 0.3s",
+                    cursor: "pointer"
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = "translateY(-5px)";
+                    e.currentTarget.style.boxShadow = `15px 15px 0 ${colors.shadow}`;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = "translateY(0)";
+                    e.currentTarget.style.boxShadow = `10px 10px 0 ${colors.shadow}`;
+                  }}
+                />
+              </a>
+            ) : (
+              <img
+                src={project.image}
+                alt={project.name}
+                className={`project-image ${index % 2 === 0 ? "float-right" : "float-left"
+                  }`}
+                style={{
+                  width: "100%",
+                  height: "auto",
+                  marginBottom: "20px",
+                  border: `5px solid ${colors.border}`,
+                  boxShadow: `10px 10px 0 ${colors.shadow}`,
+                  clipPath:
+                    index % 2 === 0
+                      ? "polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 0 100%)"
+                      : "polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px)",
+                  transition: "all 0.3s",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = "translateY(-5px)";
+                  e.currentTarget.style.boxShadow = `15px 15px 0 ${colors.shadow}`;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.boxShadow = `10px 10px 0 ${colors.shadow}`;
+                }}
+              />
+            )}
 
             <div
               style={{
@@ -92,8 +123,14 @@ export default function Projects() {
                 gap: "8px",
               }}
             >
-              <h2 style={{ margin: 0 }}>{project.name}</h2>
-              <span
+              {project.link ? (
+                <a href={project.link} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', color: 'inherit' }}>
+                  <h2 style={{ margin: 0, cursor: 'pointer', textDecoration: 'underline', textDecorationColor: 'var(--color-neon-green)' }}>{project.name} 🔗</h2>
+                </a>
+              ) : (
+                <h2 style={{ margin: 0 }}>{project.name}</h2>
+              )}
+              <span origin="end"
                 style={{
                   color: "var(--color-cyan)",
                   fontSize: "clamp(14px, 2vw, 18px)",

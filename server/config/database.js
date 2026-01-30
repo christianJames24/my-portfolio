@@ -41,6 +41,7 @@ if (isProduction) {
           year VARCHAR(10),
           image TEXT,
           image_id INTEGER,
+          link TEXT,
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
           updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
@@ -48,6 +49,10 @@ if (isProduction) {
 
       await db.query(`
         ALTER TABLE projects ADD COLUMN IF NOT EXISTS image_id INTEGER
+      `);
+
+      await db.query(`
+        ALTER TABLE projects ADD COLUMN IF NOT EXISTS link TEXT
       `);
 
       // Drop old project_images table and create new images table
@@ -128,6 +133,7 @@ if (isProduction) {
       year TEXT,
       image TEXT,
       image_id INTEGER,
+      link TEXT,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
