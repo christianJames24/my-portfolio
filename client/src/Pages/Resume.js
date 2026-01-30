@@ -6,6 +6,7 @@ import contentFr from '../data/resume-fr.json';
 import EditableText from '../components/EditableText';
 import EditableList from '../components/EditableList';
 import ExportButton from '../components/ExportButton';
+import ImportButton from '../components/ImportButton';
 import { useEdit } from '../components/EditContext';
 
 export default function Resume() {
@@ -108,6 +109,7 @@ export default function Resume() {
       {canEdit && (
         <div style={{ marginBottom: '20px', display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
           <ExportButton page="resume" language={language} />
+          <ImportButton page="resume" language={language} />
         </div>
       )}
 
