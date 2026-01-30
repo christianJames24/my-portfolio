@@ -1,5 +1,5 @@
 // EditableList.js - Inline list/array editing component
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useEdit } from "./EditContext";
 import EditableText from "./EditableText";
 
@@ -16,6 +16,11 @@ export default function EditableList({
     const { isEditing, canEdit, saveField } = useEdit();
     const [localItems, setLocalItems] = useState(items);
     const [isSaving, setIsSaving] = useState(false);
+
+    // Update localItems when items prop changes (e.g., language switch)
+    useEffect(() => {
+        setLocalItems(items);
+    }, [items]);
 
     const handleItemChange = async (index, itemField, value) => {
         const newItems = [...localItems];
