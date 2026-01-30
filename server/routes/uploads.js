@@ -10,7 +10,7 @@ const { requirePermission } = require("../middleware/permissions");
 const { validateId } = require("../utils/validators");
 
 // Constants
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB per file
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB per file
 const MAX_TOTAL_STORAGE = 500 * 1024 * 1024; // 500MB total
 
 // Multer config - store in memory for processing
@@ -155,7 +155,7 @@ router.post("/", checkJwt, requirePermission("admin:dashboard"), upload.single("
         if (!req.file) {
             return res.status(400).json({ error: "No image file provided" });
         }
-        
+
         // Additional validation for file name
         if (req.file.originalname.length > 255) {
             return res.status(400).json({ error: "Filename is too long" });
@@ -208,15 +208,15 @@ router.post("/", checkJwt, requirePermission("admin:dashboard"), upload.single("
         });
     } catch (err) {
         console.error("Error uploading image:", err);
-        
+
         // Handle specific multer errors
         if (err instanceof multer.MulterError) {
             if (err.code === 'LIMIT_FILE_SIZE') {
-                return res.status(400).json({ error: "File size exceeds 5MB limit" });
+                return res.status(400).json({ error: "File size exceeds 10MB limit" });
             }
             return res.status(400).json({ error: `Upload error: ${err.message}` });
         }
-        
+
         res.status(500).json({ error: "Failed to upload image" });
     }
 });
