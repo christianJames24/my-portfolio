@@ -181,7 +181,8 @@ const validateProject = [
         .customSanitizer(sanitizeInput),
     body('year')
         .optional()
-        .isInt({ min: 1900, max: 2100 }).withMessage('Invalid year'),
+        .trim()
+        .isLength({ max: 20 }).withMessage('Year is too long'),
     body('image')
         .optional()
         .trim(),

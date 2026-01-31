@@ -55,6 +55,11 @@ if (isProduction) {
         ALTER TABLE projects ADD COLUMN IF NOT EXISTS link TEXT
       `);
 
+      // Ensure year column is wide enough for ranges (e.g. "2025 - 2026")
+      await db.query(`
+        ALTER TABLE projects ALTER COLUMN year TYPE VARCHAR(50)
+      `);
+
       // Drop old project_images table and create new images table
       await db.query(`DROP TABLE IF EXISTS project_images`);
 
