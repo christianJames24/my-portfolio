@@ -80,12 +80,12 @@ export default function EditableText({
         return (
             <Component
                 className={`editable-field editable-field--can-edit ${className}`}
-                style={{ ...style, cursor: "pointer" }}
+                style={{ ...style, cursor: "pointer", minHeight: "1em", display: "inline-block", minWidth: "1em" }}
                 onClick={handleClick}
                 title="Click to edit"
                 {...props}
             >
-                {localValue}
+                {localValue || <span style={{ opacity: 0.5, fontStyle: "italic" }}>[Empty]</span>}
                 {isSaving && <span className="editable-saving">...</span>}
             </Component>
         );
