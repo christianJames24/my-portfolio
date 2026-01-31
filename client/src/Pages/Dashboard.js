@@ -87,7 +87,7 @@ export default function Dashboard() {
       order: "Sort Order",
       link: "Link (Optional - e.g. https://...)",
       importEn: "Import EN",
-      importEn: "Import EN",
+
       importFr: "Import FR",
       importing: "Importing...",
       importSuccess: "Projects imported successfully!",
@@ -1059,6 +1059,18 @@ export default function Dashboard() {
                           })
                         }
                         className="form-input"
+                      />
+                    </div>
+                    <div>
+                      <label className="form-label">{t.link}</label>
+                      <input
+                        type="url"
+                        value={projectForm.link || ""}
+                        onChange={(e) =>
+                          setProjectForm({ ...projectForm, link: e.target.value })
+                        }
+                        className="form-input"
+                        placeholder="https://..."
                       />
                     </div>
                   </div>

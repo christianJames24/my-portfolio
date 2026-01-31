@@ -22,6 +22,7 @@ router.get("/", async (req, res) => {
       tech: p.tech,
       year: p.year,
       image: p.image_id ? `/api/uploads/${p.image_id}` : p.image,
+      link: p.link,
     }));
 
     res.json({
