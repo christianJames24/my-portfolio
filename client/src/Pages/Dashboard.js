@@ -281,7 +281,7 @@ export default function Dashboard() {
         : "/api/dashboard/projects";
       const method = editingProject ? "PUT" : "POST";
 
-      await fetch(url, {
+      const res = await fetch(url, {
         method,
         headers: {
           "Content-Type": "application/json",
@@ -289,6 +289,11 @@ export default function Dashboard() {
         },
         body: JSON.stringify(projectForm),
       });
+
+      if (!res.ok) {
+        const errData = await res.json();
+        throw new Error(errData.error || "Failed to save project");
+      }
 
       setShowProjectForm(false);
       setEditingProject(null);
@@ -309,6 +314,7 @@ export default function Dashboard() {
       fetchData();
     } catch (err) {
       console.error("Error saving project:", err);
+      alert("Error: " + err.message);
     }
   };
 

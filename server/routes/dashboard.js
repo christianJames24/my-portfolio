@@ -75,6 +75,9 @@ router.post("/projects", validateProject, async (req, res) => {
   try {
     const { name_en, name_fr, description_en, description_fr, tech, year, image, image_id, sort_order, link } = req.body;
 
+    const finalNameFr = name_fr || name_en;
+    const finalDescFr = description_fr || description_en;
+
     const query = isProduction
       ? `INSERT INTO projects (name_en, name_fr, description_en, description_fr, tech, year, image, image_id, sort_order, link) 
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *`
@@ -82,12 +85,13 @@ router.post("/projects", validateProject, async (req, res) => {
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING *`;
 
     const result = await db.query(query, [
-      name_en, name_fr, description_en, description_fr, tech, year, image || null, image_id || null, sort_order || 0, link || null
+      name_en, finalNameFr, description_en, finalDescFr, tech, year, image || null, image_id || null, sort_order || 0, link || null
     ]);
 
     res.json(result.rows[0]);
   } catch (err) {
     console.error("Error creating project:", err);
+    console.error("Failed payload:", req.body);
     res.status(500).json({ error: err.message });
   }
 });
@@ -97,6 +101,9 @@ router.put("/projects/:id", validateId, validateProject, async (req, res) => {
   try {
     const { id } = req.params;
     const { name_en, name_fr, description_en, description_fr, tech, year, image, image_id, sort_order, link } = req.body;
+
+    const finalNameFr = name_fr || name_en;
+    const finalDescFr = description_fr || description_en;
 
     const query = isProduction
       ? `UPDATE projects SET 
@@ -109,7 +116,7 @@ router.put("/projects/:id", validateId, validateProject, async (req, res) => {
          WHERE id = ? RETURNING *`;
 
     const result = await db.query(query, [
-      name_en, name_fr, description_en, description_fr, tech, year, image || null, image_id || null, sort_order || 0, link || null, id
+      name_en, finalNameFr, description_en, finalDescFr, tech, year, image || null, image_id || null, sort_order || 0, link || null, id
     ]);
 
     res.json(result.rows[0]);
@@ -235,18 +242,27 @@ router.post("/projects/import", async (req, res) => {
 
       } else {
         // INSERT new row
-        // We need to handle the fact that we only have 1 language
+        // We must populate BOTH languages because of NOT NULL constraints.
+        // We use the current language's value as a fallback for the other language.
+
+        const nameEn = lang === 'en' ? p.name : (p.name || "New Project");
+        const nameFr = lang === 'fr' ? p.name : (p.name || "Nouveau Projet");
+        const descEn = lang === 'en' ? p.description : (p.description || "");
+        const descFr = lang === 'fr' ? p.description : (p.description || "");
+
         const insertQuery = isProduction
           ? `INSERT INTO projects (
-               name_${lang}, description_${lang}, tech, year, image, sort_order, link
-             ) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`
+               name_en, name_fr, description_en, description_fr, tech, year, image, sort_order, link
+             ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *`
           : `INSERT INTO projects (
-               name_${lang}, description_${lang}, tech, year, image, sort_order, link
-             ) VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING *`;
+               name_en, name_fr, description_en, description_fr, tech, year, image, sort_order, link
+             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING *`;
 
         const values = [
-          p.name,
-          p.description,
+          nameEn,
+          nameFr,
+          descEn,
+          descFr,
           p.tech || "",
           p.year || "",
           p.image || "",
@@ -259,17 +275,13 @@ router.post("/projects/import", async (req, res) => {
       }
     }
 
-    // 3. Optional: Delete extra rows if the import list is shorter?
-    // User strategy: "Import" usually implies "Make it look like this". 
-    // If I import a list of 3 items, and I had 5, the last 2 should probably be removed 
-    // to match the imported state. 
-    // HOWEVER, for safety in a "merge" context (importing EN then FR), 
-    // we should only delete if we are sure. 
-    // Let's assume the user wants the list to match the import size.
+
+    // 3. Always clean up orphaned projects
+    // The previous logic was tentative, but if the user uploads a definitive list,
+    // we should make the DB match that list.
     if (existingProjects.length > projects.length) {
       const idsToDelete = existingProjects.slice(projects.length).map(p => p.id);
 
-      // Delete loop (simplest for cross-db compatibility)
       for (const id of idsToDelete) {
         const deleteQuery = isProduction
           ? "DELETE FROM projects WHERE id = $1"

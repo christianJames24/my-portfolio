@@ -8,14 +8,14 @@ const xss = require('xss');
  */
 const sanitizeInput = (value) => {
     if (typeof value !== 'string') return value;
-    
+
     // Strip all HTML tags and sanitize
     const sanitized = xss(value, {
         whiteList: {}, // No HTML tags allowed
         stripIgnoreTag: true,
         stripIgnoreTagBody: ['script', 'style']
     });
-    
+
     return sanitized.trim();
 };
 
@@ -41,8 +41,8 @@ const isValidLanguage = (value) => {
 const handleValidationErrors = (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json({ 
-            error: 'Validation failed', 
+        return res.status(400).json({
+            error: 'Validation failed',
             details: errors.array().map(err => ({
                 field: err.path,
                 message: err.msg
@@ -161,7 +161,7 @@ const validateProject = [
         .customSanitizer(sanitizeInput),
     body('name_fr')
         .trim()
-        .notEmpty().withMessage('French name is required')
+        .optional()
         .isLength({ max: 200 }).withMessage('French name is too long')
         .customSanitizer(sanitizeInput),
     body('description_en')
@@ -171,7 +171,7 @@ const validateProject = [
         .customSanitizer(sanitizeInput),
     body('description_fr')
         .trim()
-        .notEmpty().withMessage('French description is required')
+        .optional()
         .isLength({ max: 2000 }).withMessage('French description is too long')
         .customSanitizer(sanitizeInput),
     body('tech')
