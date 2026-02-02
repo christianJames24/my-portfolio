@@ -1,6 +1,6 @@
 # Portfolio Website
 
-A portfolio website with 3D graphics and multilingual support.
+A portfolio website with multilingual support.
 
 ## Tech Stack
 
