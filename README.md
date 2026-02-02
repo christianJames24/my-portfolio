@@ -1,4 +1,4 @@
-# My Portfoloi
+# My Portfolio
 
 A portfolio website with multilingual support.
 
