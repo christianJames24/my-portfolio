@@ -1,4 +1,4 @@
-# Portfolio Website
+# My Portfoloi
 
 A portfolio website with multilingual support.
 
@@ -10,6 +10,8 @@ A portfolio website with multilingual support.
 - Auth0 for login
 
 ## How to Run
+
+insert .envs inside both client and server respectively.
 
 1. Install dependencies:
 ```bash
