@@ -108,7 +108,7 @@
 } */
 
 /* LIGHT THEME (Default) */
-:root {
+/* :root {
   --font-display: 'TheNeue-Black', 'Arial Black', sans-serif;
   --font-body: 'Comfortaa', 'Arial', sans-serif;
   --font-bold: 'Chintzy', sans-serif;
@@ -139,38 +139,10 @@
   --color-pink-1: #ffffff;
   --color-pink-2: #f2f2f2;
   --color-blue-3: #ffffff;
-}
-
-/* DARK THEME */
-[data-theme="dark"] {
-  --color-black: #000000;
-  --color-white: #FFFFFF;
-  --color-dark-gray: #1A1A1A;
-
-  --color-menu-bg: #505050;
-  --color-menu-content: #FFFFFF;
-
-  --color-stripe-1: rgba(87, 87, 87, 0.08);
-  --color-stripe-2: rgba(184, 184, 184, 0.08);
-
-  --color-neon-green: #f7f7f7;
-  --color-magenta: #d8d8d881;
-  --color-cyan: #505050;
-  --color-yellow: #c4c4c4;
-  --color-red-pink: #414141;
-  --color-light-blue: #606060;
-  --color-dark-magenta: #202020;
-  --color-purple: #303030;
-  --color-blue-1: #404040;
-  --color-blue-2: #505050;
-  --color-purple-2: #303030;
-  --color-pink-1: #000000;
-  --color-pink-2: #1A1A1A;
-  --color-blue-3: #000000;
-}
+} */
 
 /* OSHAWOTT LIGHT THEME */
-/* :root {
+:root {
   --font-display: 'TheNeue-Black', 'Arial Black', sans-serif;
   --font-body: 'Comfortaa','Arial', sans-serif;
   --font-bold: 'Chintzy', sans-serif;
@@ -201,7 +173,35 @@
   --color-pink-1: #FFFDF8;
   --color-pink-2: #EEF4F7;
   --color-blue-3: #FFFDF8;
-} */
+}
+
+/* DARK THEME */
+[data-theme="dark"] {
+  --color-black: #000000;
+  --color-white: #FFFFFF;
+  --color-dark-gray: #1A1A1A;
+
+  --color-menu-bg: #505050;
+  --color-menu-content: #FFFFFF;
+
+  --color-stripe-1: rgba(87, 87, 87, 0.08);
+  --color-stripe-2: rgba(184, 184, 184, 0.08);
+
+  --color-neon-green: #f7f7f7;
+  --color-magenta: #d8d8d881;
+  --color-cyan: #505050;
+  --color-yellow: #c4c4c4;
+  --color-red-pink: #414141;
+  --color-light-blue: #606060;
+  --color-dark-magenta: #202020;
+  --color-purple: #303030;
+  --color-blue-1: #404040;
+  --color-blue-2: #505050;
+  --color-purple-2: #303030;
+  --color-pink-1: #000000;
+  --color-pink-2: #1A1A1A;
+  --color-blue-3: #000000;
+}
 
 
 
