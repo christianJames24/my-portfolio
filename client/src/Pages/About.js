@@ -8,11 +8,15 @@ import EditableImage from "../components/EditableImage";
 import ExportButton from "../components/ExportButton";
 import ImportButton from "../components/ImportButton";
 import { useEdit } from "../components/EditContext";
+import Lightbox from "yet-another-react-lightbox";
+import Zoom from "yet-another-react-lightbox/plugins/zoom";
+import "yet-another-react-lightbox/styles.css";
 
 export default function About() {
   const { language } = useContext(LanguageContext);
   const { canEdit, saveContent, saveField } = useEdit();
   const [content, setContent] = useState(language === "en" ? contentEn : contentFr);
+  const [lightboxIndex, setLightboxIndex] = useState(-1);
 
   // Fetch content from API with fallback to JSON
   useEffect(() => {
@@ -81,6 +85,14 @@ export default function About() {
 
   const t = content;
 
+  // Create slides for all images on the About page
+  const allSlides = [
+    { src: t.profileImage },
+    { src: t.journeyImage },
+    ...(t.skillsImages?.map(img => ({ src: img })) || []),
+    { src: t.outsideImage }
+  ];
+
   return (
     <div className="page-container about-page">
       <h1>
@@ -128,6 +140,7 @@ export default function About() {
             page="about"
             language={language}
             onSave={(v) => handleImageSave("profileImage", v)}
+            onImageClick={() => setLightboxIndex(0)}
             className="profile-image"
             style={{
               width: "100%",
@@ -172,6 +185,7 @@ export default function About() {
             page="about"
             language={language}
             onSave={(v) => handleImageSave("journeyImage", v)}
+            onImageClick={() => setLightboxIndex(1)}
             className="section-image"
             style={{
               width: "100%",
@@ -244,6 +258,7 @@ export default function About() {
               page="about"
               language={language}
               onSave={(v) => handleImageArraySave("skillsImages", index, v)}
+              onImageClick={() => setLightboxIndex(2 + index)}
               style={{
                 width: "100%",
                 height: "auto",
@@ -299,6 +314,7 @@ export default function About() {
             page="about"
             language={language}
             onSave={(v) => handleImageSave("outsideImage", v)}
+            onImageClick={() => setLightboxIndex(2 + (t.skillsImages?.length || 0))}
             className="section-image"
             style={{
               width: "100%",
@@ -321,6 +337,14 @@ export default function About() {
           </p>
         </div>
       </div>
+
+      <Lightbox
+        open={lightboxIndex >= 0}
+        index={lightboxIndex}
+        close={() => setLightboxIndex(-1)}
+        slides={allSlides}
+        plugins={[Zoom]}
+      />
 
       <style>{`
   .content-card {

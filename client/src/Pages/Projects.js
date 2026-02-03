@@ -3,11 +3,14 @@ import React, { useContext, useState, useEffect } from "react";
 import { LanguageContext } from "../App";
 import contentEn from "../data/projects-en.json";
 import contentFr from "../data/projects-fr.json";
+import Lightbox from "yet-another-react-lightbox";
+import Zoom from "yet-another-react-lightbox/plugins/zoom";
+import "yet-another-react-lightbox/styles.css";
 
 export default function Projects() {
   const { language } = useContext(LanguageContext);
   const [projectsData, setProjectsData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [index, setIndex] = useState(-1);
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -24,7 +27,6 @@ export default function Projects() {
         console.error("Error fetching projects:", err);
         setProjectsData(language === "en" ? contentEn : contentFr);
       }
-      setLoading(false);
     };
 
     fetchProjects();
@@ -46,18 +48,22 @@ export default function Projects() {
     return colors[index % 3];
   };
 
+  const slides = t.projects.map((project) => ({
+    src: project.image,
+  }));
+
   return (
     <div className="page-container projects-page">
       <h1>{t.title}</h1>
 
-      {t.projects.map((project, index) => {
-        const colors = getProjectColors(index);
+      {t.projects.map((project, i) => {
+        const colors = getProjectColors(i);
         return (
-          <div key={index} className="content-card">
+          <div key={i} className="content-card">
             <img
               src={project.image}
               alt={project.name}
-              className={`project-image ${index % 2 === 0 ? "float-right" : "float-left"
+              className={`project-image ${i % 2 === 0 ? "float-right" : "float-left"
                 }`}
               style={{
                 width: "100%",
@@ -66,11 +72,13 @@ export default function Projects() {
                 border: `5px solid ${colors.border}`,
                 boxShadow: `10px 10px 0 ${colors.shadow}`,
                 clipPath:
-                  index % 2 === 0
+                  i % 2 === 0
                     ? "polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 0 100%)"
                     : "polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px)",
                 transition: "all 0.3s",
+                cursor: "pointer"
               }}
+              onClick={() => setIndex(i)}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = "translateY(-5px)";
                 e.currentTarget.style.boxShadow = `15px 15px 0 ${colors.shadow}`;
@@ -151,6 +159,14 @@ export default function Projects() {
           </div>
         );
       })}
+
+      <Lightbox
+        open={index >= 0}
+        index={index}
+        close={() => setIndex(-1)}
+        slides={slides}
+        plugins={[Zoom]}
+      />
 
       <style>{`
       .content-card {

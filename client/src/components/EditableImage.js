@@ -11,6 +11,7 @@ export default function EditableImage({
     page,
     language,
     onSave,
+    onImageClick,
     className = "",
     style = {},
     ...props
@@ -253,7 +254,8 @@ export default function EditableImage({
                 <img
                     src={src}
                     alt={alt}
-                    style={style}
+                    style={{ ...style, cursor: onImageClick ? 'pointer' : style.cursor }}
+                    onClick={onImageClick}
                     {...props}
                 />
 
