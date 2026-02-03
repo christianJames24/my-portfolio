@@ -8,7 +8,7 @@ import reportWebVitals from './reportWebVitals';
 
 const Auth0ProviderWithRedirectCallback = ({ children, ...props }) => {
   const navigate = useNavigate();
-  
+
   const onRedirectCallback = (appState) => {
     navigate(appState?.returnTo || window.location.pathname);
   };
@@ -22,22 +22,20 @@ const Auth0ProviderWithRedirectCallback = ({ children, ...props }) => {
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <React.StrictMode>
-    <Router>
-      <Auth0ProviderWithRedirectCallback
-        domain="dev-v1031rsex2ls46o4.us.auth0.com"
-        clientId="HQAPjwdyUiHS1KcjgnElzsGXalhobC3e"
-        authorizationParams={{
-          redirect_uri: window.location.origin,
-          audience: "https://reacttestwhatevs-api.com"
-        }}
-        cacheLocation="localstorage"
-        useRefreshTokens={true}
-      >
-        <App />
-      </Auth0ProviderWithRedirectCallback>
-    </Router>
-  </React.StrictMode>
+  <Router>
+    <Auth0ProviderWithRedirectCallback
+      domain="dev-v1031rsex2ls46o4.us.auth0.com"
+      clientId="HQAPjwdyUiHS1KcjgnElzsGXalhobC3e"
+      authorizationParams={{
+        redirect_uri: window.location.origin,
+        audience: "https://reacttestwhatevs-api.com"
+      }}
+      cacheLocation="localstorage"
+      useRefreshTokens={true}
+    >
+      <App />
+    </Auth0ProviderWithRedirectCallback>
+  </Router>
 );
 
 

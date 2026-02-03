@@ -3,9 +3,8 @@ import React, { useContext, useState, useEffect } from "react";
 import { LanguageContext } from "../App";
 import contentEn from "../data/projects-en.json";
 import contentFr from "../data/projects-fr.json";
-import Lightbox from "yet-another-react-lightbox";
-import Zoom from "yet-another-react-lightbox/plugins/zoom";
-import "yet-another-react-lightbox/styles.css";
+import Lightbox from "react-image-lightbox";
+import "react-image-lightbox/style.css";
 
 export default function Projects() {
   const { language } = useContext(LanguageContext);
@@ -37,6 +36,19 @@ export default function Projects() {
     document.title = `Christian James Lee - ${pageTitle}`;
   }, [language, projectsData]);
 
+  // Lock body scroll when lightbox is open
+  useEffect(() => {
+    if (index >= 0) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [index]);
+
   const t = projectsData || (language === "en" ? contentEn : contentFr);
 
   const getProjectColors = (index) => {
@@ -48,9 +60,7 @@ export default function Projects() {
     return colors[index % 3];
   };
 
-  const slides = t.projects.map((project) => ({
-    src: project.image,
-  }));
+  const slides = t.projects.map((project) => project.image);
 
   return (
     <div className="page-container projects-page">
@@ -160,15 +170,33 @@ export default function Projects() {
         );
       })}
 
-      <Lightbox
-        open={index >= 0}
-        index={index}
-        close={() => setIndex(-1)}
-        slides={slides}
-        plugins={[Zoom]}
-      />
+      {index >= 0 && (
+        <Lightbox
+          mainSrc={slides[index]}
+          nextSrc={slides[(index + 1) % slides.length]}
+          prevSrc={slides[(index + slides.length - 1) % slides.length]}
+          onCloseRequest={() => setIndex(-1)}
+          onMovePrevRequest={() =>
+            setIndex((index + slides.length - 1) % slides.length)
+          }
+          onMoveNextRequest={() =>
+            setIndex((index + 1) % slides.length)
+          }
+          enableZoom={true}
+          clickOutsideToClose={true}
+        />
+      )}
 
       <style>{`
+      .ril__image {
+        max-width: 75vw !important;
+        max-height: 75vh !important;
+        width: auto !important;
+        height: auto !important;
+        object-fit: contain !important;
+        transition: transform 0.2s ease-out !important;
+      }
+
       .content-card {
     overflow: hidden;
   }

@@ -8,9 +8,8 @@ import EditableImage from "../components/EditableImage";
 import ExportButton from "../components/ExportButton";
 import ImportButton from "../components/ImportButton";
 import { useEdit } from "../components/EditContext";
-import Lightbox from "yet-another-react-lightbox";
-import Zoom from "yet-another-react-lightbox/plugins/zoom";
-import "yet-another-react-lightbox/styles.css";
+import Lightbox from "react-image-lightbox";
+import "react-image-lightbox/style.css";
 
 export default function About() {
   const { language } = useContext(LanguageContext);
@@ -43,6 +42,20 @@ export default function About() {
     const pageTitle = content.title || (language === 'en' ? 'About' : 'À propos');
     document.title = `Christian James Lee - ${pageTitle}`;
   }, [language, content.title]);
+
+  // Lock body scroll when lightbox is open
+  useEffect(() => {
+    if (lightboxIndex >= 0) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+
+    // Cleanup ensures scroll is restored if component unmounts
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [lightboxIndex]);
 
   // Update local state and save to backend
   const handleFieldSave = async (field, value) => {
@@ -338,15 +351,33 @@ export default function About() {
         </div>
       </div>
 
-      <Lightbox
-        open={lightboxIndex >= 0}
-        index={lightboxIndex}
-        close={() => setLightboxIndex(-1)}
-        slides={allSlides}
-        plugins={[Zoom]}
-      />
+      {lightboxIndex >= 0 && (
+        <Lightbox
+          mainSrc={allSlides[lightboxIndex].src}
+          nextSrc={allSlides[(lightboxIndex + 1) % allSlides.length].src}
+          prevSrc={allSlides[(lightboxIndex + allSlides.length - 1) % allSlides.length].src}
+          onCloseRequest={() => setLightboxIndex(-1)}
+          onMovePrevRequest={() =>
+            setLightboxIndex((lightboxIndex + allSlides.length - 1) % allSlides.length)
+          }
+          onMoveNextRequest={() =>
+            setLightboxIndex((lightboxIndex + 1) % allSlides.length)
+          }
+          enableZoom={true}
+          clickOutsideToClose={true}
+        />
+      )}
 
       <style>{`
+  .ril__image {
+    max-width: 75vw !important;
+    max-height: 75vh !important;
+    width: auto !important;
+    height: auto !important;
+    object-fit: contain !important;
+    transition: transform 0.2s ease-out !important;
+  }
+
   .content-card {
     overflow: hidden;
   }
