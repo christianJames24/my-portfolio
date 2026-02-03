@@ -369,12 +369,17 @@ export default function About() {
       )}
 
       <style>{`
+  @media (min-width: 768px) {
+    .ril__image {
+      max-width: 75vw !important;
+      max-height: 75vh !important;
+      width: auto !important;
+      height: auto !important;
+      object-fit: contain !important;
+    }
+  }
+  
   .ril__image {
-    max-width: 75vw !important;
-    max-height: 75vh !important;
-    width: auto !important;
-    height: auto !important;
-    object-fit: contain !important;
     transition: transform 0.2s ease-out !important;
   }
 
