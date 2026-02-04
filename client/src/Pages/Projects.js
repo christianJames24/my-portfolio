@@ -119,8 +119,7 @@ export default function Projects() {
             <img
               src={project.image}
               alt={project.name}
-              className={`project-image ${i % 2 === 0 ? "float-right" : "float-left"
-                }`}
+              className={`project-image ${i % 2 === 0 ? "float-right" : "float-left"}`}
               style={{
                 width: "100%",
                 height: "auto",
@@ -131,7 +130,7 @@ export default function Projects() {
                   i % 2 === 0
                     ? "polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 0 100%)"
                     : "polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px)",
-                transition: "transform 0.3s ease-out",
+                transition: "transform 0.3s ease-out, filter 0.2s",
                 cursor: "pointer"
               }}
               onClick={() => setIndex(i)}
