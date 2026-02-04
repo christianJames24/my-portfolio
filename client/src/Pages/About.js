@@ -45,6 +45,65 @@ export default function About() {
     document.title = `Christian James Lee - ${pageTitle}`;
   }, [language, content.title]);
 
+  // Intersection Observer for scroll-based animations
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const img = entry.target;
+          const isProfileImage = img.classList.contains('profile-image');
+          const isSkillsImage = img.classList.contains('skills-image');
+          const actualImg = img.querySelector('img');
+
+          // Helper to trigger squish animation
+          const triggerSquish = () => {
+            if (isProfileImage) {
+              actualImg.style.animation = "none";
+              setTimeout(() => {
+                actualImg.style.animation = "gentleSquishRotated 0.4s ease-in-out forwards";
+              }, 10);
+            } else if (isSkillsImage) {
+              const allSkillsImages = document.querySelectorAll('.skills-image');
+              const index = Array.from(allSkillsImages).indexOf(img);
+              const animationName = index === 0 ? 'gentleSquishRotated1' : index === 1 ? 'gentleSquishRotated' : 'gentleSquishRotated2';
+              actualImg.style.animation = "none";
+              setTimeout(() => {
+                actualImg.style.animation = `${animationName} 0.4s ease-in-out forwards`;
+              }, index * 100 + 10);
+            } else {
+              actualImg.style.animation = "none";
+              setTimeout(() => {
+                actualImg.style.animation = "gentleSquish 0.4s ease-in-out forwards";
+              }, 10);
+            }
+          };
+
+          if (entry.isIntersecting) {
+            if (actualImg && actualImg.complete) {
+              triggerSquish();
+            } else if (actualImg) {
+              // Wait for image to load before animating
+              const onLoad = () => {
+                triggerSquish();
+                actualImg.removeEventListener('load', onLoad);
+              };
+              actualImg.addEventListener('load', onLoad);
+            }
+          } else {
+            // Reset animation when leaving viewport
+            if (actualImg) actualImg.style.animation = "none";
+          }
+        });
+      },
+      { threshold: 0.3 }
+    );
+
+    const images = document.querySelectorAll('.profile-image, .section-image, .skills-image');
+    images.forEach((img) => observer.observe(img));
+
+    return () => observer.disconnect();
+  }, [content]);
+
   // Lock body scroll when lightbox is open
   useEffect(() => {
     if (lightboxIndex >= 0) {
@@ -168,8 +227,8 @@ export default function About() {
               border: "6px solid var(--color-neon-green)",
               boxShadow:
                 "12px 12px 0 var(--color-magenta), -6px -6px 0 var(--color-cyan)",
-              transform: "rotate(-2deg)",
-              transition: "all 0.3s",
+              transform: "rotate(-2deg) translateY(0)",
+              transition: "transform 0.3s ease-out",
             }}
           />
         </div>
@@ -212,6 +271,8 @@ export default function About() {
               boxShadow: "10px 10px 0 var(--color-neon-green)",
               clipPath:
                 "polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 0 100%)",
+              transform: "translateY(0)",
+              transition: "transform 0.3s ease-out",
             }}
           />
         </div>
@@ -277,6 +338,7 @@ export default function About() {
               language={language}
               onSave={(v) => handleImageArraySave("skillsImages", index, v)}
               onImageClick={() => setLightboxIndex(2 + index)}
+              className="skills-image"
               style={{
                 width: "100%",
                 height: "auto",
@@ -285,7 +347,8 @@ export default function About() {
                     'var(--color-cyan)'
                   }`,
                 boxShadow: "6px 6px 0 var(--color-black)",
-                transform: `rotate(${index === 0 ? '1deg' : index === 1 ? '-2deg' : '2deg'})`,
+                transform: `rotate(${index === 0 ? '1deg' : index === 1 ? '-2deg' : '2deg'}) translateY(0)`,
+                transition: "transform 0.3s ease-out",
               }}
             />
           ))}
@@ -341,6 +404,8 @@ export default function About() {
               boxShadow: "-10px 10px 0 var(--color-neon-green)",
               clipPath:
                 "polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px)",
+              transform: "translateY(0)",
+              transition: "transform 0.3s ease-out",
             }}
           />
           <p>

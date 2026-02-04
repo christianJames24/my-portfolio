@@ -38,6 +38,47 @@ export default function Projects() {
     document.title = `Christian James Lee - ${pageTitle}`;
   }, [language, projectsData]);
 
+  // Intersection Observer for scroll-based animations
+  useEffect(() => {
+    const images = document.querySelectorAll('.project-image');
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const img = entry.target;
+
+          const triggerSquish = () => {
+            img.style.animation = "none";
+            setTimeout(() => {
+              img.style.animation = "gentleSquish 0.4s ease-in-out forwards";
+            }, 10);
+          };
+
+          if (entry.isIntersecting) {
+            if (img.complete) {
+              triggerSquish();
+            } else {
+              // Wait for image to load before animating
+              const onLoad = () => {
+                triggerSquish();
+                img.removeEventListener('load', onLoad);
+              };
+              img.addEventListener('load', onLoad);
+            }
+          } else {
+            // Reset animation when leaving viewport
+            img.style.animation = "none";
+          }
+        });
+      },
+      { threshold: 0.3 }
+    );
+
+    images.forEach((img) => observer.observe(img));
+
+    return () => observer.disconnect();
+  }, [projectsData]);
+
   // Lock body scroll when lightbox is open
   useEffect(() => {
     if (index >= 0) {
@@ -90,18 +131,10 @@ export default function Projects() {
                   i % 2 === 0
                     ? "polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 0 100%)"
                     : "polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px)",
-                transition: "all 0.3s",
+                transition: "transform 0.3s ease-out",
                 cursor: "pointer"
               }}
               onClick={() => setIndex(i)}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = "translateY(-5px)";
-                e.currentTarget.style.boxShadow = `15px 15px 0 ${colors.shadow}`;
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = "translateY(0)";
-                e.currentTarget.style.boxShadow = `10px 10px 0 ${colors.shadow}`;
-              }}
             />
 
             <div
