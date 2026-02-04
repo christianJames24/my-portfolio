@@ -3,11 +3,13 @@ import React, { useContext, useState, useEffect } from "react";
 import { LanguageContext } from "../App";
 import contentEn from "../data/projects-en.json";
 import contentFr from "../data/projects-fr.json";
+import { useLightbox } from "../contexts/LightboxContext";
 import Lightbox from "react-image-lightbox";
 import "react-image-lightbox/style.css";
 
 export default function Projects() {
   const { language } = useContext(LanguageContext);
+  const { openLightbox, closeLightbox } = useLightbox();
   const [projectsData, setProjectsData] = useState(null);
   const [index, setIndex] = useState(-1);
 
@@ -40,14 +42,17 @@ export default function Projects() {
   useEffect(() => {
     if (index >= 0) {
       document.body.style.overflow = "hidden";
+      openLightbox();
     } else {
       document.body.style.overflow = "auto";
+      closeLightbox();
     }
 
     return () => {
       document.body.style.overflow = "auto";
+      closeLightbox();
     };
-  }, [index]);
+  }, [index, openLightbox, closeLightbox]);
 
   const t = projectsData || (language === "en" ? contentEn : contentFr);
 

@@ -18,6 +18,7 @@ import Contact from "./Pages/Contact";
 import Dashboard from "./Pages/Dashboard";
 import { EditProvider } from "./components/EditContext";
 import { NotificationProvider } from "./contexts/NotificationContext";
+import { LightboxProvider } from "./contexts/LightboxContext";
 import EditModeToggle from "./components/EditModeToggle";
 import "./styles/animations.css";
 import "./styles/pageTransitions.css";
@@ -327,8 +328,9 @@ function App() {
 
   return (
     <NotificationProvider>
-      <LanguageContext.Provider value={{ language, t, toggleLanguage, theme, toggleTheme }}>
-        <EditProvider isAdmin={isAdmin}>
+      <LightboxProvider>
+        <LanguageContext.Provider value={{ language, t, toggleLanguage, theme, toggleTheme }}>
+          <EditProvider isAdmin={isAdmin}>
           <div
             style={{
               minHeight: "100vh",
@@ -380,7 +382,8 @@ function App() {
           </div>
           <ToastContainer />
         </EditProvider>
-      </LanguageContext.Provider>
+        </LanguageContext.Provider>
+      </LightboxProvider>
     </NotificationProvider>
   );
 }

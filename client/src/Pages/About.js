@@ -8,12 +8,14 @@ import EditableImage from "../components/EditableImage";
 import ExportButton from "../components/ExportButton";
 import ImportButton from "../components/ImportButton";
 import { useEdit } from "../components/EditContext";
+import { useLightbox } from "../contexts/LightboxContext";
 import Lightbox from "react-image-lightbox";
 import "react-image-lightbox/style.css";
 
 export default function About() {
   const { language } = useContext(LanguageContext);
   const { canEdit, saveContent, saveField } = useEdit();
+  const { openLightbox, closeLightbox } = useLightbox();
   const [content, setContent] = useState(language === "en" ? contentEn : contentFr);
   const [lightboxIndex, setLightboxIndex] = useState(-1);
 
@@ -47,15 +49,18 @@ export default function About() {
   useEffect(() => {
     if (lightboxIndex >= 0) {
       document.body.style.overflow = "hidden";
+      openLightbox();
     } else {
       document.body.style.overflow = "auto";
+      closeLightbox();
     }
 
     // Cleanup ensures scroll is restored if component unmounts
     return () => {
       document.body.style.overflow = "auto";
+      closeLightbox();
     };
-  }, [lightboxIndex]);
+  }, [lightboxIndex, openLightbox, closeLightbox]);
 
   // Update local state and save to backend
   const handleFieldSave = async (field, value) => {

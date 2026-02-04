@@ -2,11 +2,13 @@
 import React, { useContext, useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { LanguageContext } from "../App";
+import { useLightbox } from "../contexts/LightboxContext";
 
 export default function PageNavigation({ isTransitioning, pages: propPages }) {
   const navigate = useNavigate();
   const location = useLocation();
   const { language } = useContext(LanguageContext);
+  const { isLightboxOpen } = useLightbox();
   const [hoveredButton, setHoveredButton] = useState(null);
 
   useEffect(() => {
@@ -117,7 +119,7 @@ export default function PageNavigation({ isTransitioning, pages: propPages }) {
     top: "50%",
   });
 
-  if (isTransitioning) {
+  if (isTransitioning || isLightboxOpen) {
     return null;
   }
 
