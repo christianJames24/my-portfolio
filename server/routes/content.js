@@ -139,9 +139,38 @@ router.get("/:page/export", checkJwt, requirePermission("admin:dashboard"), asyn
             return res.status(404).json({ error: "No content found for this page" });
         }
 
-        const content = isProduction
+        let content = isProduction
             ? result.rows[0].content
             : JSON.parse(result.rows[0].content);
+
+        // Filter fields based on what's actually visible on each page
+        if (page === "about") {
+            // Only include fields that are actively displayed on the About page
+            const visibleFields = [
+                "title",
+                "intro",
+                "introText",
+                "profileImage",
+                "journey",
+                "journeyText",
+                "journeyImage",
+                "skills",
+                "skillsText",
+                "skillsImages",
+                "outside",
+                "outsideText",
+                "outsideImage"
+            ];
+            
+            // Create a new object with only the visible fields
+            const filteredContent = {};
+            visibleFields.forEach(field => {
+                if (content[field] !== undefined) {
+                    filteredContent[field] = content[field];
+                }
+            });
+            content = filteredContent;
+        }
 
         // Set headers for file download
         res.setHeader("Content-Type", "application/json");
