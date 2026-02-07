@@ -1,5 +1,5 @@
 // EditableImage.js - Inline image editing component with upload support
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import ReactDOM from "react-dom";
 import { useEdit } from "./EditContext";
 import { useAuth0 } from "@auth0/auth0-react";
@@ -19,27 +19,71 @@ export default function EditableImage({
     const { isEditing, canEdit, saveField } = useEdit();
     const { getAccessTokenSilently } = useAuth0();
     const [showModal, setShowModal] = useState(false);
-    const [newUrl, setNewUrl] = useState(src);
+
+    // Parse src prop which can be string or object
+    const getInitialState = React.useCallback(() => {
+        if (typeof src === 'object' && src !== null) {
+            return { url: src.url || '', noBorder: !!src.noBorder };
+        }
+        return { url: src || '', noBorder: false };
+    }, [src]);
+
+    const [imageData, setImageData] = useState(getInitialState());
+
+    // Update local state when prop changes
+    useEffect(() => {
+        setImageData(getInitialState());
+    }, [getInitialState]);
+
     const [isSaving, setIsSaving] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
     const [uploadError, setUploadError] = useState("");
     const fileInputRef = useRef(null);
 
+    // Edit state (separate from display state)
+    const [editUrl, setEditUrl] = useState('');
+    const [editNoBorder, setEditNoBorder] = useState(false);
+
     const handleEditClick = (e) => {
         e.stopPropagation();
-        setNewUrl(src);
+        const state = getInitialState();
+        setEditUrl(state.url);
+        setEditNoBorder(state.noBorder);
         setUploadError("");
         setShowModal(true);
     };
 
     const handleSave = async () => {
-        if (newUrl !== src) {
+        const initialState = getInitialState();
+        if (editUrl !== initialState.url || editNoBorder !== initialState.noBorder) {
             setIsSaving(true);
             try {
-                if (onSave) {
-                    await onSave(newUrl);
+                // Determine format to save
+                // If we have structure (noBorder true) or started with structure, save as object
+                // Otherwise save as string to maintain backward compatibility if user didn't change border
+                let valueToSave;
+                if (editNoBorder) {
+                    valueToSave = { url: editUrl, noBorder: true };
+                } else if (typeof src === 'object' && src !== null) {
+                    // It was an object, but noBorder is false now. Keep as object for consistency?
+                    // Or revert to string? Let's check if we want to clean up.
+                    // If we revert to string, we lose the explicit "false" state but false is default.
+                    // Let's stick to saving object if it was object, or if noBorder is true.
+                    // Actually, to fully "remove" the setting, maybe string is better if noBorder is false.
+                    valueToSave = editUrl;
                 } else {
-                    await saveField(page, field, newUrl, language);
+                    valueToSave = editUrl;
+                }
+
+                // Force object if user explicitly wants noBorder
+                if (editNoBorder) {
+                    valueToSave = { url: editUrl, noBorder: true };
+                }
+
+                if (onSave) {
+                    await onSave(valueToSave);
+                } else {
+                    await saveField(page, field, valueToSave, language);
                 }
             } catch (err) {
                 console.error("Failed to save image:", err);
@@ -50,7 +94,6 @@ export default function EditableImage({
     };
 
     const handleCancel = () => {
-        setNewUrl(src);
         setUploadError("");
         setShowModal(false);
     };
@@ -95,7 +138,7 @@ export default function EditableImage({
 
             const data = await response.json();
             // Use the uploaded image URL
-            setNewUrl(data.url);
+            setEditUrl(data.url);
         } catch (err) {
             console.error("Upload failed:", err);
             setUploadError(err.message || "Upload failed");
@@ -107,6 +150,15 @@ export default function EditableImage({
             fileInputRef.current.value = "";
         }
     };
+
+    // Prepare display style
+    const displayStyle = { ...style, cursor: onImageClick ? 'pointer' : style.cursor };
+    if (imageData.noBorder) {
+        displayStyle.border = 'none';
+        displayStyle.boxShadow = 'none';
+        // Also remove outline if present
+        displayStyle.outline = 'none';
+    }
 
     // Modal rendered via portal to escape overflow:hidden containers
     const modal = showModal ? ReactDOM.createPortal(
@@ -180,8 +232,8 @@ export default function EditableImage({
                     </p>
                     <input
                         type="text"
-                        value={newUrl}
-                        onChange={(e) => setNewUrl(e.target.value)}
+                        value={editUrl}
+                        onChange={(e) => setEditUrl(e.target.value)}
                         placeholder="Enter image URL"
                         style={{
                             width: "100%",
@@ -195,21 +247,42 @@ export default function EditableImage({
                     />
                 </div>
 
-                {newUrl && (
+                <div style={{ marginBottom: "20px" }}>
+                    <label style={{ display: "flex", alignItems: "center", cursor: "pointer", fontSize: "14px", fontWeight: "bold" }}>
+                        <input
+                            type="checkbox"
+                            checked={editNoBorder}
+                            onChange={(e) => setEditNoBorder(e.target.checked)}
+                            style={{ marginRight: "8px", width: "18px", height: "18px" }}
+                        />
+                        Remove Border (Transparent Background)
+                    </label>
+                </div>
+
+                {editUrl && (
                     <div style={{ marginBottom: "16px" }}>
                         <p style={{ fontSize: "12px", color: "#333", margin: "0 0 8px" }}>Preview:</p>
-                        <img
-                            src={newUrl}
-                            alt="Preview"
-                            style={{
-                                maxWidth: "100%",
-                                maxHeight: "200px",
-                                border: "2px solid #00ffff",
-                            }}
-                            onError={(e) => {
-                                e.target.style.display = "none";
-                            }}
-                        />
+                        <div style={{
+                            background: "#f0f0f0", // Light gray bg to see transparency
+                            padding: "10px",
+                            border: "1px dashed #ccc",
+                            display: "flex",
+                            justifyContent: "center"
+                        }}>
+                            <img
+                                src={editUrl}
+                                alt="Preview"
+                                style={{
+                                    maxWidth: "100%",
+                                    maxHeight: "200px",
+                                    border: editNoBorder ? "none" : "2px solid #00ffff",
+                                    boxShadow: editNoBorder ? "none" : "none"
+                                }}
+                                onError={(e) => {
+                                    e.target.style.display = "none";
+                                }}
+                            />
+                        </div>
                     </div>
                 )}
 
@@ -252,9 +325,9 @@ export default function EditableImage({
         <>
             <div className={className} style={{ position: "relative", display: "inline-block", flexShrink: 0 }}>
                 <img
-                    src={src}
+                    src={imageData.url}
                     alt={alt}
-                    style={{ ...style, cursor: onImageClick ? 'pointer' : style.cursor }}
+                    style={displayStyle}
                     onClick={onImageClick}
                     {...props}
                 />

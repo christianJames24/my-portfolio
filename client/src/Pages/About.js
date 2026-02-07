@@ -162,12 +162,15 @@ export default function About() {
 
   const t = content;
 
+  // Helper to extract URL from potential image object
+  const getSrc = (img) => (typeof img === 'object' && img !== null ? img.url : img);
+
   // Create slides for all images on the About page
   const allSlides = [
-    { src: t.profileImage },
-    { src: t.journeyImage },
-    ...(t.skillsImages?.map(img => ({ src: img })) || []),
-    { src: t.outsideImage }
+    { src: getSrc(t.profileImage) },
+    { src: getSrc(t.journeyImage) },
+    ...(t.skillsImages?.map(img => ({ src: getSrc(img) })) || []),
+    { src: getSrc(t.outsideImage) }
   ];
 
   return (
