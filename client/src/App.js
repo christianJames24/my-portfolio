@@ -42,6 +42,21 @@ const translations = {
       login: "login",
       logout: "logout",
     },
+    emailVerification: {
+      title: "Verify Your Email",
+      checkInbox: "Please check your inbox ({email}) and verify your email address to continue.",
+      afterVerifying: "After verifying, click on the button below to continue.",
+      verified: "I've Verified My Email",
+      resend: "Resend Verification Email",
+      sending: "Sending...",
+      notFinding: "Not finding the email? Check your spam folder.",
+      tryRelogin: "Try logging out and logging back in, which often triggers a new verification email.",
+      logout: "Log Out",
+      emailSent: "Verification email sent! Please check your inbox (and spam).",
+      sendFailed: "Failed to send: {error}",
+      sendError: "Error sending email. Please try again later.",
+      waitBeforeResend: "Please wait {seconds} seconds before resending.",
+    },
   },
   fr: {
     nav: {
@@ -54,6 +69,21 @@ const translations = {
       dashboard: "tableau",
       login: "connexion",
       logout: "déconnexion",
+    },
+    emailVerification: {
+      title: "Vérifiez votre courriel",
+      checkInbox: "Veuillez vérifier votre boîte de réception ({email}) et vérifier votre adresse courriel pour continuer.",
+      afterVerifying: "Après la vérification, cliquez sur le bouton ci-dessous pour continuer.",
+      verified: "J'ai vérifié mon courriel",
+      resend: "Renvoyer le courriel de vérification",
+      sending: "Envoi en cours...",
+      notFinding: "Vous ne trouvez pas le courriel? Vérifiez votre dossier de courrier indésirable.",
+      tryRelogin: "Essayez de vous déconnecter et de vous reconnecter, ce qui déclenche souvent un nouveau courriel de vérification.",
+      logout: "Se déconnecter",
+      emailSent: "Courriel de vérification envoyé! Veuillez vérifier votre boîte de réception (et courrier indésirable).",
+      sendFailed: "Échec de l'envoi: {error}",
+      sendError: "Erreur lors de l'envoi du courriel. Veuillez réessayer plus tard.",
+      waitBeforeResend: "Veuillez attendre {seconds} secondes avant de renvoyer.",
     },
   },
 };
@@ -75,6 +105,11 @@ function App() {
   const mobileWidth = 1100;
   const [isMobile, setIsMobile] = useState(window.innerWidth < mobileWidth);
 
+  // Email verification state (must be at top level for React Hooks rules)
+  const [lastResendTime, setLastResendTime] = useState(0);
+  const [countdown, setCountdown] = useState(0);
+  const RESEND_COOLDOWN = 30; // 30 seconds
+
   const navigate = useNavigate();
   const location = useLocation();
   const { isLoading, isAuthenticated, getAccessTokenSilently, user, logout, loginWithRedirect } = useAuth0();
@@ -86,6 +121,14 @@ function App() {
     document.documentElement.dataset.theme = theme;
     localStorage.setItem("theme", theme);
   }, [theme]);
+
+  // Countdown timer for resend button
+  useEffect(() => {
+    if (countdown > 0) {
+      const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [countdown]);
 
   const toggleTheme = () => {
     setTheme((prev) => (prev === "light" ? "dark" : "light"));
@@ -280,6 +323,51 @@ function App() {
   if (isAuthenticated && user && !user.email_verified) {
     // Some social providers (like Google) automatically verify emails. 
     // Database connections (email/password) require manual verification.
+
+    const handleResend = async () => {
+      const now = Date.now();
+      const timeSinceLastResend = (now - lastResendTime) / 1000;
+
+      if (timeSinceLastResend < RESEND_COOLDOWN) {
+        const remaining = Math.ceil(RESEND_COOLDOWN - timeSinceLastResend);
+        alert(t.emailVerification.waitBeforeResend.replace("{seconds}", remaining));
+        return;
+      }
+
+      const btn = document.getElementById("resend-btn");
+      if (btn) {
+        btn.disabled = true;
+        btn.innerText = t.emailVerification.sending;
+      }
+
+      try {
+        const token = await getAccessTokenSilently();
+        const res = await fetch("/api/auth/resend-verification", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` }
+        });
+
+        if (res.ok) {
+          alert(t.emailVerification.emailSent);
+          setLastResendTime(now);
+          setCountdown(RESEND_COOLDOWN);
+        } else {
+          const data = await res.json();
+          alert(t.emailVerification.sendFailed.replace("{error}", data.error || "Unknown error"));
+        }
+      } catch (err) {
+        console.error(err);
+        alert(t.emailVerification.sendError);
+      } finally {
+        if (btn) {
+          btn.disabled = countdown > 0;
+          btn.innerText = countdown > 0
+            ? `${t.emailVerification.resend} (${countdown}s)`
+            : t.emailVerification.resend;
+        }
+      }
+    };
+
     return (
       <div style={{
         minHeight: "100vh",
@@ -290,11 +378,120 @@ function App() {
         background: "var(--color-bg)",
         color: "var(--color-text)",
         textAlign: "center",
-        padding: "20px"
+        padding: "20px",
+        position: "relative"
       }}>
-        <h1 style={{ color: "var(--color-text)" }}>Verify Your Email</h1>
-        <p style={{ color: "var(--color-text)" }}>Please check your inbox ({user.email}) and verify your email address to continue.</p>
-        <p style={{ color: "var(--color-text)" }}>After verifying, please refresh this page.</p>
+        {/* Language and Theme toggles */}
+        <div style={{
+          position: "absolute",
+          top: "20px",
+          right: "20px",
+          display: "flex",
+          gap: "12px",
+          alignItems: "center"
+        }}>
+          {/* Theme Toggle */}
+          <button
+            onClick={toggleTheme}
+            style={{
+              padding: '12px 24px',
+              borderRadius: '8px',
+              border: '3px solid var(--color-black)',
+              background: 'var(--color-white)',
+              color: 'var(--color-black)',
+              fontSize: '16px',
+              fontWeight: '900',
+              cursor: 'pointer',
+              boxShadow: '4px 4px 0 var(--color-black)',
+              transition: 'all 0.2s',
+              fontFamily: 'var(--font-special)',
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+              transform: 'rotate(2deg)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'rotate(0deg) translate(-2px, -2px)';
+              e.currentTarget.style.boxShadow = '6px 6px 0 var(--color-black)';
+              e.currentTarget.style.background = 'var(--color-cyan)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'rotate(2deg)';
+              e.currentTarget.style.boxShadow = '4px 4px 0 var(--color-black)';
+              e.currentTarget.style.background = 'var(--color-white)';
+            }}
+            onMouseDown={(e) => {
+              e.currentTarget.style.transform = 'rotate(0deg) translate(2px, 2px)';
+              e.currentTarget.style.boxShadow = '2px 2px 0 var(--color-black)';
+            }}
+            aria-label={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
+          >
+            {theme === 'light' ? (
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 0 1-4.4 2.26 5.403 5.403 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1z" />
+                <circle cx="19" cy="5" r="2" fill="currentColor" />
+              </svg>
+            ) : (
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <circle cx="12" cy="12" r="4" />
+                <rect x="11" y="1" width="2" height="4" rx="1" />
+                <rect x="11" y="19" width="2" height="4" rx="1" />
+                <rect x="19" y="11" width="4" height="2" rx="1" />
+                <rect x="1" y="11" width="4" height="2" rx="1" />
+                <rect x="17.5" y="4.1" width="2" height="4" rx="1" transform="rotate(45 18.5 6.1)" />
+                <rect x="4.5" y="15.9" width="2" height="4" rx="1" transform="rotate(45 5.5 17.9)" />
+                <rect x="15.9" y="17.5" width="4" height="2" rx="1" transform="rotate(45 17.9 18.5)" />
+                <rect x="4.1" y="4.5" width="4" height="2" rx="1" transform="rotate(45 6.1 5.5)" />
+              </svg>
+            )}
+          </button>
+
+          {/* Language Toggle */}
+          <button
+            onClick={toggleLanguage}
+            style={{
+              padding: '12px 24px',
+              borderRadius: '8px',
+              border: '3px solid var(--color-black)',
+              background: 'var(--color-white)',
+              color: 'var(--color-black)',
+              fontSize: '16px',
+              fontWeight: '900',
+              cursor: 'pointer',
+              boxShadow: '4px 4px 0 var(--color-black)',
+              transition: 'all 0.2s',
+              fontFamily: 'var(--font-special)',
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+              transform: 'rotate(-2deg)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'rotate(0deg) translate(-2px, -2px)';
+              e.currentTarget.style.boxShadow = '6px 6px 0 var(--color-black)';
+              e.currentTarget.style.background = 'var(--color-yellow)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'rotate(-2deg)';
+              e.currentTarget.style.boxShadow = '4px 4px 0 var(--color-black)';
+              e.currentTarget.style.background = 'var(--color-white)';
+            }}
+            onMouseDown={(e) => {
+              e.currentTarget.style.transform = 'rotate(0deg) translate(2px, 2px)';
+              e.currentTarget.style.boxShadow = '2px 2px 0 var(--color-black)';
+            }}
+            aria-label="Toggle language"
+          >
+            {language === "en" ? "FR" : "EN"}
+          </button>
+        </div>
+
+        <h1 style={{ color: "var(--color-text)" }}>{t.emailVerification.title}</h1>
+        <p style={{ color: "var(--color-text)" }}>
+          {t.emailVerification.checkInbox.replace("{email}", user.email)}
+        </p>
+        <p style={{ color: "var(--color-text)" }}>{t.emailVerification.afterVerifying}</p>
         <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginTop: "20px" }}>
           <button
             onClick={() => loginWithRedirect()}
@@ -308,59 +505,32 @@ function App() {
               fontSize: "16px"
             }}
           >
-            I've Verified My Email
+            {t.emailVerification.verified}
           </button>
 
           <button
-            onClick={async () => {
-              const btn = document.getElementById("resend-btn");
-              if (btn) {
-                btn.disabled = true;
-                btn.innerText = "Sending...";
-              }
-              try {
-                const token = await getAccessTokenSilently();
-                const res = await fetch("/api/auth/resend-verification", {
-                  method: "POST",
-                  headers: { Authorization: `Bearer ${token}` }
-                });
-
-                if (res.ok) {
-                  alert("Verification email sent! Please check your inbox (and spam).");
-                } else {
-                  const data = await res.json();
-                  alert("Failed to send: " + (data.error || "Unknown error"));
-                }
-              } catch (err) {
-                console.error(err);
-                alert("Error sending email. Please try again later.");
-              } finally {
-                if (btn) {
-                  btn.disabled = false;
-                  btn.innerText = "Resend Verification Email";
-                }
-              }
-            }}
+            onClick={handleResend}
             id="resend-btn"
+            disabled={countdown > 0}
             style={{
               padding: "10px 20px",
-              background: "var(--color-secondary, #6c757d)",
+              background: countdown > 0 ? "var(--color-gray, #999)" : "var(--color-secondary, #6c757d)",
               color: "white",
               border: "none",
               borderRadius: "5px",
-              cursor: "pointer",
-              fontSize: "16px"
+              cursor: countdown > 0 ? "not-allowed" : "pointer",
+              fontSize: "16px",
+              opacity: countdown > 0 ? 0.6 : 1
             }}
           >
-            Resend Verification Email
+            {countdown > 0 ? `${t.emailVerification.resend} (${countdown}s)` : t.emailVerification.resend}
           </button>
 
           <p style={{ fontSize: "14px", marginTop: "10px", maxWidth: "400px" }}>
-            Not finding the email? Check your spam folder.
+            {t.emailVerification.notFinding}
             <br />
-            Auth0 sometimes won't send the email if you are using the default "Try" provider.
             <br />
-            <b>Try logging out and logging back in</b>, which often triggers a new verification email.
+            {t.emailVerification.tryRelogin}
           </p>
 
           <button
@@ -374,7 +544,7 @@ function App() {
               cursor: "pointer"
             }}
           >
-            Log Out
+            {t.emailVerification.logout}
           </button>
         </div>
       </div>
