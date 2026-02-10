@@ -39,6 +39,8 @@ app.use("/api/uploads", uploadsRoutes);
 app.use("/api/content", contentRoutes);
 app.use("/api/messages", messagesRoutes);
 app.use("/api/resumes", resumesRoutes);
+// Temporarily allow auth route even if env vars missing (it handles errors gracefully)
+app.use("/api/auth", require("./routes/auth"));
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, "0.0.0.0", () => {

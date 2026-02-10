@@ -77,7 +77,7 @@ function App() {
 
   const navigate = useNavigate();
   const location = useLocation();
-  const { isLoading, isAuthenticated, getAccessTokenSilently } = useAuth0();
+  const { isLoading, isAuthenticated, getAccessTokenSilently, user, logout, loginWithRedirect } = useAuth0();
 
   const t = translations[language];
 
@@ -274,6 +274,111 @@ function App() {
 
   if (isLoading) {
     return <div>Loading...</div>;
+  }
+
+  // Check for email verification
+  if (isAuthenticated && user && !user.email_verified) {
+    // Some social providers (like Google) automatically verify emails. 
+    // Database connections (email/password) require manual verification.
+    return (
+      <div style={{
+        minHeight: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        background: "var(--color-bg)",
+        color: "var(--color-text)",
+        textAlign: "center",
+        padding: "20px"
+      }}>
+        <h1 style={{ color: "var(--color-text)" }}>Verify Your Email</h1>
+        <p style={{ color: "var(--color-text)" }}>Please check your inbox ({user.email}) and verify your email address to continue.</p>
+        <p style={{ color: "var(--color-text)" }}>After verifying, please refresh this page.</p>
+        <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginTop: "20px" }}>
+          <button
+            onClick={() => loginWithRedirect()}
+            style={{
+              padding: "10px 20px",
+              background: "var(--color-primary, #007bff)",
+              color: "white",
+              border: "none",
+              borderRadius: "5px",
+              cursor: "pointer",
+              fontSize: "16px"
+            }}
+          >
+            I've Verified My Email
+          </button>
+
+          <button
+            onClick={async () => {
+              const btn = document.getElementById("resend-btn");
+              if (btn) {
+                btn.disabled = true;
+                btn.innerText = "Sending...";
+              }
+              try {
+                const token = await getAccessTokenSilently();
+                const res = await fetch("/api/auth/resend-verification", {
+                  method: "POST",
+                  headers: { Authorization: `Bearer ${token}` }
+                });
+
+                if (res.ok) {
+                  alert("Verification email sent! Please check your inbox (and spam).");
+                } else {
+                  const data = await res.json();
+                  alert("Failed to send: " + (data.error || "Unknown error"));
+                }
+              } catch (err) {
+                console.error(err);
+                alert("Error sending email. Please try again later.");
+              } finally {
+                if (btn) {
+                  btn.disabled = false;
+                  btn.innerText = "Resend Verification Email";
+                }
+              }
+            }}
+            id="resend-btn"
+            style={{
+              padding: "10px 20px",
+              background: "var(--color-secondary, #6c757d)",
+              color: "white",
+              border: "none",
+              borderRadius: "5px",
+              cursor: "pointer",
+              fontSize: "16px"
+            }}
+          >
+            Resend Verification Email
+          </button>
+
+          <p style={{ fontSize: "14px", marginTop: "10px", maxWidth: "400px" }}>
+            Not finding the email? Check your spam folder.
+            <br />
+            Auth0 sometimes won't send the email if you are using the default "Try" provider.
+            <br />
+            <b>Try logging out and logging back in</b>, which often triggers a new verification email.
+          </p>
+
+          <button
+            onClick={() => logout({ returnTo: window.location.origin })}
+            style={{
+              background: "transparent",
+              color: "var(--color-text)",
+              border: "1px solid var(--color-text)",
+              padding: "8px 16px",
+              borderRadius: "5px",
+              cursor: "pointer"
+            }}
+          >
+            Log Out
+          </button>
+        </div>
+      </div>
+    );
   }
 
   const getTransitionClass = () => {
