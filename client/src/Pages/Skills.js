@@ -14,6 +14,8 @@ export default function Skills() {
   const { canEdit, saveContent } = useEdit();
   const [content, setContent] = useState(language === 'en' ? contentEn : contentFr);
 
+  const [previewUrl, setPreviewUrl] = useState(null);
+
   // Fetch content from API with fallback to JSON
   useEffect(() => {
     const fetchContent = async () => {
@@ -33,6 +35,31 @@ export default function Skills() {
     };
 
     fetchContent();
+  }, [language]);
+
+  // Fetch PDF for preview
+  useEffect(() => {
+    const fetchPdf = async () => {
+      try {
+        const res = await fetch(`/api/resumes/${language}`);
+        if (res.ok) {
+          const blob = await res.blob();
+          const url = URL.createObjectURL(blob);
+          setPreviewUrl(url);
+
+          return () => {
+            if (url) URL.revokeObjectURL(url);
+          };
+        } else {
+          setPreviewUrl(null);
+        }
+      } catch (err) {
+        console.error('Error fetching PDF preview:', err);
+        setPreviewUrl(null);
+      }
+    };
+
+    fetchPdf();
   }, [language]);
 
   useEffect(() => {
@@ -113,7 +140,7 @@ export default function Skills() {
         </div>
       )}
 
-      <div className="content-card">
+      {/* <div className="content-card">
         <button className="btn-primary" onClick={handleDownload}>
           <EditableText
             value={t.download}
@@ -123,7 +150,96 @@ export default function Skills() {
             onSave={(v) => handleFieldSave('download', v)}
           />
         </button>
+      </div> */}
+
+      <div className="content-card">
+        <h2>
+          <EditableText
+            value={t.skills}
+            field="skills"
+            page="resume"
+            language={language}
+            onSave={(v) => handleFieldSave('skills', v)}
+          />
+        </h2>
+        <p style={{ whiteSpace: 'pre-line', margin: 0 }}>
+          <EditableText
+            value={t.skillsList}
+            field="skillsList"
+            page="resume"
+            language={language}
+            multiline
+            onSave={(v) => handleFieldSave('skillsList', v)}
+          />
+        </p>
       </div>
+
+      <div className="content-card" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+        <h2 style={{ marginBottom: "0" }}>
+          <EditableText
+            value={t.preview || (language === 'en' ? "Resume Preview" : "Aperçu du CV")}
+            field="preview"
+            page="resume"
+            language={language}
+            onSave={(v) => handleFieldSave('preview', v)}
+          />
+        </h2>
+        <div
+          className="resume-preview-container"
+          style={{
+            width: '100%',
+            background: '#333',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            border: '4px solid var(--color-black)',
+            boxShadow: '8px 8px 0 var(--color-black)',
+            overflow: 'hidden',
+            aspectRatio: '1 / 1.41',
+            maxHeight: '1500px'
+          }}
+        >
+          {previewUrl ? (
+            <iframe
+              src={previewUrl}
+              title="Resume Preview"
+              width="100%"
+              height="100%"
+              style={{ border: 'none' }}
+              className="resume-iframe"
+            />
+          ) : (
+            <p style={{ color: 'var(--color-yellow)' }}>
+              {language === 'en'
+                ? 'No resume uploaded yet. Visit the Dashboard to upload one.'
+                : 'Aucun CV téléversé pour le moment. Visitez le tableau de bord pour en ajouter un.'}
+            </p>
+          )}
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <button className="btn-primary" onClick={handleDownload}>
+            <EditableText
+              value={t.download}
+              field="download"
+              page="resume"
+              language={language}
+              onSave={(v) => handleFieldSave('download', v)}
+            />
+          </button>
+        </div>
+      </div>
+
+      <style>{`
+        .resume-preview-container {
+          height: auto;
+        }
+        @media (max-width: 768px) {
+          .resume-preview-container {
+            border-width: 2px !important;
+            box-shadow: 4px 4px 0 var(--color-black) !important;
+          }
+        }
+      `}</style>
 
       <div className="content-card">
         <h2>
@@ -243,27 +359,6 @@ export default function Skills() {
         />
       </div>
 
-      <div className="content-card">
-        <h2>
-          <EditableText
-            value={t.skills}
-            field="skills"
-            page="resume"
-            language={language}
-            onSave={(v) => handleFieldSave('skills', v)}
-          />
-        </h2>
-        <p style={{ whiteSpace: 'pre-line', margin: 0 }}>
-          <EditableText
-            value={t.skillsList}
-            field="skillsList"
-            page="resume"
-            language={language}
-            multiline
-            onSave={(v) => handleFieldSave('skillsList', v)}
-          />
-        </p>
-      </div>
 
       {/* <div className="content-card">
         <h2>

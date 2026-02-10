@@ -173,6 +173,36 @@ export default function About() {
     { src: getSrc(t.outsideImage) }
   ];
 
+  const handleDownload = async () => {
+    try {
+      const res = await fetch(`/api/resumes/${language}`);
+
+      if (!res.ok) {
+        if (res.status === 404) {
+          alert(language === 'en'
+            ? 'No resume available for download yet. Please upload one in the Dashboard.'
+            : 'Aucun CV disponible au téléchargement. Veuillez en télécharger un dans le tableau de bord.');
+        } else {
+          alert(language === 'en' ? 'Error downloading resume' : 'Erreur lors du téléchargement du CV');
+        }
+        return;
+      }
+
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Resume_${language.toUpperCase()}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (err) {
+      console.error('Download error:', err);
+      alert(language === 'en' ? 'Error downloading resume' : 'Erreur lors du téléchargement du CV');
+    }
+  };
+
   return (
     <div className="page-container about-page">
       <h1>
@@ -203,16 +233,31 @@ export default function About() {
           />
         </h2>
         <div className="about-intro-content">
-          <p>
-            <EditableText
-              value={t.introText}
-              field="introText"
-              page="about"
-              language={language}
-              multiline
-              onSave={(v) => handleFieldSave("introText", v)}
-            />
-          </p>
+          <div style={{ flex: 1 }}>
+            <p>
+              <EditableText
+                value={t.introText}
+                field="introText"
+                page="about"
+                language={language}
+                multiline
+                onSave={(v) => handleFieldSave("introText", v)}
+              />
+            </p>
+            <button
+              className="btn-primary"
+              onClick={handleDownload}
+              style={{ marginTop: '16px' }}
+            >
+              <EditableText
+                value={t.download || "Download Resume"}
+                field="download"
+                page="about"
+                language={language}
+                onSave={(v) => handleFieldSave('download', v)}
+              />
+            </button>
+          </div>
           <EditableImage
             src={t.profileImage}
             alt="Profile"
