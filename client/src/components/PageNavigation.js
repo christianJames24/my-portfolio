@@ -25,7 +25,7 @@ export default function PageNavigation({ isTransitioning, pages: propPages }) {
         home: "Home",
         about: "About",
         projects: "Projects",
-        resume: "Resume",
+        skills: "Skills",
         comments: "Testimonials",
         contact: "Contact",
         dashboard: "Dashboard",
@@ -38,7 +38,7 @@ export default function PageNavigation({ isTransitioning, pages: propPages }) {
         home: "Accueil",
         about: "À Propos",
         projects: "Projets",
-        resume: "CV",
+        skills: "Compétences",
         comments: "Témoinages",
         contact: "Contact",
         dashboard: "Tableau",
@@ -52,7 +52,7 @@ export default function PageNavigation({ isTransitioning, pages: propPages }) {
     { path: "/", name: "home" },
     { path: "/about", name: "about" },
     { path: "/projects", name: "projects" },
-    { path: "/resume", name: "resume" },
+    { path: "/skills", name: "skills" },
     { path: "/comments", name: "comments" },
   ];
 

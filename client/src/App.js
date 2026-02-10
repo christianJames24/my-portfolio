@@ -12,7 +12,7 @@ import ThreeD from "./ThreeD";
 import Home from "./Pages/Home";
 import About from "./Pages/About";
 import Projects from "./Pages/Projects";
-import Resume from "./Pages/Resume";
+import Skills from "./Pages/Skills";
 import Comments from "./Pages/Comments";
 import Contact from "./Pages/Contact";
 import Dashboard from "./Pages/Dashboard";
@@ -35,7 +35,7 @@ const translations = {
       home: "home",
       about: "about",
       projects: "projects",
-      resume: "resume",
+      skills: "skills",
       comments: "testimonials",
       contact: "contact",
       dashboard: "dashboard",
@@ -48,7 +48,7 @@ const translations = {
       home: "accueil",
       about: "à propos",
       projects: "projets",
-      resume: "cv",
+      skills: "compétences",
       comments: "témoignages",
       contact: "contact",
       dashboard: "tableau",
@@ -95,7 +95,7 @@ function App() {
     { path: "/", name: "home" },
     { path: "/about", name: "about" },
     { path: "/projects", name: "projects" },
-    { path: "/resume", name: "resume" },
+    { path: "/skills", name: "skills" },
     { path: "/comments", name: "comments" },
     { path: "/contact", name: "contact" },
     ...(isAdmin ? [{ path: "/dashboard", name: "dashboard" }] : []),
@@ -133,14 +133,14 @@ function App() {
       path: "/projects",
     },
     {
-      label: t.nav.resume,
-      ariaLabel: t.nav.resume,
+      label: t.nav.skills,
+      ariaLabel: t.nav.skills,
       rotation: 8,
       hoverStyles: {
         bgColor: "var(--color-pink-1)",
         textColor: "var(--color-white)",
       },
-      path: "/resume",
+      path: "/skills",
     },
     {
       label: t.nav.comments,
@@ -298,8 +298,8 @@ function App() {
         return <About backendData={backendData} />;
       case "/projects":
         return <Projects backendData={backendData} />;
-      case "/resume":
-        return <Resume backendData={backendData} />;
+      case "/skills":
+        return <Skills backendData={backendData} />;
       case "/comments":
         return <Comments backendData={backendData} />;
       case "/contact":
@@ -331,57 +331,57 @@ function App() {
       <LightboxProvider>
         <LanguageContext.Provider value={{ language, t, toggleLanguage, theme, toggleTheme }}>
           <EditProvider isAdmin={isAdmin}>
-          <div
-            style={{
-              minHeight: "100vh",
-              position: "relative",
-              paddingBottom: "0",
-            }}
-          >
-            <BackgroundGradient scrollY={scrollY} />
+            <div
+              style={{
+                minHeight: "100vh",
+                position: "relative",
+                paddingBottom: "0",
+              }}
+            >
+              <BackgroundGradient scrollY={scrollY} />
 
-            <TopNav />
+              <TopNav />
 
-            <BubbleMenu
-              items={menuItems}
-              menuAriaLabel="Toggle navigation"
-              menuBg="var(--color-menu-bg)"
-              menuContentColor="var(--color-menu-content)"
-              useFixedPosition={true}
-              animationEase="back.out(1.5)"
-              animationDuration={0.5}
-              staggerDelay={0.12}
-              onItemClick={handleMenuItemClick}
-            />
+              <BubbleMenu
+                items={menuItems}
+                menuAriaLabel="Toggle navigation"
+                menuBg="var(--color-menu-bg)"
+                menuContentColor="var(--color-menu-content)"
+                useFixedPosition={true}
+                animationEase="back.out(1.5)"
+                animationDuration={0.5}
+                staggerDelay={0.12}
+                onItemClick={handleMenuItemClick}
+              />
 
-            <PageNavigation
-              isTransitioning={transitionStage !== "idle"}
-              pages={pages}
-            />
+              <PageNavigation
+                isTransitioning={transitionStage !== "idle"}
+                pages={pages}
+              />
 
-            <div style={cowStyles}>
-              <ThreeD />
-            </div>
-
-            <div className="page-transition-wrapper">
-              <div
-                className={`page-transition-content ${transitionStage !== "idle" ? "transitioning" : ""
-                  } ${getTransitionClass()}`}
-                onAnimationEnd={handleTransitionEnd}
-              >
-                {displayLocation && renderPage(displayLocation.pathname)}
+              <div style={cowStyles}>
+                <ThreeD />
               </div>
+
+              <div className="page-transition-wrapper">
+                <div
+                  className={`page-transition-content ${transitionStage !== "idle" ? "transitioning" : ""
+                    } ${getTransitionClass()}`}
+                  onAnimationEnd={handleTransitionEnd}
+                >
+                  {displayLocation && renderPage(displayLocation.pathname)}
+                </div>
+              </div>
+
+              {/* <BottomBar show={showFooter} /> */}
+              {transitionStage === "idle" && (
+                <BottomBar show={showFooter} instantHide={instantHide} />
+              )}
+
+              <EditModeToggle />
             </div>
-
-            {/* <BottomBar show={showFooter} /> */}
-            {transitionStage === "idle" && (
-              <BottomBar show={showFooter} instantHide={instantHide} />
-            )}
-
-            <EditModeToggle />
-          </div>
-          <ToastContainer />
-        </EditProvider>
+            <ToastContainer />
+          </EditProvider>
         </LanguageContext.Provider>
       </LightboxProvider>
     </NotificationProvider>

@@ -1,15 +1,15 @@
-// Resume.js
+// Skills.js
 import React, { useContext, useEffect, useState } from 'react';
 import { LanguageContext } from '../App';
-import contentEn from '../data/resume-en.json';
-import contentFr from '../data/resume-fr.json';
+import contentEn from '../data/skills-en.json';
+import contentFr from '../data/skills-fr.json';
 import EditableText from '../components/EditableText';
 import EditableList from '../components/EditableList';
 import ExportButton from '../components/ExportButton';
 import ImportButton from '../components/ImportButton';
 import { useEdit } from '../components/EditContext';
 
-export default function Resume() {
+export default function Skills() {
   const { language } = useContext(LanguageContext);
   const { canEdit, saveContent } = useEdit();
   const [content, setContent] = useState(language === 'en' ? contentEn : contentFr);
@@ -27,7 +27,7 @@ export default function Resume() {
           setContent(data);
         }
       } catch (err) {
-        console.error('Error fetching resume content:', err);
+        console.error('Error fetching skills content:', err);
         setContent(language === 'en' ? contentEn : contentFr);
       }
     };
@@ -36,7 +36,7 @@ export default function Resume() {
   }, [language]);
 
   useEffect(() => {
-    const pageTitle = content.title || (language === 'en' ? 'Resume' : 'CV');
+    const pageTitle = content.title || (language === 'en' ? 'Skills' : 'Compétences');
     document.title = `Christian James Lee - ${pageTitle}`;
   }, [language, content.title]);
 

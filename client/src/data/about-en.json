@@ -1,23 +1,22 @@
 {
   "title": "About Me",
-  "intro": "Hi, I'm a Computer Science student and developer",
-  "introText": "I build software and applications as part of my studies and personal projects. I enjoy working on practical systems, backend development, and learning new tools through real projects.",
+  "intro": "Who am i?",
+  "introText": "Hi, my name is Christian and I'm currently a 20 year old CEGEP student completing my final semester at Champlain College Saint-Lambert Computer Science Technology Technical DEC.",
   "profileImage": "https://picsum.photos/400/400?random=1",
-  "journey": "My Background",
-  "journeyText": "I am currently studying Computer Science and working on team-based and personal projects focused on application and backend development. I have experience working in collaborative environments and following structured development workflows.",
-  "journeyImage": "https://picsum.photos/800/400?random=2",
-  "whatIDo": "What I Do",
-  "whatIDoText": "I work on software projects involving backend systems, databases, APIs, and application logic, both individually and in team environments.",
+  "journey": "My Approach",
+  "journeyText": "I love learning and making whatever I feel like on the computer. The most important thing that I've realized through living is the fact that there's no perfect anything but through collaboration and open communication, figuring out an optimal solution for all is possible. This extends to how I view user experience especially. On top of all that, I do find that most importantly, not understanding where to start, although scary, is only a natural part of the process for everything great to happen!",
+  "journeyImage": {
+    "url": "https://picsum.photos/800/400?random=2",
+    "noBorder": true
+  },
   "skills": "Hobbies & Interests",
-  "skillsText": "• Game development and gameplay systems\n• Learning new programming tools and frameworks\n• Backend and system-oriented development\n• 3D and technical tools such as Blender\n• Experimenting with personal software and game projects",
+  "skillsText": "• Game development and thinking about user experience\n• 2D, 3D, and programs such as Blender for example\n• Music DAWs such as LMMS and FL Studio\n• Experimenting with personal software\n• Playing Video Games (My favorite being Minecraft)\n• Watching Adam Sandler movies.",
   "skillsImages": [
     "https://picsum.photos/300/200?random=3",
     "https://picsum.photos/300/200?random=4",
     "https://picsum.photos/300/200?random=5"
   ],
-  "philosophy": "More About Me",
-  "philosophyText": "I prefer working on practical projects where I can learn by building, testing, and improving real systems. I enjoy problem-solving, understanding how systems work behind the scenes, and continuously improving my development skills.",
-  "outside": "Outside of Development",
-  "outsideText": "Outside of school and development work, I spend time on personal projects, experimenting with tools, and learning new technologies at my own pace.",
+  "outside": "On The Lookout",
+  "outsideText": "I am always for the lookout of awesome people who do creative things and have much to share about any topics they're interested in. If you're one of those people, feel free to contact me!",
   "outsideImage": "https://picsum.photos/800/500?random=6"
 }
