@@ -195,13 +195,13 @@ export default function Skills() {
             border: '4px solid var(--color-black)',
             boxShadow: '8px 8px 0 var(--color-black)',
             overflow: 'hidden',
-            aspectRatio: '1 / 1.41',
+            aspectRatio: '1 / 1.3',
             maxHeight: '1500px'
           }}
         >
           {previewUrl ? (
             <iframe
-              src={previewUrl}
+              src={`${previewUrl}#navpanes=0&zoom=FitH`}
               title="Resume Preview"
               width="100%"
               height="100%"
