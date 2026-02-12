@@ -1,6 +1,7 @@
 // DesktopNavbar.js
 import React, { useContext } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
+import { useLocation, Link } from "react-router-dom";
 import { LanguageContext } from "../App";
 import "../styles/DesktopNavbar.css";
 
@@ -20,6 +21,13 @@ export default function DesktopNavbar({ items, currentPath, onItemClick }) {
     return (
         <nav className="desktop-navbar" aria-label="Main navigation">
             <div className="desktop-navbar-container">
+                <Link to="/" className="desktop-nav-logo-link">
+                    <img
+                        src={theme === 'light' ? "/faviconNew2.png" : "/faviconNew.png"}
+                        alt="Logo"
+                        className="desktop-nav-logo"
+                    />
+                </Link>
                 <ul className="desktop-nav-list">
                     {items.map((item, idx) => {
                         const isActive = item.path === currentPath;
