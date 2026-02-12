@@ -33,7 +33,7 @@
     margin: 0 auto;
     padding: 12px 40px;
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: center;
     gap: 20px;
 }
@@ -97,6 +97,7 @@
     gap: 8px;
     align-items: center;
     flex-shrink: 0;
+    margin-left: auto;
 }
 
 .desktop-nav-util-btn {
@@ -129,4 +130,14 @@
 .desktop-nav-util-btn:active {
     transform: skewX(-5deg) translate(2px, 2px);
     box-shadow: 1px 1px 0 var(--color-white);
+}
+
+.desktop-nav-logo {
+    height: 40px;
+    width: auto;
+    object-fit: contain;
+    cursor: pointer;
+    margin-right: 8px;
+    /* Reduced spacing to group closer */
+    margin-left: 0;
 }
