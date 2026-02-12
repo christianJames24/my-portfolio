@@ -249,13 +249,7 @@ export default function About() {
               onClick={handleDownload}
               style={{ marginTop: '16px' }}
             >
-              <EditableText
-                value={t.download || "Download Resume"}
-                field="download"
-                page="about"
-                language={language}
-                onSave={(v) => handleFieldSave('download', v)}
-              />
+              {language === 'en' ? 'Download Resume' : 'Télécharger CV'}
             </button>
           </div>
           <EditableImage

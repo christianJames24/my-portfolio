@@ -218,13 +218,7 @@ export default function Skills() {
         </div>
         <div style={{ display: 'flex', justifyContent: 'center' }}>
           <button className="btn-primary" onClick={handleDownload}>
-            <EditableText
-              value={t.download}
-              field="download"
-              page="resume"
-              language={language}
-              onSave={(v) => handleFieldSave('download', v)}
-            />
+            {language === 'en' ? 'Download Resume' : 'Télécharger CV'}
           </button>
         </div>
       </div>
