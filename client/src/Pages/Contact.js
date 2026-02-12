@@ -267,7 +267,6 @@ export default function Contact() {
                                 // We can use value for that if we make it readOnly.
                                 value={isAuthenticated ? formData.email : t.emailPlaceholder}
                                 onChange={handleChange}
-                                required={isAuthenticated} // Only required if logged in (techinically backend handles anonymous)
                                 maxLength="255"
                                 readOnly={true} // Always read-only based on requirements (logged in = auto-fill, not logged in = placeholder)
                                 style={{

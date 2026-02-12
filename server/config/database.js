@@ -88,11 +88,15 @@ if (isProduction) {
         CREATE TABLE IF NOT EXISTS messages (
           id SERIAL PRIMARY KEY,
           name VARCHAR(255) NOT NULL,
-          email VARCHAR(255) NOT NULL,
+          email VARCHAR(255),
           message TEXT NOT NULL,
           read BOOLEAN DEFAULT FALSE,
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
+      `);
+
+      await db.query(`
+        ALTER TABLE messages ALTER COLUMN email DROP NOT NULL
       `);
 
       await db.query(`
@@ -163,7 +167,7 @@ if (isProduction) {
     CREATE TABLE IF NOT EXISTS messages (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL,
-      email TEXT NOT NULL,
+      email TEXT,
       message TEXT NOT NULL,
       read INTEGER DEFAULT 0,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP

@@ -66,9 +66,8 @@ const validateMessage = [
         .escape(),
     body('email')
         .trim()
-        .notEmpty().withMessage('Email is required')
-        .custom((value, { req }) => {
-            if (value === 'anonymous') return true;
+        .custom((value) => {
+            if (!value || value === 'anonymous') return true;
             if (!validator.isEmail(value)) throw new Error('Invalid email format');
             return true;
         })

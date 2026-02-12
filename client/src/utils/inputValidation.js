@@ -64,7 +64,7 @@ export const validateName = (name) => {
  */
 export const validateEmail = (email) => {
     if (!email || email.trim().length === 0) {
-        return { isValid: false, error: 'Email is required' };
+        return { isValid: true, error: '' };
     }
 
     // Allow "anonymous" to pass validation for non-logged in users
