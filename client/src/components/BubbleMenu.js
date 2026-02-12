@@ -53,6 +53,7 @@ export default function BubbleMenu({
   menuContentColor = "var(--color-black)",
   useFixedPosition = false,
   items,
+  currentPath,
   animationEase = "back.out(1.5)",
   animationDuration = 0.5,
   staggerDelay = 0.12,
@@ -97,15 +98,14 @@ export default function BubbleMenu({
       if (!bubble) return;
 
       const item = menuItems[idx];
+
       if (isHovering) {
         bubble.style.background = item.hoverStyles?.bgColor || "var(--color-white)";
         bubble.style.color = item.hoverStyles?.textColor || menuContentColor;
-        // bubble.style.transform = `rotate(0deg) scale(1.05) translate(-4px, -4px)`;
         bubble.style.boxShadow = "12px 12px 0 var(--color-black)";
       } else {
         bubble.style.background = menuBg;
         bubble.style.color = menuContentColor;
-        // bubble.style.transform = `rotate(${item.rotation ?? 0}deg) scale(1)`;
         bubble.style.boxShadow = "8px 8px 0 var(--color-black)";
       }
     },
@@ -174,6 +174,10 @@ export default function BubbleMenu({
           scale: 1,
           duration: animationDuration,
           ease: animationEase,
+          onComplete: () => {
+            // Apply hover state styling if currently hovered (handled by handleMouseEnter)
+            // No permanent active state color per user request
+          }
         });
         if (labels[i]) {
           tl.to(
@@ -299,48 +303,50 @@ export default function BubbleMenu({
             aria-hidden={!isMenuOpen}
           >
             <ul className="pill-list" role="menu" aria-label="Menu links">
-              {menuItems.map((item, idx) => (
-                <li key={idx} role="none" className="pill-col">
-                  <a
-                    role="menuitem"
-                    href={item.href}
-                    onClick={(e) => handleItemClick(e, item, idx)}
-                    onMouseEnter={() => handleMouseEnter(idx)}
-                    onMouseLeave={() => handleMouseLeave(idx)}
-                    aria-label={item.ariaLabel || item.label}
-                    className="pill-link"
-                    style={{
-                      "--item-rot": `${item.rotation ?? 0}deg`,
-                      "--pill-bg": menuBg,
-                      "--pill-color": menuContentColor,
-                      "--hover-bg": item.hoverStyles?.bgColor || "var(--color-white)",
-                      "--hover-color": item.hoverStyles?.textColor || menuContentColor,
-                      pointerEvents: isDisabled ? "none" : "auto",
-                      opacity: isDisabled ? 0.5 : 1,
-                      cursor: isDisabled ? "default" : "pointer",
-                      userSelect: "none",
-                      border: "4px solid var(--color-black)",
-                      background: menuBg,
-                      boxShadow: "8px 8px 0 var(--color-black)",
-                      fontWeight: "900",
-                      textTransform: "uppercase",
-                      letterSpacing: "0.05em"
-                    }}
-                    ref={(el) => {
-                      if (el) bubblesRef.current[idx] = el;
-                    }}
-                  >
-                    <span
-                      className="pill-label"
+              {menuItems.map((item, idx) => {
+                const isActive = item.path === currentPath;
+                return (
+                  <li key={idx} role="none" className="pill-col">
+                    <a
+                      role="menuitem"
+                      href={item.href}
+                      onClick={(e) => handleItemClick(e, item, idx)}
+                      onMouseEnter={() => handleMouseEnter(idx)}
+                      onMouseLeave={() => handleMouseLeave(idx)}
+                      aria-label={item.ariaLabel || item.label}
+                      aria-current={isActive ? "page" : undefined}
+                      className={`pill-link ${isActive ? 'active' : ''}`}
+                      style={{
+                        "--item-rot": `${item.rotation ?? 0}deg`,
+                        "--pill-bg": menuBg,
+                        "--pill-color": menuContentColor,
+                        "--hover-bg": item.hoverStyles?.bgColor || "var(--color-white)",
+                        "--hover-color": item.hoverStyles?.textColor || menuContentColor,
+                        pointerEvents: isDisabled ? "none" : "auto",
+                        opacity: isDisabled ? 0.5 : 1,
+                        cursor: isDisabled ? "default" : "pointer",
+                        userSelect: "none",
+                        border: "4px solid var(--color-black)",
+                        fontWeight: "900",
+                        textTransform: "uppercase",
+                        letterSpacing: "0.05em"
+                      }}
                       ref={(el) => {
-                        if (el) labelRefs.current[idx] = el;
+                        if (el) bubblesRef.current[idx] = el;
                       }}
                     >
-                      {item.label}
-                    </span>
-                  </a>
-                </li>
-              ))}
+                      <span
+                        className="pill-label"
+                        ref={(el) => {
+                          if (el) labelRefs.current[idx] = el;
+                        }}
+                      >
+                        {item.label}
+                      </span>
+                    </a>
+                  </li>
+                );
+              })}
             </ul>
           </div>
         </>

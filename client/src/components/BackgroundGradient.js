@@ -91,11 +91,11 @@ export default function BackgroundGradient() {
       color2: "var(--color-cyan)",
       title: "PROJECTS",
     },
-    "/resume": {
+    "/skills": {
       number: 4,
       color1: "var(--color-magenta)",
       color2: "var(--color-cyan)",
-      title: "RESUME",
+      title: "SKILLS",
     },
     "/comments": {
       number: 5,

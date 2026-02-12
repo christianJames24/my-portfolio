@@ -619,6 +619,7 @@ function App() {
 
               <BubbleMenu
                 items={menuItems}
+                currentPath={location.pathname}
                 menuAriaLabel="Toggle navigation"
                 menuBg="var(--color-menu-bg)"
                 menuContentColor="var(--color-menu-content)"
