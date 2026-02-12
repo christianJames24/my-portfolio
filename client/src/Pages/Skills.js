@@ -206,12 +206,8 @@ export default function Skills() {
           {t.skillCategories?.map((category, catIndex) => (
             <div key={catIndex} className="skill-category">
               <h3 style={{
-                color: catIndex === 0 ? "var(--color-magenta)" :
-                  catIndex === 1 ? "var(--color-neon-green)" :
-                    "var(--color-cyan)",
-                borderBottom: `2px solid ${catIndex === 0 ? "var(--color-magenta)" :
-                  catIndex === 1 ? "var(--color-neon-green)" :
-                    "var(--color-cyan)"}`,
+                color: "var(--color-neon-green)",
+                borderBottom: "2px solid var(--color-neon-green)",
                 paddingBottom: "8px",
                 marginBottom: "16px",
                 display: "inline-block"
@@ -232,9 +228,7 @@ export default function Skills() {
                 {category.skills?.map((skill, skillIndex) => (
                   <div key={skillIndex} style={{
                     background: "var(--color-dark-gray)",
-                    border: `2px solid ${catIndex === 0 ? "var(--color-magenta)" :
-                      catIndex === 1 ? "var(--color-neon-green)" :
-                        "var(--color-cyan)"}`,
+                    border: "2px solid var(--color-neon-green)",
                     padding: "12px",
                     display: "flex",
                     flexDirection: "column",
