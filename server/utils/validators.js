@@ -72,7 +72,7 @@ const validateMessage = [
             return true;
         })
         .customSanitizer((value) => {
-            if (value === 'anonymous') return value;
+            if (!value || value === 'anonymous') return value;
             return validator.normalizeEmail(value);
         })
         .isLength({ max: 255 }).withMessage('Email is too long'),

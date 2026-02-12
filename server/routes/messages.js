@@ -10,12 +10,13 @@ const { validateMessage, validateId } = require("../utils/validators");
 router.post("/", validateMessage, async (req, res) => {
     try {
         const { name, email, message } = req.body;
+        const effectiveEmail = (email && email !== "anonymous") ? email : null;
 
         const query = isProduction
             ? `INSERT INTO messages (name, email, message) VALUES ($1, $2, $3) RETURNING *`
             : `INSERT INTO messages (name, email, message) VALUES (?, ?, ?)`;
 
-        await db.query(query, [name, email, message]);
+        await db.query(query, [name, effectiveEmail, message]);
 
         // Send email via SMTP
         if (process.env.SMTP_USER && process.env.SMTP_PASS) {
@@ -40,8 +41,8 @@ router.post("/", validateMessage, async (req, res) => {
                     from: process.env.SMTP_FROM || process.env.SMTP_USER,
                     to: process.env.CONTACT_RECEIVER || process.env.SMTP_USER, // Send to configured receiver or self
                     subject: `New Contact Form Message from ${name}`,
-                    text: `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`,
-                    replyTo: email, // Reply goes to the person who submitted the form
+                    text: `Name: ${name}\nEmail: ${effectiveEmail || "Anonymous"}\n\nMessage:\n${message}`,
+                    replyTo: effectiveEmail || undefined, // Reply goes to the person who submitted the form or is omitted
                 };
 
                 await transporter.sendMail(mailOptions);

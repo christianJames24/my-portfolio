@@ -122,13 +122,22 @@ export default function Contact() {
                 email: isAuthenticated ? sanitizeInput(formData.email) : "anonymous",
                 message: sanitizeInput(formData.message),
             };
-            const token = await getAccessTokenSilently();
+            const headers = {
+                "Content-Type": "application/json",
+            };
+
+            if (isAuthenticated) {
+                try {
+                    const token = await getAccessTokenSilently();
+                    headers["Authorization"] = `Bearer ${token}`;
+                } catch (tokenErr) {
+                    console.warn("Could not get access token, sending without auth:", tokenErr);
+                }
+            }
+
             const res = await fetch("/api/messages", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
+                headers,
                 body: JSON.stringify(sanitizedData),
             });
 
