@@ -9,9 +9,11 @@ import ExportButton from '../components/ExportButton';
 import ImportButton from '../components/ImportButton';
 import { useEdit } from '../components/EditContext';
 
+import EditableImage from '../components/EditableImage';
+
 export default function Skills() {
   const { language } = useContext(LanguageContext);
-  const { canEdit, saveContent } = useEdit();
+  const { isEditing, canEdit, saveContent } = useEdit();
   const [content, setContent] = useState(language === 'en' ? contentEn : contentFr);
 
   const [previewUrl, setPreviewUrl] = useState(null);
@@ -121,6 +123,47 @@ export default function Skills() {
     }
   };
 
+  // Helper functions for skills
+  const handleSkillCategorySave = async (catIndex, field, value) => {
+    const newCategories = [...content.skillCategories];
+    newCategories[catIndex] = { ...newCategories[catIndex], [field]: value };
+    const newContent = { ...content, skillCategories: newCategories };
+    setContent(newContent);
+    await saveContent('resume', newContent, language);
+  };
+
+  const handleSkillSave = async (catIndex, skillIndex, field, value) => {
+    const newCategories = [...content.skillCategories];
+    const newSkills = [...newCategories[catIndex].skills];
+    newSkills[skillIndex] = { ...newSkills[skillIndex], [field]: value };
+    newCategories[catIndex] = { ...newCategories[catIndex], skills: newSkills };
+
+    const newContent = { ...content, skillCategories: newCategories };
+    setContent(newContent);
+    await saveContent('resume', newContent, language);
+  };
+
+  const handleSkillAdd = async (catIndex) => {
+    const newSkill = { name: "New Skill", icon: "https://via.placeholder.com/50" };
+    const newCategories = [...content.skillCategories];
+    const newSkills = [...(newCategories[catIndex].skills || []), newSkill];
+    newCategories[catIndex] = { ...newCategories[catIndex], skills: newSkills };
+
+    const newContent = { ...content, skillCategories: newCategories };
+    setContent(newContent);
+    await saveContent('resume', newContent, language);
+  };
+
+  const handleSkillRemove = async (catIndex, skillIndex) => {
+    const newCategories = [...content.skillCategories];
+    const newSkills = newCategories[catIndex].skills.filter((_, i) => i !== skillIndex);
+    newCategories[catIndex] = { ...newCategories[catIndex], skills: newSkills };
+
+    const newContent = { ...content, skillCategories: newCategories };
+    setContent(newContent);
+    await saveContent('resume', newContent, language);
+  };
+
   return (
     <div className="page-container resume-page">
       <h1>
@@ -140,18 +183,7 @@ export default function Skills() {
         </div>
       )}
 
-      {/* <div className="content-card">
-        <button className="btn-primary" onClick={handleDownload}>
-          <EditableText
-            value={t.download}
-            field="download"
-            page="resume"
-            language={language}
-            onSave={(v) => handleFieldSave('download', v)}
-          />
-        </button>
-      </div> */}
-
+      {/* Skills Section Redesign */}
       <div className="content-card">
         <h2>
           <EditableText
@@ -162,16 +194,132 @@ export default function Skills() {
             onSave={(v) => handleFieldSave('skills', v)}
           />
         </h2>
-        <p style={{ whiteSpace: 'pre-line', margin: 0 }}>
-          <EditableText
-            value={t.skillsList}
-            field="skillsList"
-            page="resume"
-            language={language}
-            multiline
-            onSave={(v) => handleFieldSave('skillsList', v)}
-          />
-        </p>
+
+        {/* Optional intro text if needed, currently reusing skillsList key or can be new key if desired. 
+            Cleaning up old skillsList text reference since we are moving to categories. 
+        */}
+        {t.skillsList && (
+          <p style={{ whiteSpace: 'pre-line', marginBottom: '24px' }}>
+            <EditableText
+              value={t.skillsList}
+              field="skillsList"
+              page="resume"
+              language={language}
+              multiline
+              onSave={(v) => handleFieldSave('skillsList', v)}
+            />
+          </p>
+        )}
+
+
+        <div style={{ display: "flex", flexDirection: "column", gap: "32px" }}>
+          {t.skillCategories?.map((category, catIndex) => (
+            <div key={catIndex} className="skill-category">
+              <h3 style={{
+                color: catIndex === 0 ? "var(--color-magenta)" :
+                  catIndex === 1 ? "var(--color-neon-green)" :
+                    "var(--color-cyan)",
+                borderBottom: `2px solid ${catIndex === 0 ? "var(--color-magenta)" :
+                  catIndex === 1 ? "var(--color-neon-green)" :
+                    "var(--color-cyan)"}`,
+                paddingBottom: "8px",
+                marginBottom: "16px",
+                display: "inline-block"
+              }}>
+                <EditableText
+                  value={category.title}
+                  field={`skillCategories[${catIndex}].title`}
+                  page="resume"
+                  language={language}
+                  onSave={(v) => handleSkillCategorySave(catIndex, "title", v)}
+                />
+              </h3>
+              <div style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fill, minmax(110px, 1fr))",
+                gap: "16px"
+              }}>
+                {category.skills?.map((skill, skillIndex) => (
+                  <div key={skillIndex} style={{
+                    background: "var(--color-dark-gray)",
+                    border: `2px solid ${catIndex === 0 ? "var(--color-magenta)" :
+                      catIndex === 1 ? "var(--color-neon-green)" :
+                        "var(--color-cyan)"}`,
+                    padding: "12px",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    gap: "8px",
+                    position: "relative",
+                    borderRadius: "8px"
+                  }}>
+                    {isEditing && (
+                      <button
+                        onClick={() => handleSkillRemove(catIndex, skillIndex)}
+                        style={{
+                          position: "absolute",
+                          top: "4px",
+                          right: "4px",
+                          background: "var(--color-red-pink)",
+                          color: "white",
+                          border: "none",
+                          width: "20px",
+                          height: "20px",
+                          fontSize: "14px",
+                          lineHeight: "1",
+                          cursor: "pointer",
+                          zIndex: 10,
+                          borderRadius: "50%"
+                        }}
+                      >
+                        ×
+                      </button>
+                    )}
+                    <div style={{ width: "40px", height: "40px" }}>
+                      <EditableImage
+                        src={skill.icon}
+                        alt={skill.name}
+                        field={`skillCategories[${catIndex}].skills[${skillIndex}].icon`}
+                        page="resume"
+                        language={language}
+                        onSave={(v) => handleSkillSave(catIndex, skillIndex, "icon", v)}
+                        style={{ width: "100%", height: "100%", objectFit: "contain" }}
+                      />
+                    </div>
+                    <span style={{ textAlign: "center", fontSize: "14px", fontWeight: "bold" }}>
+                      <EditableText
+                        value={skill.name}
+                        field={`skillCategories[${catIndex}].skills[${skillIndex}].name`}
+                        page="resume"
+                        language={language}
+                        onSave={(v) => handleSkillSave(catIndex, skillIndex, "name", v)}
+                      />
+                    </span>
+                  </div>
+                ))}
+                {isEditing && (
+                  <button
+                    onClick={() => handleSkillAdd(catIndex)}
+                    style={{
+                      background: "rgba(255,255,255,0.1)",
+                      border: "2px dashed var(--color-white)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      cursor: "pointer",
+                      minHeight: "100px",
+                      color: "var(--color-white)",
+                      fontSize: "24px",
+                      borderRadius: "8px"
+                    }}
+                  >
+                    +
+                  </button>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
 
       <div className="content-card" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
@@ -352,39 +500,6 @@ export default function Skills() {
           )}
         />
       </div>
-
-
-      {/* <div className="content-card">
-        <h2>
-          <EditableText
-            value={t.certifications}
-            field="certifications"
-            page="resume"
-            language={language}
-            onSave={(v) => handleFieldSave('certifications', v)}
-          />
-        </h2>
-        {t.certs?.map((cert, index) => (
-          <p key={index} style={{
-            margin: '8px 0',
-            color: 'var(--color-neon-green)',
-            fontSize: 'clamp(16px, 2.5vw, 18px)',
-            fontWeight: '700'
-          }}>
-            • <EditableText
-              value={cert}
-              field={`certs[${index}]`}
-              page="resume"
-              language={language}
-              onSave={async (v) => {
-                const newCerts = [...t.certs];
-                newCerts[index] = v;
-                await handleFieldSave('certs', newCerts);
-              }}
-            />
-          </p>
-        ))}
-      </div> */}
     </div>
   );
 }
