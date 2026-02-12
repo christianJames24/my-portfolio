@@ -7,13 +7,13 @@
  */
 export const sanitizeInput = (input) => {
     if (typeof input !== 'string') return input;
-    
+
     // Remove HTML tags
     let sanitized = input.replace(/<[^>]*>/g, '');
-    
+
     // Remove script tags and their content
     sanitized = sanitized.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
-    
+
     // Trim whitespace
     return sanitized.trim();
 };
@@ -49,11 +49,11 @@ export const validateName = (name) => {
     if (!name || name.trim().length === 0) {
         return { isValid: false, error: 'Name is required' };
     }
-    
+
     if (!isValidLength(name, 2, 100)) {
         return { isValid: false, error: 'Name must be between 2 and 100 characters' };
     }
-    
+
     return { isValid: true, error: '' };
 };
 
@@ -66,15 +66,20 @@ export const validateEmail = (email) => {
     if (!email || email.trim().length === 0) {
         return { isValid: false, error: 'Email is required' };
     }
-    
+
+    // Allow "anonymous" to pass validation for non-logged in users
+    if (email === "anonymous") {
+        return { isValid: true, error: '' };
+    }
+
     if (!isValidEmail(email)) {
         return { isValid: false, error: 'Invalid email format' };
     }
-    
+
     if (email.length > 255) {
         return { isValid: false, error: 'Email is too long' };
     }
-    
+
     return { isValid: true, error: '' };
 };
 
@@ -87,11 +92,11 @@ export const validateMessage = (message) => {
     if (!message || message.trim().length === 0) {
         return { isValid: false, error: 'Message is required' };
     }
-    
+
     if (!isValidLength(message, 10, 5000)) {
         return { isValid: false, error: 'Message must be between 10 and 5000 characters' };
     }
-    
+
     return { isValid: true, error: '' };
 };
 
@@ -104,11 +109,11 @@ export const validateComment = (text) => {
     if (!text || text.trim().length === 0) {
         return { isValid: false, error: 'Comment cannot be empty' };
     }
-    
+
     if (!isValidLength(text, 1, 1000)) {
         return { isValid: false, error: 'Comment must be between 1 and 1000 characters' };
     }
-    
+
     return { isValid: true, error: '' };
 };
 
@@ -119,22 +124,22 @@ export const validateComment = (text) => {
  */
 export const validateContactForm = (formData) => {
     const errors = {};
-    
+
     const nameValidation = validateName(formData.name);
     if (!nameValidation.isValid) {
         errors.name = nameValidation.error;
     }
-    
+
     const emailValidation = validateEmail(formData.email);
     if (!emailValidation.isValid) {
         errors.email = emailValidation.error;
     }
-    
+
     const messageValidation = validateMessage(formData.message);
     if (!messageValidation.isValid) {
         errors.message = messageValidation.error;
     }
-    
+
     return {
         isValid: Object.keys(errors).length === 0,
         errors

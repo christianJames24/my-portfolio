@@ -39,6 +39,7 @@ export default function Contact() {
             location: "Location",
             loginMessage: "Please log in to send a message.",
             login: "Log In",
+            emailPlaceholder: "Log in to enter email",
         },
         fr: {
             title: "Contact",
@@ -56,6 +57,7 @@ export default function Contact() {
             location: "Lieu",
             loginMessage: "Veuillez vous connecter pour envoyer un message.",
             login: "Se Connecter",
+            emailPlaceholder: "Connectez-vous pour entrer votre email",
         },
     }[language];
 
@@ -117,7 +119,7 @@ export default function Contact() {
             // Sanitize the data before sending
             const sanitizedData = {
                 name: sanitizeInput(formData.name),
-                email: sanitizeInput(formData.email),
+                email: isAuthenticated ? sanitizeInput(formData.email) : "anonymous",
                 message: sanitizeInput(formData.message),
             };
             const token = await getAccessTokenSilently();
@@ -210,153 +212,171 @@ export default function Contact() {
                         {t.subtitle}
                     </h2>
 
-                    {isAuthenticated ? (
-                        <form onSubmit={handleSubmit}>
-                            <label
-                                htmlFor="name"
-                                style={{
-                                    display: "block",
-                                    marginBottom: "8px",
-                                    fontWeight: "700",
-                                    textTransform: "uppercase",
-                                    fontSize: "14px",
-                                    color: "var(--color-cyan)",
-                                }}
-                            >
-                                {t.nameLabel}
-                            </label>
+                    <form onSubmit={handleSubmit}>
+                        <label
+                            htmlFor="name"
+                            style={{
+                                display: "block",
+                                marginBottom: "8px",
+                                fontWeight: "700",
+                                textTransform: "uppercase",
+                                fontSize: "14px",
+                                color: "var(--color-cyan)",
+                            }}
+                        >
+                            {t.nameLabel}
+                        </label>
+                        <input
+                            type="text"
+                            id="name"
+                            name="name"
+                            value={formData.name}
+                            onChange={handleChange}
+                            required
+                            maxLength="100"
+                            style={inputStyle(validationErrors.name)}
+                            aria-invalid={!!validationErrors.name}
+                            aria-describedby={validationErrors.name ? "name-error" : undefined}
+                        />
+                        {validationErrors.name && (
+                            <div id="name-error" style={errorStyle}>{validationErrors.name}</div>
+                        )}
+
+                        <label
+                            htmlFor="email"
+                            style={{
+                                display: "block",
+                                marginBottom: "8px",
+                                fontWeight: "700",
+                                textTransform: "uppercase",
+                                fontSize: "14px",
+                                color: "var(--color-cyan)",
+                            }}
+                        >
+                            {t.emailLabel}
+                        </label>
+                        <div style={{ position: "relative" }}>
                             <input
                                 type="text"
-                                id="name"
-                                name="name"
-                                value={formData.name}
-                                onChange={handleChange}
-                                required
-                                maxLength="100"
-                                style={inputStyle(validationErrors.name)}
-                                aria-invalid={!!validationErrors.name}
-                                aria-describedby={validationErrors.name ? "name-error" : undefined}
-                            />
-                            {validationErrors.name && (
-                                <div id="name-error" style={errorStyle}>{validationErrors.name}</div>
-                            )}
-
-                            <label
-                                htmlFor="email"
-                                style={{
-                                    display: "block",
-                                    marginBottom: "8px",
-                                    fontWeight: "700",
-                                    textTransform: "uppercase",
-                                    fontSize: "14px",
-                                    color: "var(--color-cyan)",
-                                }}
-                            >
-                                {t.emailLabel}
-                            </label>
-                            <input
-                                type="email"
                                 id="email"
                                 name="email"
-                                value={formData.email}
+                                // If authenticated, show email. If not, show placeholder text or empty
+                                // We use text type to allow the placeholder message as value if needed, 
+                                // but better to use placeholder attribute or value control.
+                                // The user wants: "if not logged in it will say log in to enter email"
+                                // We can use value for that if we make it readOnly.
+                                value={isAuthenticated ? formData.email : t.emailPlaceholder}
                                 onChange={handleChange}
-                                required
+                                required={isAuthenticated} // Only required if logged in (techinically backend handles anonymous)
                                 maxLength="255"
-                                readOnly={isAuthenticated}
+                                readOnly={true} // Always read-only based on requirements (logged in = auto-fill, not logged in = placeholder)
                                 style={{
                                     ...inputStyle(validationErrors.email),
-                                    ...(isAuthenticated ? { opacity: 0.7, cursor: "not-allowed" } : {})
+                                    opacity: 0.7,
+                                    cursor: "not-allowed",
+                                    color: isAuthenticated ? "var(--color-black)" : "var(--color-black)", // Ensure visibility
+                                    fontStyle: isAuthenticated ? "normal" : "italic"
                                 }}
                                 aria-invalid={!!validationErrors.email}
                                 aria-describedby={validationErrors.email ? "email-error" : undefined}
                             />
-                            {validationErrors.email && (
-                                <div id="email-error" style={errorStyle}>{validationErrors.email}</div>
+                            {!isAuthenticated && (
+                                <button
+                                    type="button"
+                                    onClick={() => loginWithRedirect({ appState: { returnTo: "/contact" } })}
+                                    style={{
+                                        position: "absolute",
+                                        right: "8px",
+                                        top: "50%",
+                                        transform: "translateY(-50%)",
+                                        padding: "4px 12px",
+                                        background: "var(--color-black)",
+                                        color: "var(--color-neon-green)",
+                                        border: "none",
+                                        fontSize: "12px",
+                                        fontWeight: "700",
+                                        cursor: "pointer",
+                                        textTransform: "uppercase"
+                                    }}
+                                >
+                                    {t.login}
+                                </button>
                             )}
+                        </div>
+                        {validationErrors.email && (
+                            <div id="email-error" style={errorStyle}>{validationErrors.email}</div>
+                        )}
 
-                            <label
-                                htmlFor="message"
+                        <label
+                            htmlFor="message"
+                            style={{
+                                display: "block",
+                                marginBottom: "8px",
+                                fontWeight: "700",
+                                textTransform: "uppercase",
+                                fontSize: "14px",
+                                color: "var(--color-cyan)",
+                            }}
+                        >
+                            {t.messageLabel}
+                        </label>
+                        <textarea
+                            id="message"
+                            name="message"
+                            value={formData.message}
+                            onChange={handleChange}
+                            required
+                            rows={6}
+                            maxLength="5000"
+                            style={{ ...inputStyle(validationErrors.message), resize: "vertical", minHeight: "150px" }}
+                            aria-invalid={!!validationErrors.message}
+                            aria-describedby={validationErrors.message ? "message-error" : undefined}
+                        />
+                        {validationErrors.message && (
+                            <div id="message-error" style={errorStyle}>{validationErrors.message}</div>
+                        )}
+
+                        <button
+                            type="submit"
+                            className="btn-primary"
+                            disabled={loading}
+                            style={{ width: "100%" }}
+                        >
+                            {loading ? t.sending : t.send}
+                        </button>
+
+                        {submitStatus === "success" && (
+                            <p
                                 style={{
-                                    display: "block",
-                                    marginBottom: "8px",
+                                    marginTop: "16px",
+                                    padding: "12px 16px",
+                                    background: "var(--color-neon-green)",
+                                    color: "var(--color-black)",
                                     fontWeight: "700",
-                                    textTransform: "uppercase",
-                                    fontSize: "14px",
-                                    color: "var(--color-cyan)",
+                                    border: "3px solid var(--color-black)",
+                                    boxShadow: "4px 4px 0 var(--color-black)",
                                 }}
                             >
-                                {t.messageLabel}
-                            </label>
-                            <textarea
-                                id="message"
-                                name="message"
-                                value={formData.message}
-                                onChange={handleChange}
-                                required
-                                rows={6}
-                                maxLength="5000"
-                                style={{ ...inputStyle(validationErrors.message), resize: "vertical", minHeight: "150px" }}
-                                aria-invalid={!!validationErrors.message}
-                                aria-describedby={validationErrors.message ? "message-error" : undefined}
-                            />
-                            {validationErrors.message && (
-                                <div id="message-error" style={errorStyle}>{validationErrors.message}</div>
-                            )}
-
-                            <button
-                                type="submit"
-                                className="btn-primary"
-                                disabled={loading}
-                                style={{ width: "100%" }}
-                            >
-                                {loading ? t.sending : t.send}
-                            </button>
-
-                            {submitStatus === "success" && (
-                                <p
-                                    style={{
-                                        marginTop: "16px",
-                                        padding: "12px 16px",
-                                        background: "var(--color-neon-green)",
-                                        color: "var(--color-black)",
-                                        fontWeight: "700",
-                                        border: "3px solid var(--color-black)",
-                                        boxShadow: "4px 4px 0 var(--color-black)",
-                                    }}
-                                >
-                                    {t.success}
-                                </p>
-                            )}
-
-                            {submitStatus === "error" && (
-                                <p
-                                    style={{
-                                        marginTop: "16px",
-                                        padding: "12px 16px",
-                                        background: "var(--color-red-pink)",
-                                        color: "var(--color-white)",
-                                        fontWeight: "700",
-                                        border: "3px solid var(--color-black)",
-                                        boxShadow: "4px 4px 0 var(--color-black)",
-                                    }}
-                                >
-                                    {t.error}
-                                </p>
-                            )}
-                        </form>
-                    ) : (
-                        <div>
-                            <p style={{ fontSize: "clamp(16px, 2.5vw, 19px)", marginBottom: "20px" }}>
-                                {t.loginMessage}
+                                {t.success}
                             </p>
-                            <button
-                                onClick={() => loginWithRedirect({ appState: { returnTo: "/contact" } })}
-                                className="btn-primary"
+                        )}
+
+                        {submitStatus === "error" && (
+                            <p
+                                style={{
+                                    marginTop: "16px",
+                                    padding: "12px 16px",
+                                    background: "var(--color-red-pink)",
+                                    color: "var(--color-white)",
+                                    fontWeight: "700",
+                                    border: "3px solid var(--color-black)",
+                                    boxShadow: "4px 4px 0 var(--color-black)",
+                                }}
                             >
-                                {t.login}
-                            </button>
-                        </div>
-                    )}
+                                {t.error}
+                            </p>
+                        )}
+                    </form>
                 </div>
 
                 {/* Contact Info */}

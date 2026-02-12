@@ -67,8 +67,15 @@ const validateMessage = [
     body('email')
         .trim()
         .notEmpty().withMessage('Email is required')
-        .isEmail().withMessage('Invalid email format')
-        .normalizeEmail()
+        .custom((value, { req }) => {
+            if (value === 'anonymous') return true;
+            if (!validator.isEmail(value)) throw new Error('Invalid email format');
+            return true;
+        })
+        .customSanitizer((value) => {
+            if (value === 'anonymous') return value;
+            return validator.normalizeEmail(value);
+        })
         .isLength({ max: 255 }).withMessage('Email is too long'),
     body('message')
         .trim()
