@@ -25,8 +25,12 @@ export default function Skills() {
         const res = await fetch(`/api/content/resume?lang=${language}`);
         const data = await res.json();
 
+        const localContent = (language === 'en' ? contentEn : contentFr);
         if (data.useClientFallback) {
-          setContent(language === 'en' ? contentEn : contentFr);
+          setContent(localContent);
+        } else if (!data.skillCategories && localContent.skillCategories) {
+          // Merge local skillCategories into DB data to keep experience/education
+          setContent({ ...data, skillCategories: localContent.skillCategories });
         } else {
           setContent(data);
         }
@@ -195,21 +199,7 @@ export default function Skills() {
           />
         </h2>
 
-        {/* Optional intro text if needed, currently reusing skillsList key or can be new key if desired. 
-            Cleaning up old skillsList text reference since we are moving to categories. 
-        */}
-        {t.skillsList && (
-          <p style={{ whiteSpace: 'pre-line', marginBottom: '24px' }}>
-            <EditableText
-              value={t.skillsList}
-              field="skillsList"
-              page="resume"
-              language={language}
-              multiline
-              onSave={(v) => handleFieldSave('skillsList', v)}
-            />
-          </p>
-        )}
+
 
 
         <div style={{ display: "flex", flexDirection: "column", gap: "32px" }}>
