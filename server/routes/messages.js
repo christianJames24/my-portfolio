@@ -6,9 +6,25 @@ const { checkJwt } = require("../config/auth");
 const { requirePermission } = require("../middleware/permissions");
 const { validateMessage, validateId } = require("../utils/validators");
 
+// Simple in-memory rate limiting
+const lastSubmissionByIP = new Map();
+
 // POST - Submit a message (requires authentication)
 router.post("/", validateMessage, async (req, res) => {
+    const ip = req.ip || req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+    const now = Date.now();
+
+    if (lastSubmissionByIP.has(ip)) {
+        const lastTime = lastSubmissionByIP.get(ip);
+        if (now - lastTime < 60000) { // 60 seconds
+            return res.status(429).json({
+                error: "Too many requests. Please wait before sending another message."
+            });
+        }
+    }
+
     try {
+        lastSubmissionByIP.set(ip, now);
         const { name, email, message } = req.body;
         const effectiveEmail = (email && email !== "anonymous") ? email : null;
 

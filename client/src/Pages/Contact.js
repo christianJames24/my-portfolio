@@ -14,6 +14,8 @@ export default function Contact() {
     const [submitStatus, setSubmitStatus] = useState(null);
     const [contactInfo, setContactInfo] = useState(null);
     const [validationErrors, setValidationErrors] = useState({});
+    const [cooldown, setCooldown] = useState(0);
+    const [canSubmit, setCanSubmit] = useState(true);
 
     // Pre-fill email from Auth0 if logged in
     useEffect(() => {
@@ -40,6 +42,7 @@ export default function Contact() {
             loginMessage: "Please log in to send a message.",
             login: "Log In",
             emailPlaceholder: "Log in to enter email",
+            cooldownMsg: (seconds) => `Please wait ${seconds} seconds before sending another message.`,
         },
         fr: {
             title: "Contact",
@@ -58,6 +61,7 @@ export default function Contact() {
             loginMessage: "Veuillez vous connecter pour envoyer un message.",
             login: "Se Connecter",
             emailPlaceholder: "Connectez-vous pour entrer votre email",
+            cooldownMsg: (seconds) => `Veuillez patienter ${seconds} secondes avant d'envoyer un autre message.`,
         },
     }[language];
 
@@ -82,6 +86,34 @@ export default function Contact() {
         fetchContactInfo();
     }, [language]);
 
+    // Cooldown logic
+    useEffect(() => {
+        const lastSent = localStorage.getItem("lastContactSent");
+        if (lastSent) {
+            const timeDiff = Math.floor((Date.now() - parseInt(lastSent)) / 1000);
+            if (timeDiff < 60) {
+                setCooldown(60 - timeDiff);
+                setCanSubmit(false);
+            }
+        }
+    }, []);
+
+    useEffect(() => {
+        let timer;
+        if (cooldown > 0) {
+            timer = setInterval(() => {
+                setCooldown(prev => {
+                    if (prev <= 1) {
+                        setCanSubmit(true);
+                        return 0;
+                    }
+                    return prev - 1;
+                });
+            }, 1000);
+        }
+        return () => clearInterval(timer);
+    }, [cooldown]);
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         // Don't sanitize on every keystroke - only on submit
@@ -97,6 +129,11 @@ export default function Contact() {
         e.preventDefault();
 
         // Client-side validation
+        if (!canSubmit) {
+            notify(t.cooldownMsg(cooldown), "error", 3000);
+            return;
+        }
+
         const validation = validateContactForm(formData);
         if (!validation.isValid) {
             setValidationErrors(validation.errors);
@@ -151,6 +188,13 @@ export default function Contact() {
                 if (!isAuthenticated) {
                     setFormData(prev => ({ ...prev, email: "" }));
                 }
+
+                // Set cooldown
+                const now = Date.now();
+                localStorage.setItem("lastContactSent", now.toString());
+                setCooldown(60);
+                setCanSubmit(false);
+
                 notify(
                     language === "en" ? "Message sent successfully!" : "Message envoyé avec succès!",
                     "success",
@@ -347,10 +391,14 @@ export default function Contact() {
                         <button
                             type="submit"
                             className="btn-primary"
-                            disabled={loading}
-                            style={{ width: "100%" }}
+                            disabled={loading || !canSubmit}
+                            style={{
+                                width: "100%",
+                                opacity: (!canSubmit && !loading) ? 0.6 : 1,
+                                cursor: (!canSubmit && !loading) ? "not-allowed" : "pointer"
+                            }}
                         >
-                            {loading ? t.sending : t.send}
+                            {loading ? t.sending : (!canSubmit ? `${t.send} (${cooldown}s)` : t.send)}
                         </button>
 
                         {submitStatus === "success" && (
