@@ -19,15 +19,18 @@ export default function TopNav() {
 
   return (
     <>
-      <div style={{
-        position: 'fixed',
-        top: '2em',
-        right: '2em',
-        zIndex: 100,
-        display: 'flex',
-        gap: '12px',
-        alignItems: 'center'
-      }}>
+      <div
+        className="topnav-buttons"
+        style={{
+          position: 'fixed',
+          top: '2em',
+          right: '2em',
+          zIndex: 100,
+          display: 'flex',
+          gap: '12px',
+          alignItems: 'center'
+        }}
+      >
         <button
           onClick={toggleTheme}
           className="topnav-btn topnav-theme"
@@ -161,9 +164,15 @@ export default function TopNav() {
         >
           {isAuthenticated ? t.nav.logout : t.nav.login}
         </button>
-      </div>
+      </div >
 
       <style>{`
+        @media (min-width: 1100px) {
+          .topnav-buttons {
+            display: none !important;
+          }
+        }
+
         @media (max-width: 768px) {
           div[style*="top: 2em"][style*="right: 2em"] {
             top: 2em !important;

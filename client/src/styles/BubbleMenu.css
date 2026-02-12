@@ -12,6 +12,13 @@
   z-index: 99;
 }
 
+/* Hide bubble menu on desktop (we use DesktopNavbar instead) */
+@media (min-width: 1100px) {
+  .bubble-menu {
+    display: none !important;
+  }
+}
+
 .bubble-menu.fixed {
   position: fixed;
 }

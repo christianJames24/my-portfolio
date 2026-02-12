@@ -54,7 +54,7 @@ export default function Home({ backendData }) {
       marginLeft: '7.5%',
       padding: '2.5%',
       maxWidth: '800px',
-      marginTop: '-2%',
+      marginTop: '2%',
       height: '98vh',
       display: 'flex',
       flexDirection: 'column',

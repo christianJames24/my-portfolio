@@ -3,6 +3,7 @@ import React, { useEffect, useState, createContext } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import BubbleMenu from "./components/BubbleMenu";
+import DesktopNavbar from "./components/DesktopNavbar";
 import BackgroundGradient from "./components/BackgroundGradient";
 import TopNav from "./components/TopNav";
 import BottomBar from "./components/BottomBar";
@@ -617,6 +618,14 @@ function App() {
 
               <TopNav />
 
+              {/* Desktop Navigation - shows on screens >= 1100px */}
+              <DesktopNavbar
+                items={menuItems}
+                currentPath={location.pathname}
+                onItemClick={handleMenuItemClick}
+              />
+
+              {/* Mobile Bubble Menu - shows on screens < 1100px */}
               <BubbleMenu
                 items={menuItems}
                 currentPath={location.pathname}

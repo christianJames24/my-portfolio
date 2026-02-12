@@ -6,6 +6,7 @@
   filter: brightness(0.5);
   transition: filter 0.2s;
 }
+
 /* index.css */
 
 /* ORIGINAL THEME */
@@ -152,14 +153,14 @@
 /* OSHAWOTT LIGHT THEME */
 :root {
   --font-display: 'TheNeue-Black', 'Arial Black', sans-serif;
-  --font-body: 'Comfortaa','Arial', sans-serif;
-  --font-bold: 'Chintzy', sans-serif;
+  --font-body: 'Comfortaa', 'Arial', sans-serif;
+  --font-bold: 'ComfortaaB', 'Chintzy', sans-serif;
   --font-special: 'Chintzy', sans-serif;
   --font-countdown: 'Gothica', sans-serif;
 
   --color-black: #FFFDF8;
   --color-white: #0E2A3B;
-  --color-dark-gray: #EEF4F7;
+  --color-dark-gray: #EEF4F7b2;
 
   --color-menu-bg: #2F6F95;
   --color-menu-content: #FFFFFF;
@@ -187,7 +188,8 @@
 [data-theme="dark"] {
   --color-black: #000000;
   --color-white: #FFFFFF;
-  --color-dark-gray: #1A1A1A;
+  /* --color-dark-gray: #1A1A1A; */
+  --color-dark-gray: #1a1a1ab2;
 
   --color-menu-bg: #505050;
   --color-menu-content: #FFFFFF;
@@ -228,6 +230,11 @@
   font-family: Comfortaa;
   src: url("../public/assets/Fonts/fonts/Comfortaa-Bold.ttf");
   font-weight: bold;
+}
+
+@font-face {
+  font-family: ComfortaaB;
+  src: url("../public/assets/Fonts/fonts/Comfortaa-Bold.ttf");
 }
 
 @font-face {
@@ -376,7 +383,7 @@ body::before {
 }
 
 /* Sharp accent bar - NO GLOW */
-.page-container::before {
+/* .page-container::before {
   content: '';
   position: absolute;
   top: 60px;
@@ -397,7 +404,7 @@ body::before {
   height: 8px;
   background: var(--color-neon-green);
   transform: rotate(5deg) skewX(10deg);
-}
+} */
 
 @media (min-width: 768px) {
   .page-container::before {
