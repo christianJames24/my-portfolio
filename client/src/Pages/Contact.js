@@ -43,7 +43,7 @@ export default function Contact() {
         },
         fr: {
             title: "Contact",
-            subtitle: "Contactez-moi",
+            subtitle: "Contactez moi",
             nameLabel: "Votre Nom",
             emailLabel: "Votre Email",
             messageLabel: "Votre Message",
